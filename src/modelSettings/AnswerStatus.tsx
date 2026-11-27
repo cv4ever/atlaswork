@@ -19,8 +19,8 @@ export function AnswerStatus({ state, answering, hosted, signedIn, onRetry }: {
     : `${status!.model}${status!.effort ? ` · ${effortLabels[status!.effort]}` : ""} through ${providerLabels[status!.provider]}`
       + (status!.base_url ? ` (${new URL(status!.base_url).host})` : "");
   const note = !answering ? null : hosted ? (signedIn
-    ? "Included with Pro and the trial. Pick your own provider below to answer on any plan, billed by that provider."
-    : "Signed out, nothing answers your agents yet. Sign in for Atlaswork's model, or pick a provider on this device below.")
+    ? "Atlaswork's model is invite-only for now. Pick your own provider below to answer on any plan, billed by that provider."
+    : "Signed out, nothing answers your agents yet. Sign in to connect your own provider, or pick one on this device below.")
     : answering.using === "device" ? `On this device only${status ? `; your account's ${providerLabels[status.provider]} key stays saved for other devices` : ""}.`
     : `Key ${status!.hint}. Works on any plan; your provider bills you.`;
   return (

@@ -1,6 +1,6 @@
-# Cloudflare Pages response headers for atlaswork.app. Scripts: the page's own waitlist.js, Turnstile, and the
-# Cloudflare Web Analytics beacon and email-address decoder Cloudflare adds to the page.
+# Cloudflare Pages response headers for atlaswork.app. Scripts: the Cloudflare Web Analytics beacon and the
+# email-address decoder Cloudflare adds to the page; the page has none of its own.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://mcihsugblojunfpuohim.supabase.co https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

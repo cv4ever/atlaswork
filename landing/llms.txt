@@ -1,6 +1,6 @@
 # Atlaswork
 
-> Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life (home, health, family, money, career and your own), with an AI agent looking after each area. Agents read only what you allow, and every change they suggest can be applied, rejected or undone. It is in closed beta, with a waitlist at https://atlaswork.app/.
+> Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life (home, health, family, money, career and your own), with an AI agent looking after each area. Agents read only what you allow, and every change they suggest can be applied, rejected or undone. It is free to use at https://app.atlaswork.app/ and open source at https://github.com/cv4ever/atlaswork (AGPL-3.0).
 
 Made in Portugal by Carlos Oliveira. Contact: hello@atlaswork.app.
 
@@ -17,15 +17,16 @@ Made in Portugal by Carlos Oliveira. Contact: hello@atlaswork.app.
 ## Data and AI
 
 - Signed in, notes and tasks live in your account and sync across devices; attached files stay on the device that added them. Full backup export at any time.
-- By default replies come from an open model on Cloudflare Workers AI, or Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them.
-- You can connect your own provider instead (OpenRouter, OpenAI, Anthropic or any OpenAI-compatible API) and pay it directly.
+- Agents answer through the AI provider you connect (OpenRouter, OpenAI, Anthropic or any OpenAI-compatible API), billed by that provider. A reply sends only your message, the recent conversation and the notes and tasks that agent may read.
 
 ## Status
 
-- Closed beta: invitations go out in small groups from the waitlist. No public launch date or public pricing yet.
+- Open to everyone: sign in with Google or email. Free with an AI model of your own. Source code: https://github.com/cv4ever/atlaswork.
 
 ## Pages
 
-- [Home and waitlist](https://atlaswork.app/)
+- [Home](https://atlaswork.app/)
+- [App](https://app.atlaswork.app/)
+- [Source on GitHub](https://github.com/cv4ever/atlaswork)
 - [Privacy notice](https://atlaswork.app/privacy)
 - [Terms](https://atlaswork.app/terms)

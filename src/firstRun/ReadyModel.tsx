@@ -39,7 +39,10 @@ export function ReadyModel({ onModel, onLeave }: { onModel: (tab: ModelTab) => v
   const inUse: Way | undefined = !answering ? undefined : hosted ? "hosted" : own ? own.provider === "openrouter" ? "openrouter" : "key"
     : answering.using === "device" && answering.device === localModel?.label ? "local" : undefined;
   const [chosen, setChosen] = useState<Way>();
-  const shown = chosen ?? inUse ?? "hosted";
+  const days = standing?.plan === "trial" ? trialDaysLeft(standing.trialEndsAt, now) : 0;
+  const plan = standing?.plan === "pro" ? "pro" : days > 0 ? "trial" : standing ? "none" : "unknown";
+  // Atlaswork's model is invite-only (launch plan D12), so an account without it starts on OpenRouter's card.
+  const shown = chosen ?? (inUse === "hosted" && plan === "none" ? "openrouter" : inUse) ?? "hosted";
   const [keyKind, setKeyKind] = useState<"openai" | "anthropic">(own?.provider === "anthropic" ? "anthropic" : "openai");
   const go = (tab: ModelTab) => { countUsage("onboarding_model"); onModel(tab); };
   // Nothing on this device can pick a provider: say what's missing, and go where it's fixed.
@@ -51,17 +54,15 @@ export function ReadyModel({ onModel, onLeave }: { onModel: (tab: ModelTab) => v
         <Unplug size={18} aria-hidden="true" />
         <p>{failed ? <><strong>Your AI model isn't answering.</strong> {state.status === "error" && state.message}</>
           : !answering ? "Checking which AI model answers…"
-          : auth ? <><strong>No AI model yet.</strong> Sign in to start Atlaswork's model, free for {trialDays} days, or to connect your own.</>
+          : auth ? <><strong>No AI model yet.</strong> Sign in to connect your own.</>
           : <><strong>No AI model yet.</strong> Agents wait until one is connected.</>}</p>
         {action && <Tip label="Opens your workspace, then Settings"><button type="button" className="secondary-button" onClick={() => go(action.tab)}>{action.label}</button></Tip>}
       </div>
     );
   }
-  const days = standing?.plan === "trial" ? trialDaysLeft(standing.trialEndsAt, now) : 0;
-  const plan = standing?.plan === "pro" ? "pro" : days > 0 ? "trial" : standing ? "none" : "unknown";
   const ways: { way: Way; icon: ReactNode; title: string; line: string; disabled?: boolean }[] = [
     { way: "hosted", icon: <Sparkles size={18} />, title: "Atlaswork",
-      line: plan === "pro" ? "Included with Pro" : plan === "trial" ? `Free for ${days} more ${days === 1 ? "day" : "days"}` : plan === "none" ? "Needs Pro" : "Free for the trial" },
+      line: plan === "pro" ? "Included with Pro" : plan === "trial" ? `Free for ${days} more ${days === 1 ? "day" : "days"}` : "Invite only" },
     { way: "openrouter", icon: <Link2 size={18} />, title: "OpenRouter", line: "1 click · free and paid models" },
     { way: "key", icon: <KeyRound size={18} />, title: "API key", line: "OpenAI-compatible or Anthropic" },
     localModel ? { way: "local", icon: <MessageCircle size={18} />, title: "ChatGPT", line: `Your ${localModel.label} · this device only` }
@@ -90,7 +91,7 @@ export function ReadyModel({ onModel, onLeave }: { onModel: (tab: ModelTab) => v
             <div><dt>Replies</dt><dd>{caps.replies} a day, all agents together, routines included</dd></div>
             <div><dt>Resets</dt><dd>00:00 UTC, {resets}</dd></div>
             <div><dt>Model</dt><dd>One for every agent, no choice of model or thinking</dd></div>
-            <div><dt>{plan === "pro" ? "Plan" : "Afterwards"}</dt><dd>{plan === "pro" ? "Pro, €8 a month" : "Pro at €8 a month, or a model of your own"}</dd></div>
+            <div><dt>{plan === "pro" ? "Plan" : "Afterwards"}</dt><dd>{plan === "pro" ? "Pro" : "Invite only for now; a model of your own works on any plan"}</dd></div>
           </dl>
         </div>
       ) : (

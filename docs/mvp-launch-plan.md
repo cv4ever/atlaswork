@@ -27,6 +27,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
   Pro: a monthly or yearly subscription for live agents and routines on our hosted model, with a fair-use daily limit and a 14-day trial that needs no card.
   Prices and the demand test are private.
   Since 2026-11-09 routines are model calls too (agents-design D43), so they count against the same daily replies.
+  Since 2026-11-27 (Carlos, with open signups) an account that signs itself up starts on Free, and the hosted model is invite-only: an account invited from the admin page starts the 14-day trial (migration `20261127180000_open_signups.sql`), since the free Workers AI budget covers about 70 replies a day for everyone.
 - **D2 Frontend.**
   Host the PWA and the landing page on Cloudflare Pages, free plan.
   Keep them off the VPS: Pages serves the service worker from its global network, and the app stays up if the VPS goes down.
@@ -142,7 +143,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
     Rejected: a sync engine (PowerSync or ElectricSQL), which works offline but adds a service and much more code; a local copy backed up to the server, which isn't real cross-device use.
   - **Files:** bodies stay on the device that added them (D11). Records sync, and another device shows the resource without its file. R2 is the upgrade when that hurts.
   - **First sign-in:** an empty account takes the browser's workspace. An account with data loads as it is, and the browser's copy stays underneath, untouched, for when you sign out.
-  - **Plans:** `public.entitlements`. A new account gets the 14-day Pro trial (D12), and the agent function refuses live replies without Pro or a running trial. Anonymous sign-ins are off, and anonymous users get neither a server workspace nor live replies.
+  - **Plans:** `public.entitlements`. A self-signup starts on Free and an invited account gets the 14-day Pro trial (D12); the agent function refuses hosted replies without Pro or a running trial. Anonymous sign-ins are off, and anonymous users get neither a server workspace nor live replies.
 - **D16 Bring your own model** (decided 2026-11-06, Carlos, required before launch). Any signed-in account, **including the free plan**, can have its agents answer through its own AI provider and pay that provider directly. Pro remains the plan for our hosted model.
   - **Ways in:** Settings → AI model has one Provider row (`src/OwnModelSettings.tsx`, `src/ownModel.ts`, reworked 2026-11-09 at Carlos's request): Atlaswork (the hosted model), OpenRouter, OpenAI API (any OpenAI-compatible address: OpenAI, Groq, Mistral, others), Anthropic API, and on the dev server ChatGPT plan.
     The card above it names the one in use; picking another opens its setup, and the one in use changes only when that setup succeeds ("Use Atlaswork's model" disconnects the stored key).
@@ -202,10 +203,10 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
 ## Launch steps
 
 1. **Define the test.** ~~Decide what's paid, the price, and the success number.~~ Decided 2026-11-05: see D12.
-2. **Fake-door test.** A "coming soon" landing page with real screenshots and a waitlist, live at <https://atlaswork.app> since 2026-11-05; no payments or pricing on the page yet.
-   - `public.waitlist`: nobody can read the list through the API; since 2026-11-13 emails go in only through the `waitlist` Edge Function after a Turnstile check.
-   - Each signup stores `source` = `<utm_source>:<utm_content>:<hero|footer>` (migration `20261105150430_waitlist_source.sql`), so the database counts signups per shared link without cookies. Visits come from Cloudflare Web Analytics.
-   - The waitlist privacy notice is `landing/privacy.html`. Promotion plans and the founder offer are private.
+2. **Fake-door test.** A "coming soon" landing page with real screenshots and a waitlist, live at <https://atlaswork.app> from 2026-11-05 to 2026-11-27; no payments or pricing on the page yet.
+   - `public.waitlist` keeps the addresses that joined; nobody can read it through the API, and the admin page invites from it (step 5).
+   - Each signup stored `source` = `<utm_source>:<utm_content>:<hero|footer>` (migration `20261105150430_waitlist_source.sql`). Visits come from Cloudflare Web Analytics.
+   - Since 2026-11-27 the page sends people to the app and the GitHub repo instead; the `waitlist` Edge Function and `landing/waitlist.js` are gone. Promotion plans and the founder offer are private.
 3. **Prepare the app for strangers.**
    - ~~Replace the demo seed with onboarding and empty states.~~ Done 2026-11-05 (Carlos chose the smallest option): a never-saved workspace starts with five empty areas (Everyday, Health, Family, Finance, Career) and Atlas, whose welcome explains the first step (note → attach → ask for next steps → approve).
      The existing empty states cover Today, tasks and resources.
@@ -236,17 +237,15 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
      Google uses the OAuth client in GCP project `atlaswork`, published to production with only the basic email and profile scopes, so it needs no verification.
    - ~~Resend as custom SMTP (D5).~~ Done 2026-11-06: Supabase sends from `no-reply@auth.atlaswork.app` through `smtp.resend.com` with a sending-only key limited to that domain. A test sign-in link to Resend's `delivered@resend.dev` was delivered.
    - ~~SPF, DKIM, and DMARC records on an auth subdomain.~~ Done: Resend's DKIM, its two return-path CNAMEs and `_dmarc.auth` (`p=none`) in the `atlaswork.app` zone. The domain is verified in Resend.
-   - ~~Raise Supabase's email limit.~~ 30 an hour, lowered to 4 an hour on 2026-11-13: Resend's free 100 a day are shared with FxTT, and a flood of sign-in requests must not use them up. Raise it again with Atlaswork's own Resend team or a paid plan before signups open.
+   - ~~Raise Supabase's email limit.~~ 30 an hour, lowered to 4 an hour on 2026-11-13, raised back to 30 on 2026-11-27 with open signups (Carlos's choice): Resend's free 100 a day are still shared with FxTT, and "Continue with Google" has no limit.
    - ~~Turn on Supabase's CAPTCHA protection.~~ On, with the Turnstile widget "Atlaswork sign-in" (hostnames `atlaswork.app`, `localhost`, `127.0.0.1`).
      An email sign-in without a token is refused (`captcha_failed`).
      Builds must set `VITE_TURNSTILE_SITE_KEY`, or the form waits for a CAPTCHA that never appears.
-   - The app is live at <https://app.atlaswork.app> (2026-11-06, D2) with **new signups closed** (Carlos's decision): only invited accounts can sign in, by email link or Google.
+   - The app is live at <https://app.atlaswork.app> (2026-11-06, D2).
      The owner's account is invited and set to `pro`.
      The hosted site URL is the app; the redirect list adds the local dev and preview servers.
-     Opening signups is one switch: Supabase Auth → "Allow new users to sign up".
-     Gated 2026-11-07 (Carlos: the app is not ready for release and must not be usable by strangers): signed out, `app.atlaswork.app` shows only the waitlist and an invited sign-in (`src/Gate.tsx`); the local-only workspace is no longer reachable there.
-     Since 2026-11-13 the gate covers every deployed host, Cloudflare's `atlaswork-app.pages.dev` and per-deployment addresses included, which had still opened the local workspace; only the dev server and loopback skip it.
-     Opening it again is the `closed` line in `src/main.tsx`.
+     From 2026-11-07 to 2026-11-27 it was a closed beta: signed out, every deployed host showed only the waitlist and an invited sign-in.
+     **Open since 2026-11-27** (Carlos): signups are on (Supabase Auth → "Allow new users to sign up"), the gate is gone, and signed out the app opens the local workspace, where Settings → Account signs in or creates an account. New accounts answer through a model of their own (D12).
    - Security review 2026-11-13, before signups open: a Content-Security-Policy and `frame-ancestors 'none'` on both sites (`public/_headers`, `landing/_headers`); sign-in emails carry a one-time code beside the link; the waitlist needs a Turnstile check and no longer tells whether an address was listed; Auth's before-user-created hook refuses sign-ups on disposable email domains (admin-created and invited accounts skip it); each account gets at most 2,000 of the 8,000 shared Neurons a day.
 6. **Billing.**
    - Stripe Checkout for subscriptions with a trial, plus a webhook (Edge Function) that updates `entitlements` from `customer.subscription.*` events. With Managed Payments, subscriptions must be created through Checkout or Payment Links.
@@ -262,7 +261,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
      Backups keep a deleted account for up to 30 days (D10), as the notice says.
    - Business registration and tax notes are private.
 8. **Measure.** Track signup, activation (first project, first real agent reply), week-1 retention, trial-to-paid conversion, and LLM tokens per user.
-9. **Launch in stages.** A closed beta with 10 to 20 hand-picked users and a support inbox. Open public signups only once paid LLM usage is affordable, since the free LLM tiers (D6) can't support more.
+9. **Launch in stages.** Open to everyone since 2026-11-27 with own models only; the hosted model stays invite-only until paid LLM usage is affordable, since the free LLM tiers (D6) can't support more.
 
 ## Not free
 

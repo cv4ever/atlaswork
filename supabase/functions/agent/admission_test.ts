@@ -19,7 +19,7 @@ function usage(own: OwnModel | null, verdict: string | Error) {
 }
 
 Deno.test("our models refuse for plan, shared budget, the account's share of it and the daily cap, and otherwise admit on our providers", async () => {
-  for (const [verdict, status, error] of [["plan", 403, /need Pro/], ["budget", 429, /shared budget/], ["share", 429, /today's share/],
+  for (const [verdict, status, error] of [["plan", 403, /invite-only/], ["budget", 429, /shared budget/], ["share", 429, /today's share/],
     ["user", 429, new RegExp(`today's ${caps.replies} live`)]] as const) {
     const refused = await createAdmission(usage(null, verdict).rpc, ours).admit("u", "reply");
     assert.ok("error" in refused);
@@ -45,7 +45,7 @@ Deno.test("a long job's next run counts no reply, and stops when the account's s
   const { rpc, calls } = usage(null, "ok");
   assert.deepEqual(await createAdmission(rpc, ours).carry("u"), { providers: ours });
   assert.ok(!calls.some(([name]) => name === "begin_agent_reply"), "the hand-off's one admission covered it");
-  for (const [verdict, error] of [["share", /today's share/], ["budget", /shared budget/], ["plan", /need Pro/]] as const) {
+  for (const [verdict, error] of [["share", /today's share/], ["budget", /shared budget/], ["plan", /invite-only/]] as const) {
     const refused = await createAdmission(usage(null, verdict).rpc, ours).carry("u");
     assert.ok("error" in refused);
     assert.match(refused.error, error);

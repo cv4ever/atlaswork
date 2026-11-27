@@ -1,7 +1,6 @@
 // Fails when the production build carries a dev-only engine (dev/chatgpt/README.md, dev/echo), the admin page
 // (dev/admin, DEVELOPMENT.md "Admin page"), the Agents page's Briefings tab (dev/briefings) or the large seed
-// (dev/large, speed builds only), or has lost the closed-beta gate (src/Gate.tsx, launch plan step 5): strangers at
-// app.atlaswork.app must see the waitlist. Run after `vite build`.
+// (dev/large, speed builds only). Run after `vite build`.
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -18,10 +17,4 @@ if (leaks.length) {
   console.error(`The production bundle contains dev-only adapter code:\n${leaks.join("\n")}`);
   process.exit(1);
 }
-// Opening the app to everyone is a decision: change `closed` in src/main.tsx and this marker in the same commit.
-const gate = "Join the waitlist";
-if (!files.some((file) => readFileSync(file, "utf8").includes(gate))) {
-  console.error(`The production bundle has no closed-beta gate (expected "${gate}" from src/Gate.tsx).`);
-  process.exit(1);
-}
-console.log(`Bundle clean: ${files.length} files, no dev adapter markers, gate present.`);
+console.log(`Bundle clean: ${files.length} files, no dev adapter markers.`);

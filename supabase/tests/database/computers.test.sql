@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(73);
-insert into auth.users (id) values ('00000000-0000-0000-0000-000000000501'), ('00000000-0000-0000-0000-000000000502');
+insert into auth.users (id, invited_at) values ('00000000-0000-0000-0000-000000000501', now()), ('00000000-0000-0000-0000-000000000502', now());
 insert into auth.users (id, is_anonymous) values ('00000000-0000-0000-0000-000000000503', true);
 create temporary table pc (owner text, id uuid, token text);
 grant all on pc to public;

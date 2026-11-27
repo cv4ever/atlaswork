@@ -17,7 +17,7 @@
     "lint:repo": "node scripts/check-files.mjs && node scripts/check-doc-lines.mjs && node scripts/check-doc-paths.mjs && node scripts/design-index.mjs --check && node scripts/check-tokens.mjs && node scripts/check-design-sidecar.mjs",
     "check:bundle": "vite build && node scripts/check-bundle.mjs",
     "check:browser": "node scripts/check-browser.mjs",
-    "test:functions": "deno check supabase/functions/agent/index.ts supabase/functions/waitlist/index.ts supabase/functions/routines/index.ts supabase/functions/connectors/index.ts && deno test supabase/functions && deno check --config desktop/helper/deno.json desktop/helper/main.ts && deno test --config desktop/helper/deno.json --allow-read --allow-write --allow-env desktop/helper",
+    "test:functions": "deno check supabase/functions/agent/index.ts supabase/functions/routines/index.ts supabase/functions/connectors/index.ts && deno test supabase/functions && deno check --config desktop/helper/deno.json desktop/helper/main.ts && deno test --config desktop/helper/deno.json --allow-read --allow-write --allow-env desktop/helper",
     "deploy:landing": "node scripts/deploy-pages.mjs landing atlaswork",
     "landing:shots": "node scripts/landing-shots.mjs",
     "deploy:app": "vite build && node scripts/deploy-pages.mjs dist atlaswork-app",

@@ -16,7 +16,7 @@ export const background = { replies: 3, rounds: 24, lookups: 24, runs: 6, ms: 60
 
 /** What the function says when a reply needs a plan, or the account used today's replies or share; the chat offers its own model on each. */
 export const refusals = {
-  plan: "Live agents need Pro, or your own AI model connected in Settings → AI model.",
+  plan: "Atlaswork's model is invite-only for now. Connect your own AI model in Settings → AI model.",
   replies: (cap: number) => `You've used today's ${cap} live replies. They reset at 00:00 UTC.`,
   background: (count: number) => `Work in the background counts as ${count} replies, and today has fewer left. Send it as a normal message, or wait for 00:00 UTC.`,
   share: "You've used today's share of live agents. It resets at 00:00 UTC, or connect your own AI model in Settings → AI model.",

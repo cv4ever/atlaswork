@@ -115,7 +115,7 @@ Settings saves the account's own provider through the engine (`engine.own`, `acc
   It prints a table of right answers, replies that keep the chat's format (no headings or raw HTML), latency, model calls and the tokens a reply read (with the share its provider served from cache: Workers AI gets the function's `x-session-affinity` key, one per agent), writes every reply to a temp file, and names the cases that started or stopped passing against that model's baseline in `dev/compare/baseline/`; `--save` makes the run the new baseline for the cases it ran, so commit it with the change it measured.
   Run it after changing an agent's instructions, the system prompt or the agent loop: day to day on Carlos's ChatGPT plan (`chatgpt`, free and outside the shared allocation), then once on `workers-ai`, the model Atlaswork's own plan answers on, before a release.
   A pass on the plan's much stronger model doesn't promise one on gpt-oss-120b, so only the Workers AI baseline counts for release.
-  While production is a closed beta with only Carlos's test accounts behind the waitlist, a release doesn't wait for the Workers AI run (Carlos, 2026-11-20): the run is a measurement of what to fix, and it gates releases again once the waitlist opens to real users.
+  A release doesn't wait for the Workers AI run (Carlos, 2026-11-20): the run is a measurement of what to fix. Since 2026-11-27 the hosted model is invite-only, so it reaches only invited accounts.
   The `claude` and `codex` rows call tools through a JSON schema in their CLIs, not through `provider.ts`, so they measure the model, not the adapter an own key uses.
   Run it from this folder with `WORKERS_AI_TOKEN=… node --experimental-strip-types dev/compare/compare.ts [workers-ai] [groq] [chatgpt] [claude] [codex] [--cases=…] [--runs=…] [--save]`.
   The cases live in `dev/compare/cases.ts`; `--draft=<file>` runs one agent's unsaved defaults instead of the saved ones and `--json=<file>` writes each case's result, which is how the admin page's Cases view runs them ("Admin page").
@@ -146,7 +146,6 @@ Signed out, the workspace stays in this browser's IndexedDB.
 - **Disposable addresses:** Auth's before-user-created hook (`hook_before_user_created`, migration `20261113180000_signup_hardening.sql`) refuses sign-ups by email link or Google whose email domain is in `public.blocked_email_domains`. Accounts made or invited through the admin API or dashboard skip it (checked 2026-11-13). Refresh the list with a new migration. The hosted hook is on under Authentication → Hooks.
 - **Local test:** `pnpm exec supabase start`, then put `VITE_SUPABASE_URL=http://127.0.0.1:54321`, the local publishable key and Turnstile's always-pass test site key `1x00000000000000000000AA` in `.env.e2e.local` and run Vite with `--mode e2e` (`.env.local` points at the hosted project).
   Env files beat `VITE_*` inherited from the shell (`vite.config.ts`), and Vite prints the backend it uses (`[env] e2e: backend …`).
-  The waitlist function needs `TURNSTILE_SECRET_KEY` in `supabase/functions/.env` (the test secret `1x0000000000000000000000000000000AA` passes every token) and `pnpm exec supabase functions serve`.
   Throwaway hosted accounts for browser checks: `dev/test-account.mjs`, run with `WORKBENCH_SUPABASE_SECRET_KEY` in the environment (the Bitwarden key of that name).
   The browser checks open their tabs signed out (`scripts/check-tab.mjs`), so a test account's session left on a disposable port doesn't leak into them.
   Sign-in emails land in Mailpit at <http://127.0.0.1:54324>.
@@ -159,11 +158,10 @@ The backup scripts live outside this repo, and the operational runbook is privat
 
 ### Landing page
 
-`landing/` is Atlaswork's "coming soon" page (launch plan step 2 and D13): real screenshots and a waitlist, no pricing or payments yet.
+`landing/` is Atlaswork's home page (launch plan step 2 and D13): what it does, real screenshots, and links to the app and the GitHub repo; no pricing or payments yet.
 It's one `index.html` with no build step, and it reuses the app's fonts and colours.
 Preview it with `python -m http.server 5197 -d landing`.
-Both waitlist forms post to the `waitlist` Edge Function (`landing/waitlist.js`), which stores an email only after a Cloudflare Turnstile check passes and answers the same whether the address was listed before; the table takes no direct inserts.
-The check is invisible unless Cloudflare wants a challenge.
+The page runs no script of its own.
 `landing/_headers` and `public/_headers` set each site's Content-Security-Policy; a new script, frame or API host must be added there or the browser blocks it.
 Retake the screenshots when the app changes: `pnpm run landing:shots` (`scripts/landing-shots.mjs`) builds this checkout, serves a production preview and writes `today.webp`, `project.webp` and the two phone shots from the demo seed in light theme with the status bar hidden, at the sizes the page serves (1920×1200, 780×1688); update their alt texts with what they now show.
 Chat and dialog close-ups are element crops taken by hand the same way, at device scale 2.
@@ -181,12 +179,9 @@ Run Wrangler only through the script: inside this repo, wrangler 4 detects the V
 ### The hosted app
 
 The app itself is the Pages project `atlaswork-app` at <https://app.atlaswork.app> (launch plan D2), built with `.env.production` (committed: every value in it is public).
-The app is closed (launch plan step 5): on every deployed host, Cloudflare's `atlaswork-app.pages.dev` and per-deployment addresses included, a signed-out visitor gets `src/Gate.tsx`, the waitlist (the same `waitlist` function as the landing page, source `app::gate`) with an "Invited?
-Sign in" switch, and only invited accounts open the app.
-Invite one from the Supabase dashboard (Authentication → Users → Invite) or with the admin API.
-The dev server and loopback open the local workspace signed out; `?gate` shows the gate there.
-Opening the app to everyone is one line in `src/main.tsx` (`closed`).
-The gate and the app are separate chunks (`React.lazy` in `src/main.tsx`), so a visitor at the waitlist never downloads the app; `src/appContext.ts` imports only types for the same reason, since the gate's account section reads it.
+Since 2026-11-27 the app is open to everyone (launch plan step 5): signed out, every host opens the local workspace, and Settings → Account signs in or creates an account.
+A self-signup starts on Free and answers through a model of its own; an account invited from the admin page's waitlist, or from the Supabase dashboard (Authentication → Users → Invite), starts the hosted model's 14-day trial (launch plan D12).
+The app is a chunk of its own (`React.lazy` in `src/main.tsx`), loading beside the session check.
 
 ### Desktop app
 

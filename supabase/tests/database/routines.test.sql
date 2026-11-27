@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(17);
-insert into auth.users (id) values ('00000000-0000-0000-0000-000000000101'), ('00000000-0000-0000-0000-000000000102');
+insert into auth.users (id, invited_at) values ('00000000-0000-0000-0000-000000000101', now()), ('00000000-0000-0000-0000-000000000102', now());
 
 set local role anon;
 select throws_ok($$ select public.claim_routine('r', '2026-11-11T08:00:00Z') $$, '42501', null, 'signed-out callers cannot claim a Routine');

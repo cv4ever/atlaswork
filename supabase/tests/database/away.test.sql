@@ -3,8 +3,8 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(18);
-insert into auth.users (id) values ('00000000-0000-0000-0000-000000000201'), ('00000000-0000-0000-0000-000000000202'),
-  ('00000000-0000-0000-0000-000000000203'), ('00000000-0000-0000-0000-000000000204'), ('00000000-0000-0000-0000-000000000205');
+insert into auth.users (id, invited_at) values ('00000000-0000-0000-0000-000000000201', now()), ('00000000-0000-0000-0000-000000000202', now()),
+  ('00000000-0000-0000-0000-000000000203', now()), ('00000000-0000-0000-0000-000000000204', now()), ('00000000-0000-0000-0000-000000000205', now());
 
 set local role anon;
 select throws_ok($$ select public.seen_app('Europe/Lisbon') $$, '42501', null, 'signed-out callers cannot report being seen');

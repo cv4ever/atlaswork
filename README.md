@@ -7,7 +7,7 @@
 <p align="center">
   A personal workspace where AI agents look after the parts of your life.<br>
   <a href="https://atlaswork.app">Website</a> ·
-  <a href="https://app.atlaswork.app">Open the app</a> (closed beta) ·
+  <a href="https://app.atlaswork.app">Open the app</a> ·
   <a href="DEVELOPMENT.md">Development</a> ·
   <a href="https://carlosoliveira.me/">Author</a>
 </p>

@@ -12,8 +12,8 @@ export function HostedChoice({ signedIn, inUse, status, disabled, onUse }: {
 }) {
   return (
     <div className="settings-card own-model-form">
-      <p className="own-model-note">{signedIn ? "Atlaswork's own model, run for you. Live replies need Pro or the trial and have a daily cap."
-        : "Sign in from Settings → Account for Atlaswork's live agents."}</p>
+      <p className="own-model-note">{signedIn ? "Atlaswork's own model, run for you. Invite only for now, with a daily cap."
+        : "Sign in from Settings → Account to connect a model."}</p>
       {signedIn && !inUse && <div className="settings-actions">
         <button className="primary-button" disabled={disabled} onClick={onUse}><CircleCheck size={16} />Use Atlaswork's model</button>
       </div>}

@@ -409,10 +409,6 @@ deno_version = 2
 [functions.agent]
 verify_jwt = false
 
-# The waitlist is public: the function checks a Turnstile token instead of a signed-in user.
-[functions.waitlist]
-verify_jwt = false
-
 # pg_cron calls it with its own secret (ROUTINES_CRON_SECRET), not a user's token.
 [functions.routines]
 verify_jwt = false

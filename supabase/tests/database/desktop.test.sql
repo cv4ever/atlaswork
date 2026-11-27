@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(6);
-insert into auth.users (id) values ('00000000-0000-0000-0000-000000000901');
+insert into auth.users (id, invited_at) values ('00000000-0000-0000-0000-000000000901', now());
 
 select results_eq($$ select public, file_size_limit from storage.buckets where id = 'desktop' $$,
   $$ values (true, 52428800::bigint) $$, 'the bucket is public, for installers up to 50 MB');

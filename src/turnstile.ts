@@ -1,5 +1,5 @@
-// Cloudflare Turnstile, the "not a bot" check in front of sign-in emails (Supabase's CAPTCHA protection) and the
-// waitlist (supabase/functions/waitlist). Builds without VITE_TURNSTILE_SITE_KEY show no widget and send no token.
+// Cloudflare Turnstile, the "not a bot" check in front of sign-in emails (Supabase's CAPTCHA protection). Builds
+// without VITE_TURNSTILE_SITE_KEY show no widget and send no token.
 import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {

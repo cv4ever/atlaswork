@@ -156,8 +156,8 @@ export function AccountSection({ user, onExport }: { user: string | null; onExpo
 }
 
 /**
- * The signed-in account's plan and today's live replies. Its own component because it reads the engine from the app's
- * context, which the signed-out gate (src/Gate.tsx) doesn't have.
+ * The signed-in account's plan and today's live replies, in a component of its own because it reads the engine from
+ * the app's context.
  */
 function PlanAndUsage() {
   // undefined while loading, null if it couldn't be read.

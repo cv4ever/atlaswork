@@ -44,16 +44,11 @@ const fresh = params.has("fresh") && !localStorage.getItem("atlaswork.auth");
 const large = (import.meta.env.DEV || import.meta.env.MODE === "speed") && fresh && params.get("fresh") === "large";
 const freshNew = fresh && params.get("fresh") === "new";
 const demo = fresh && !freshNew && !large;
-// Closed beta (launch plan step 5): on every deployed host (app.atlaswork.app and Cloudflare's *.pages.dev addresses),
-// strangers get the waitlist and invited people a sign-in. Only the dev server and loopback (the speed check's local
-// production preview) still open the local workspace signed out; `?gate` shows the gate there.
-const local = import.meta.env.DEV || location.hostname === "localhost" || location.hostname === "127.0.0.1";
-// The app and the gate are chunks of their own, so a stranger at the waitlist never downloads the app. The one this
-// device most likely shows starts loading now, beside the session check, so the first paint doesn't wait on a second
-// round trip; the guess only orders the downloads, the session decides which one draws.
+// The app is a chunk of its own that starts loading now, beside the session check, so the first paint doesn't wait on
+// a second round trip. Since 2026-11-27 the app is open to everyone (launch plan step 5): signed out, it opens the
+// local workspace, and Settings → Account signs in or creates an account.
 const App = lazy(() => import("./App.tsx"));
-const Gate = lazy(() => import("./Gate.tsx"));
-void ((local && !params.has("gate")) || localStorage.getItem("atlaswork.auth") ? import("./App.tsx") : import("./Gate.tsx"));
+void import("./App.tsx");
 const ready = fresh ? clearWorkspace().then(() => {
   params.delete("fresh");
   history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}${location.hash}`);
@@ -125,13 +120,12 @@ ready
     } };
     // Dynamic like the dev engines: behind the DEV guard, production bundles drop dev/ and the portrait with it.
     const portrait = import.meta.env.DEV ? (await import("../dev/profile/index.ts")).portrait : undefined;
-    const closed = (!local || params.has("gate")) && !signedIn;
     createRoot(document.getElementById("root")!).render(
       <StrictMode>
-        <Tips><Suspense fallback={null}>{closed ? <Gate /> : (
+        <Tips><Suspense fallback={null}>
           <App store={store} engine={engine} signedIn={signedIn} portrait={portrait} away={signedIn ? createAway(account!) : null}
             outbox={outbox} readJobs={signedIn ? account!.read : undefined} />
-        )}</Suspense></Tips>
+        </Suspense></Tips>
       </StrictMode>,
     );
   });

@@ -1,5 +1,5 @@
-// Creates the app's services once. Apart from appContext.tsx, so a component that only reads the context (the
-// closed-beta gate's account section among them) doesn't pull the Workbench, the Room and every action into its chunk.
+// Creates the app's services once. Apart from appContext.tsx, so a component that only reads the context doesn't pull
+// the Workbench, the Room and every action into its chunk.
 import { createRef } from "react";
 import { Actions } from "./actions.ts";
 import type { App } from "./appContext.ts";

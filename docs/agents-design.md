@@ -551,6 +551,7 @@ Agreed on 2026-10-19 and built the same day (simulated replies). Decisions are n
   A refusal a model of your own would lift (out of today's replies or today's share of the budget, or no plan: `needsOwnModel` in `caps.ts`, the function's own wording) gets a Connect your own model button under the error.
   Claude Pro/Max can't be offered (launch plan D16), and the ChatGPT plan waits on OpenAI's approval, so "your subscription" means OpenRouter's one-click sign-in for now.
   Counts: `onboarding_model` when the row's action is taken, `own_model_connected` when a model of your own is saved with a new key or OpenRouter's sign-in finishes (migration `20261113200000_model_counts.sql`).
+  Since 2026-11-27 (open signups, launch plan D12) a self-signup starts on Free: Atlaswork's card reads "Invite only", Ready opens on OpenRouter's card when Atlaswork's model can't answer for this account, and signed out the row says "Sign in to connect your own."
 - **D49 What agents remember** (2026-11-14, Carlos chose memory across sessions after the agent-harness review: keep the in-house loop, memories as visible records owned by places and by you, landing with Undo whatever the write mode).
   Extends D28 (sessions start fresh), D31 (the request) and D46 (Briefing).
   **What it is.** A Memory (`Memory` in `src/model.ts`, a `memory:<id>` Workspace record, migration `20261113210000_memory_records.sql`) is one short sentence, at most 200 characters, about a place (a domain, or one of its projects) or about you (`domain` "").

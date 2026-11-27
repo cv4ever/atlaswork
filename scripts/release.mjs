@@ -7,7 +7,7 @@
 // ships anyway and says so). Then, in order: the full check, the desktop app's build when the plan publishes a new
 // version (agents-design D85: signed with the update key from Bitwarden, built before anything ships so a failed build
 // changes nothing), the database tests on a throwaway local stack when the plan has migrations (CI's database
-// workflow may not have run: Actions minutes run out), database migrations, the agent and waitlist Edge Functions,
+// workflow may not have run: Actions minutes run out), database migrations, the agent, routines and connectors Edge Functions,
 // the app (app.atlaswork.app) and the landing page (atlaswork.app), each site only when its plan changed, and last
 // the desktop app's update (`publish-desktop.mjs`), so computers never run ahead of the server. Stops at the first
 // failure.
@@ -107,7 +107,7 @@ try {
     writeFileSync(config, original);
   }
   step("Database migrations", "pnpm", ["exec", "supabase", "db", "push", `--remote=${projectRef}`, "--yes"], dir, env);
-  for (const name of ["agent", "waitlist", "routines", "connectors"]) {
+  for (const name of ["agent", "routines", "connectors"]) {
     step(`${name} function`, "pnpm", ["exec", "supabase", "functions", "deploy", name, "--project-ref", projectRef, "--yes"], dir, env);
   }
   const pages = { ...env, CLOUDFLARE_API_TOKEN: token };

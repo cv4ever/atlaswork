@@ -2,10 +2,11 @@
 -- steps 2, 4 and 5). Run: pnpm exec supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(82);
+select plan(83);
 
-insert into auth.users (id) values ('00000000-0000-0000-0000-000000000001'), ('00000000-0000-0000-0000-000000000002');
+insert into auth.users (id, invited_at) values ('00000000-0000-0000-0000-000000000001', now()), ('00000000-0000-0000-0000-000000000002', now());
 insert into auth.users (id, is_anonymous) values ('00000000-0000-0000-0000-000000000003', true);
+insert into auth.users (id) values ('00000000-0000-0000-0000-000000000004');
 
 -- The waitlist: only the waitlist function (service role, after a Turnstile check) adds an email and a source.
 set local role anon;
@@ -62,10 +63,13 @@ set local role authenticated;
 select throws_ok($$ select public.hook_before_user_created('{}') $$, '42501', null, 'users cannot call the signup hook');
 set local role service_role;
 
--- Entitlements: a new account starts a trial and can read but never change it.
+select is((select plan from public.entitlements where user_id = '00000000-0000-0000-0000-000000000004'), 'free',
+  'an account that signed itself up starts on Free, without the hosted model');
+
+-- Entitlements: an invited account starts a trial and can read but never change it.
 set local role authenticated;
 set local request.jwt.claims = '{"sub": "00000000-0000-0000-0000-000000000001", "role": "authenticated"}';
-select is((select plan from public.entitlements), 'trial', 'a new account reads its own trial, and only its own');
+select is((select plan from public.entitlements), 'trial', 'an invited account reads its own trial, and only its own');
 select throws_ok($$ update public.entitlements set plan = 'pro' $$, '42501', null, 'a user cannot upgrade themselves');
 select throws_ok($$ insert into public.entitlements (user_id, plan) values ('00000000-0000-0000-0000-000000000001', 'pro') $$, '42501', null, 'a user cannot grant themselves a plan');
 

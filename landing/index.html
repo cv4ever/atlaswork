@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlaswork: AI agents for your notes and tasks that ask first</title>
-<meta name="description" content="Notes, tasks and projects for every part of your life, with an AI agent for each. They plan, check in and suggest; you apply or undo. Join the closed beta.">
+<meta name="description" content="Notes, tasks and projects for every part of your life, with an AI agent for each. They plan, check in and suggest; you apply or undo. Free and open source.">
 <link rel="canonical" href="https://atlaswork.app/">
 <meta name="theme-color" content="#f7f5ef">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Atlaswork">
 <meta property="og:url" content="https://atlaswork.app/">
 <meta property="og:title" content="Atlaswork: AI agents for your life that ask first">
-<meta property="og:description" content="Notes, tasks and projects for home, family, health, money and career, with an AI agent for each. They suggest, you decide. In closed beta: join the waitlist for an invitation.">
+<meta property="og:description" content="Notes, tasks and projects for home, family, health, money and career, with an AI agent for each. They suggest, you decide. Free and open source.">
 <meta property="og:image" content="https://atlaswork.app/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -60,13 +60,13 @@
     {
       "@type": "FAQPage",
       "mainEntity": [
-        { "@type": "Question", "name": "What is Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira and is in closed beta." } },
+        { "@type": "Question", "name": "What is Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira, and its source is open on GitHub under the AGPL-3.0 license." } },
         { "@type": "Question", "name": "Can the agents change my notes without asking?", "acceptedAnswer": { "@type": "Answer", "text": "Only if you let them. You set each agent to ask first, so every change arrives as a proposal you apply or reject, or to act straight away with Undo. You also choose what each agent may read and which tools it may use." } },
-        { "@type": "Question", "name": "Which AI answers, and is my data used for training?", "acceptedAnswer": { "@type": "Answer", "text": "By default an open model on Cloudflare Workers AI answers, or on Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them." } },
-        { "@type": "Question", "name": "Can I use my own AI provider?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay that provider directly. Every agent and routine then answers through it." } },
+        { "@type": "Question", "name": "Which AI answers, and is my data used for training?", "acceptedAnswer": { "@type": "Answer", "text": "The AI model you connect: OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, billed by that provider. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Whether your provider keeps or trains on them is set by its terms." } },
+        { "@type": "Question", "name": "Is Atlaswork open source?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The app, the backend and the Windows app are on GitHub at github.com/cv4ever/atlaswork under the AGPL-3.0 license. You can read the code, run your own copy and contribute." } },
         { "@type": "Question", "name": "Does it work on my phone?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Install Atlaswork from your phone's browser. Phones get their own layout with Today, Projects, Capture and Chat one tap away, and on Android Atlaswork appears in the Share sheet." } },
         { "@type": "Question", "name": "Do my notes sync between devices?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Signed in, your notes and tasks live in your account and open on every device. Files you attach stay on the device that added them. You can export a full backup at any time and delete your account from Settings." } },
-        { "@type": "Question", "name": "When can I use Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Atlaswork is in closed beta. Join the waitlist at atlaswork.app and invitations go out in small groups. There is no public launch date yet." } }
+        { "@type": "Question", "name": "When can I use Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Now. Open app.atlaswork.app and sign in with Google or your email. It's free with an AI model of your own." } }
       ]
     }
   ]
@@ -119,7 +119,7 @@
   .cast span { position: absolute; left: 12px; bottom: 12px; padding: 3px 10px; border-radius: 999px; background: var(--panel); font-size: .85rem; font-weight: 600; line-height: 1.5; }
   .cast .lead span { font: 600 1.15rem/1.4 Fraunces, Georgia, serif; padding: 4px 14px; left: 16px; bottom: 16px; }
   @media (prefers-reduced-motion: reduce) { .cast li { transition: none; } }
-  /* Phones: the cast is one row of faces above the headline, so the headline and the waitlist stay in the first screen. */
+  /* Phones: the cast is one row of faces above the headline, so the headline and the buttons stay in the first screen. */
   @media (max-width: 899px) {
     .cast { order: -1; display: flex; align-items: center; gap: 0; }
     .cast li, .cast li:nth-child(even) { rotate: none; width: 52px; flex: none; }
@@ -130,10 +130,14 @@
     .hero { padding-top: 16px; gap: 24px; }
   }
   .soon { margin-top: 1.5rem; font-weight: 600; }
-  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 10px;
-    font: 600 1rem "DM Sans", sans-serif; border: 1px solid transparent; cursor: pointer; background: var(--accent); color: var(--panel); }
+  .soon a { color: inherit; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+  .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 10px;
+    font: 600 1rem "DM Sans", sans-serif; border: 1px solid transparent; cursor: pointer; background: var(--accent); color: var(--panel); text-decoration: none; }
   .button:hover { background: var(--accent-hover); }
-  .button:disabled { opacity: .7; cursor: progress; }
+  .button.quiet { background: var(--panel); color: var(--ink); border-color: var(--line-field); }
+  .button.quiet:hover { background: var(--line); }
+  .button svg { width: 18px; height: 18px; fill: currentColor; }
   figure { margin: 0; }
   section figure { margin-top: 2.5rem; }
   .split figure { margin-top: 0; }
@@ -180,14 +184,7 @@
   @media (prefers-reduced-motion: reduce) { .faq summary::after { transition: none; } }
   .faq details p { padding: 0 0 20px; color: var(--secondary); max-width: 62ch; }
 
-  .waitlist { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; max-width: 30rem; }
-  .waitlist label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .waitlist input { flex: 1 1 16rem; min-height: 48px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-field); background: var(--panel); color: var(--ink); font: inherit; }
-  .waitlist .human-check { flex-basis: 100%; }
-  .waitlist .human-check:empty { display: none; }
-  .waitlist [role=status] { flex-basis: 100%; min-height: 1.6em; font-size: .95rem; }
-  .waitlist [role=status].error { color: var(--error); }
-  .waitlist .privacy { flex-basis: 100%; font-size: .88rem; color: var(--secondary); }
+  .join-note { margin-top: 1rem; font-size: .92rem; color: var(--secondary); max-width: var(--measure); }
 
   footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--secondary); font-size: .92rem; }
   footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
@@ -197,7 +194,7 @@
 <body>
 <header class="wrap">
   <a class="brand" href="#top"><img src="atlas.webp" alt="">Atlaswork</a>
-  <a class="to-join" href="#join">Join the waitlist</a>
+  <a class="to-join" href="https://app.atlaswork.app">Open the app</a>
 </header>
 
 <main id="top">
@@ -206,15 +203,11 @@
       <h1>AI agents for your life that ask before they change anything.</h1>
       <svg class="underline" viewBox="0 0 180 12" aria-hidden="true"><path d="M2 8 C 40 2, 70 12, 110 6 S 160 3, 178 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
       <p class="lede">Atlaswork keeps your notes, tasks and projects for home, family, health, money and career, with an AI agent looking after each. They plan, check in and suggest. You apply what you want and undo the rest.</p>
-      <p class="soon">Atlaswork is in closed beta. Join the waitlist and we'll invite people in small groups.</p>
-      <form class="waitlist" data-placement="hero" novalidate>
-        <label for="email-top">Email address</label>
-        <input id="email-top" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-        <button class="button" type="submit">Join the waitlist</button>
-        <div class="human-check"></div>
-        <p role="status"></p>
-        <p class="privacy">We'll use your email only to invite you to the beta and to tell you when Atlaswork opens. To request removal, contact <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>. Read the <a href="privacy.html">privacy notice</a>.</p>
-      </form>
+      <p class="soon">Free, and now <a href="https://github.com/cv4ever/atlaswork">open source on GitHub</a>.</p>
+      <div class="actions">
+        <a class="button" href="https://app.atlaswork.app">Open the app</a>
+        <a class="button quiet" href="https://github.com/cv4ever/atlaswork"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>View on GitHub</a>
+      </div>
     </div>
     <ul class="cast" aria-label="The agents">
       <li class="lead"><img src="atlas.webp" width="464" height="464" alt="" fetchpriority="high"><span>Atlas</span></li>
@@ -235,7 +228,7 @@
           <source media="(max-width: 600px)" srcset="phone-today.webp" width="780" height="1688">
           <img class="shot" src="today.webp" width="1920" height="1200" loading="lazy" alt="Atlaswork's Today page at 14:40: Good afternoon, 0 done, 10 to go, 4 carried over. A line from 07 to 23 has the sun at now, tasks at their hours and the agents' suggested steps dashed with their faces. Below, Anytime today lists tasks with no time yet and the rituals to tick, then Morning, Afternoon and Evening. Beside it, Your crew today: Atlas says Book blood work matters most, then suggests times at 17:30, 19:30 and 21:00, each with a reason and Apply, Other time, See it and Not now.">
         </picture>
-        <figcaption>Today in the closed beta, from the demo workspace. The app may change before it opens to everyone.</figcaption>
+        <figcaption>Today, from the demo workspace.</figcaption>
       </figure>
     </div>
   </section>
@@ -340,8 +333,8 @@
       <h2>Your notes on every device. AI only when you ask.</h2>
       <div class="facts">
         <p>Signed in, your notes and tasks live in your account and open on your phone and computer. Files you attach stay on the device that added them. Export a full backup any time.</p>
-        <p>Live AI replies need an internet connection. Your message and recent conversation, with only the notes and tasks that agent may read, go to an open model on Cloudflare, or on Groq when Cloudflare is busy. Neither keeps them or trains on them.</p>
-        <p>Prefer your own AI? Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay it directly.</p>
+        <p>Live AI replies need an internet connection. Your message and recent conversation, with only the notes and tasks that agent may read, go to the AI model you connected, under that provider's terms.</p>
+        <p>Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay it directly.</p>
       </div>
     </div>
   </section>
@@ -363,7 +356,7 @@
       <div class="faq">
         <details>
           <summary>What is Atlaswork?</summary>
-          <p>Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira and is in closed beta.</p>
+          <p>Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira, and its source is open on <a href="https://github.com/cv4ever/atlaswork">GitHub</a> under the AGPL-3.0 license.</p>
         </details>
         <details>
           <summary>Can the agents change my notes without asking?</summary>
@@ -371,11 +364,11 @@
         </details>
         <details>
           <summary>Which AI answers, and is my data used for training?</summary>
-          <p>By default an open model on Cloudflare Workers AI answers, or on Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them.</p>
+          <p>The AI model you connect: OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, billed by that provider. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Whether your provider keeps or trains on them is set by its terms.</p>
         </details>
         <details>
-          <summary>Can I use my own AI provider?</summary>
-          <p>Yes. Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay that provider directly. Every agent and routine then answers through it.</p>
+          <summary>Is Atlaswork open source?</summary>
+          <p>Yes. The app, the backend and the Windows app are on <a href="https://github.com/cv4ever/atlaswork">GitHub</a> under the AGPL-3.0 license. You can read the code, run your own copy and contribute.</p>
         </details>
         <details>
           <summary>Does it work on my phone?</summary>
@@ -387,7 +380,7 @@
         </details>
         <details>
           <summary>When can I use Atlaswork?</summary>
-          <p>Atlaswork is in closed beta. Join the waitlist below and invitations go out in small groups. There is no public launch date yet.</p>
+          <p>Now. Open the app and sign in with Google or your email. It's free with an AI model of your own.</p>
         </details>
       </div>
     </div>
@@ -395,16 +388,13 @@
 
   <section id="join">
     <div class="wrap">
-      <h2>Get an invitation to the beta</h2>
-      <p class="lede">Join the waitlist. We invite people in small groups, and early testers shape what Atlaswork becomes.</p>
-      <form class="waitlist" data-placement="footer" novalidate>
-        <label for="email-end">Email address</label>
-        <input id="email-end" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
-        <button class="button" type="submit">Join the waitlist</button>
-        <div class="human-check"></div>
-        <p role="status"></p>
-        <p class="privacy">We'll use your email only to invite you to the beta and to tell you when Atlaswork opens. To request removal, contact <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>. Read the <a href="privacy.html">privacy notice</a>.</p>
-      </form>
+      <h2>Start now</h2>
+      <p class="lede">Sign in with Google or your email, connect an AI model of your own, and meet your crew.</p>
+      <div class="actions">
+        <a class="button" href="https://app.atlaswork.app">Open the app</a>
+        <a class="button quiet" href="https://github.com/cv4ever/atlaswork">View on GitHub</a>
+      </div>
+      <p class="join-note">Atlaswork is open source under the AGPL-3.0 license. Read the <a href="privacy.html">privacy notice</a> and the <a href="terms.html">terms</a>.</p>
     </div>
   </section>
 </main>
@@ -416,6 +406,5 @@
   </div>
 </footer>
 
-<script src="waitlist.js" defer></script>
 </body>
 </html>

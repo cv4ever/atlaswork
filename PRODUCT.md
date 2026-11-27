@@ -14,7 +14,7 @@ An installable PWA (React, TypeScript, Vite) at app.atlaswork.app, used on deskt
 
 Individuals organising their own life: notes, tasks and projects across areas such as Everyday, Health, Family, Finance and Career. They return to the app daily to capture, plan and review, and want AI help without giving an assistant free rein over their records.
 
-Today the app is a closed beta: invited accounts only, everyone else gets the waitlist.
+Since 2026-11-27 the app is open to everyone and its source is public (AGPL-3.0). New accounts answer through an AI model of their own; Atlaswork's hosted model is invite-only.
 
 ## Product Purpose
 
