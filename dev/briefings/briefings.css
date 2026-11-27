@@ -1,0 +1,34 @@
+/* The Agents page's dev-only Briefings tab: every agent's briefing size side by side, a row unfolding to its lines and tools. */
+.briefings { display: grid; gap: 12px; }
+.briefings-note { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+.briefings-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.briefings-table th, .briefings-table td { padding: 8px; border-bottom: 1px solid var(--line); text-align: start; vertical-align: middle; }
+.briefings-table thead th { color: var(--muted); font-size: var(--text-xs); font-weight: 600; }
+.briefings-num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.briefings-table td.briefings-num { text-align: end; }
+.briefings-num small { display: block; color: var(--muted); font-size: var(--text-xs); }
+.briefings-who { display: flex; align-items: center; gap: 8px; text-align: start; }
+.briefings-who img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.briefings-who strong { display: block; }
+.briefings-who small { display: block; color: var(--muted); font-size: var(--text-xs); font-weight: 400; }
+.briefings-total { display: block; font-weight: 600; font-variant-numeric: tabular-nums; }
+.briefings-bar { display: flex; inline-size: 120px; block-size: 6px; margin-top: 4px; border-radius: var(--radius-pill); background: var(--recessed); overflow: hidden; }
+.briefings-bar > i { background: var(--accent); }
+.briefings-bar > b { background: var(--clay); }
+.briefings-can { max-inline-size: 260px; color: var(--secondary); font-size: var(--text-xs); }
+.briefings-row[data-open] > * { border-bottom-color: transparent; }
+.briefings-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 12px; color: var(--secondary); font-size: var(--text-xs); }
+.briefings-columns { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+.briefings-prompt, .briefings-tools { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.briefings-prompt li { padding-left: 8px; border-left: 3px solid var(--source, var(--line-strong)); white-space: pre-wrap; font-size: var(--text-xs); line-height: 1.5; }
+.briefings-prompt li > span { display: block; color: var(--muted); font-weight: 600; }
+.briefings-prompt li[data-from="agent"] { --source: var(--sage); }
+.briefings-prompt li[data-from="every"] { --source: var(--accent); }
+.briefings-prompt li[data-from="you"] { --source: var(--ochre); }
+.briefings-prompt li[data-from="memory"] { --source: color-mix(in oklab, var(--ochre) 50%, var(--sage)); }
+.briefings-prompt li[data-from="tools"] { --source: var(--clay); }
+.briefings-prompt li[data-from="workspace"] { --source: var(--secondary); }
+.briefings-tools li { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: var(--text-xs); }
+.briefings-tools li > span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.briefings-tools li > small { grid-column: 1 / -1; color: var(--secondary); line-height: 1.5; }
+@media (max-width: 760px) { .briefings-columns { grid-template-columns: 1fr; } .briefings-table { display: block; overflow-x: auto; } }

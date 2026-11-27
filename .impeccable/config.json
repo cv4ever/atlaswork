@@ -1,0 +1,45 @@
+{
+  "buildPath": "code",
+  "telemetry": false,
+  "detector": {
+    "ignoreRules": ["nested-cards", "repeated-container-text"],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "fraunces",
+        "reason": "Brand font: Fraunces is the Atlaswork title face"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": ["**"],
+        "reason": "The default Garden theme's warm paper canvas (#f7f5ef) is the brand's North Star in DESIGN.md, and the landing page reuses it"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": ["landing/**"],
+        "reason": "False positive: the detector misreads the font shorthand '\"DM Sans\", system-ui, sans-serif'; the face is DM Sans, which DESIGN.md declares"
+      },
+      {
+        "rule": "line-length",
+        "value": "*",
+        "files": ["**view=chats*"],
+        "reason": "Carlos, 2026-11-22 (4647db3): Chats page messages fill the transcript's width like its cards and composer, not a 56ch measure"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": ["src/styles/base.css"],
+        "reason": "Carlos, 2026-11-23: the themes' title faces (Instrument Serif, Young Serif, Newsreader, Inter Tight, Bricolage Grotesque) are declared in DESIGN.md, Typography, 'Theme title faces'; the frontmatter keeps Garden's"
+      },
+      {
+        "rule": "overused-font",
+        "value": "*",
+        "files": ["src/styles/base.css"],
+        "reason": "Carlos, 2026-11-23: Linen's Instrument Serif and Frost's Inter Tight titles were chosen from the theme mockups"
+      }
+    ]
+  }
+}

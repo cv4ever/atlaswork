@@ -1,0 +1,247 @@
+/* Teams on the Agents page, and the Chats page: tabs, the live conversation, history, context windows and details. */
+/* restyles: .workspace-content .chat-message */
+/* Agents page sections and team cards. */
+.roster-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin: 32px 0 0; font: 600 var(--text-2xl)/1.3 var(--font-title); }
+.roster-heading small { font: 400 var(--text-sm)/1.5 var(--font-body, inherit); color: var(--muted); }
+.roster-heading + .agent-roster { margin-top: 14px; }
+/* Agents and Teams share the page; the switch counts each, and the chosen icon gives a little wave. */
+.crew-switch { width: fit-content; margin: 2px 0 24px; border-radius: var(--radius-pill); }
+.crew-switch > button { position: relative; gap: 8px; padding: 8px 14px; font-size: var(--text-sm); border-radius: var(--radius-pill); }
+.crew-switch > button[aria-pressed="true"] svg { animation: crew-wave var(--motion-flourish) var(--ease-spring); }
+@keyframes crew-wave { 30% { rotate: -16deg; scale: 1.15; } 60% { rotate: 10deg; } }
+.crew-count { min-width: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--recessed); color: var(--muted); font-size: var(--text-2xs); line-height: 18px; text-align: center; }
+.crew-unread { position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--recessed); }
+.crew-hint { color: var(--muted); font-size: var(--text-sm); margin-bottom: 16px; }
+.agents-page .agent-boundaries { margin-top: 44px; padding-top: 22px; border-top: 1px dashed var(--line-strong); }
+.team-roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.team-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: left;
+  animation: bed-rise var(--motion-enter) calc(min(var(--i, 0), 8) * 50ms) var(--ease-spring) backwards;
+  transition: translate var(--motion-settle) var(--ease-settle), box-shadow var(--motion-quick);
+}
+.team-card:hover { translate: 0 -3px; box-shadow: var(--shadow); }
+.team-card h3 { font: 600 var(--text-2xl)/1.25 var(--font-title); letter-spacing: -0.3px; }
+.team-card > p { color: var(--secondary); font-size: var(--text-sm); line-height: 1.55; }
+.team-card .agent-card-chips { justify-content: flex-start; }
+.team-card .agent-card-foot .text-button { display: inline-flex; align-items: center; gap: 6px; }
+.team-faces { position: relative; display: flex; margin: 8px 0 6px; }
+.team-faces > button { position: relative; border-radius: 50%; transition: translate var(--motion-settle) var(--ease-settle), rotate var(--motion-settle) var(--ease-settle); }
+.team-faces > button + button { margin-left: -14px; }
+.team-faces img { display: block; width: 52px; height: 52px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--panel); }
+/* Hovering the card fans the team out like a hand of cards; the face under the pointer hops up. */
+.team-card:hover .team-faces > button { translate: calc(var(--n) * 7px) 0; rotate: calc((var(--n) - 1) * 4deg); }
+.team-card .team-faces > button:hover { translate: calc(var(--n) * 7px) -6px; z-index: var(--layer-raised); }
+.team-faces > button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.team-members { color: var(--secondary); font-size: var(--text-sm); }
+/* Picking a team's or a room's members: a face, a name and a role per agent; the order picked is the order they answer. */
+.member-choices { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.member-choices legend { margin-bottom: 8px; font-size: var(--text-sm); color: var(--secondary); }
+.member-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.member-choice > span { position: relative; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-control); cursor: pointer; transition: border-color var(--motion-quick), background var(--motion-quick); }
+.member-choice img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.member-choice > span > span { min-width: 0; }
+.member-choice strong { display: block; font-size: var(--text-sm); }
+.member-choice small { display: block; font-size: var(--text-xs); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-choice i { margin-left: auto; padding: 0 6px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); font-size: var(--text-2xs); font-style: normal; font-weight: 700; }
+.member-choice input:checked + span { border-color: var(--accent); background: var(--accent-soft); }
+.member-choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.team-members strong { color: var(--ink); font-weight: 600; }
+/* The lead wears a small crown. */
+.team-faces > .lead::after { content: "👑"; position: absolute; top: -11px; left: 50%; translate: -50% 0; font-size: 15px; rotate: -12deg; transition: rotate var(--motion-settle) var(--ease-settle); }
+.team-card:hover .team-faces > .lead::after { rotate: 8deg; }
+.team-faces > .strip-unread { position: absolute; top: -4px; right: -10px; }
+.team-card.agent-card-new { align-items: center; justify-content: center; text-align: center; }
+.assignment-chip.team { --hue: var(--accent); }
+button.assignment-chip:hover { background: color-mix(in oklab, var(--hue) 22%, var(--panel)); }
+
+/* The chat list ends with a door to the Chats page. */
+.chat-list-all { margin-top: 6px; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px !important; color: var(--accent-ink); }
+/* A new day in a conversation gets its own quiet heading. */
+.chat-message[data-day]::before {
+  content: attr(data-day);
+  display: block;
+  margin: 4px 0 16px;
+  text-align: center;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Chats page (D27): open chats as tabs over the live conversation, the Details rail beside it, and the fixed Logbook
+   tab whose page takes the chat's place. It fills the page so only the transcript and the rail scroll. */
+.workspace-content:has(> .chats-page) { container-type: inline-size; }
+.chats-page { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px; height: 100%; padding: 0 var(--page-padding) 16px; box-sizing: border-box; }
+.chats-page[data-rail] { grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 380px); }
+/* The chat tabs are the workspace tab bar (`.workspace-topbar`, `.tabs`, `.tab`), edge to edge like a domain's. */
+.chat-topbar { grid-column: 1 / -1; margin-inline: calc(-1 * var(--page-padding)); }
+/* The Logbook under the chat tab bar scrolls on its own, like a transcript. */
+.chats-manage { grid-column: 1 / -1; min-height: 0; overflow: auto; margin-inline: calc(-1 * var(--page-padding)); padding-inline: var(--page-padding); }
+.chat-topbar .tab > button[role="tab"] { padding-left: 6px; gap: 8px; }
+.chat-topbar .tab .strip-unread { position: static; box-shadow: none; }
+.chat-topbar .chat-tab-pin { border-radius: 0; }
+/* Open a chat sits right after the last tab, like a browser's new tab; the page's own controls end the bar. */
+.chat-topbar > .tabs { flex: 0 1 auto; }
+.chat-topbar .topbar-actions { align-self: stretch; margin-left: auto; }
+.chat-picker-button { position: relative; flex: none; margin-left: 4px; }
+/* The reading bar lines up with the conversation's width, like the box it replaces. */
+.agent-panel-embedded > .reading-bar { margin-inline: max(20px, calc((100% - 860px) / 2)); }
+.chat-picker { width: min(400px, calc(100vw - 32px)); max-height: min(580px, 75vh, var(--available-height)); }
+.chat-list-empty { padding: 14px 10px; font-size: var(--text-sm); color: var(--muted); }
+.chat-picker .chats-search { margin: 2px 2px 4px; }
+.chat-picker em { font-size: var(--text-xs); font-style: normal; color: var(--accent-ink); }
+/* The live conversation: the side panel's chat, given the page. Same view-transition name, so one morphs into the other. */
+/* The page panel is the frame: the conversation sits straight on it, and a hairline sets the rail apart. */
+.agent-panel-embedded { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--panel); overflow: hidden; view-transition-name: atlas; animation: bed-rise var(--motion-pop) var(--ease-spring) backwards; }
+.agent-panel-embedded > .agent-transcript { flex: 1; min-height: 0; }
+.agent-panel-embedded > :is(.agent-transcript, .agent-composer) { padding-inline: max(20px, calc((100% - 860px) / 2)); }
+/* The header lines up with the conversation's width too. */
+.agent-panel-embedded > .agent-header { padding-inline: max(20px, calc((100% - 860px) / 2)); }
+.chat-find { display: flex; align-items: center; gap: 6px; margin: 0 16px 8px; padding: 4px 4px 4px 10px; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--recessed); color: var(--muted); animation: header-in var(--motion-quick) var(--ease-settle); }
+.chat-find input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: var(--text-sm); }
+.chat-find input:focus-visible { outline: none; }
+.chat-find > span { font-size: var(--text-xs); white-space: nowrap; }
+.chat-find .icon-button:disabled { opacity: 0.35; }
+mark { padding: 0 1px; border-radius: var(--radius-hair); background: color-mix(in oklab, var(--ochre) 32%, transparent); color: inherit; }
+mark[data-current] { background: var(--ochre); color: var(--on-accent); }
+.chat-topbar .tab-separator { flex: none; align-self: center; width: 1px; height: 20px; margin: 0 4px; background: var(--line); }
+.chat-rail { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-left: 1px solid var(--line); background: var(--panel); overflow: hidden; animation: bed-rise var(--motion-pop) var(--ease-spring) backwards; }
+.chat-rail > header { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 6px 16px; }
+.chat-rail h2 { font: 600 var(--text-xl)/1.3 var(--font-title); }
+.chat-rail-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 8px 10px; overscroll-behavior: contain; }
+.chats-search { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius); background: var(--recessed); color: var(--muted); }
+.chats-search input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: var(--text-sm); }
+.chats-search input:focus-visible { outline: none; }
+.chats-search:focus-within { box-shadow: 0 0 0 2px var(--accent-soft); color: var(--accent-ink); }
+/* The Logbook (agents-design D19): filters beside the list, each conversation one row saying what came of it.
+   Rows render lazily, so a logbook of thousands only lays out what's on screen. */
+.logbook { display: grid; grid-template: "filters head" auto "filters main" 1fr / 200px minmax(0, 760px); gap: 0 40px; justify-content: center; padding: 28px 0 40px; }
+.logbook-head { grid-area: head; }
+.logbook-main { grid-area: main; min-width: 0; }
+.logbook-filters { grid-area: filters; display: grid; align-content: start; gap: 24px; padding-top: 6px; }
+.logbook-filters [role="group"] { display: grid; gap: 2px; }
+.logbook-filters h2 { margin: 0 0 6px 10px; font: 600 var(--text-xs)/1.3 var(--font-ui, inherit); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.logbook-filters button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px; padding: 6px 10px; border-radius: var(--radius); text-align: left; font-size: var(--text-sm); color: var(--ink); transition: background var(--motion-quick); }
+.logbook-filters button:hover { background: var(--recessed); }
+.logbook-filters button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.logbook-filters button > span:not(.avatar-stack) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.logbook-filters button > small { font-size: var(--text-xs); font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.logbook-filters button[data-show="waiting"] > small { color: var(--clay-ink); font-weight: 600; }
+.logbook-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; padding: 0 10px 6px; }
+.logbook-head h1 { margin: 0; font: 600 var(--text-4xl)/1.15 var(--font-title); }
+.logbook-head p { margin: 4px 0 0; font-size: var(--text-sm); color: var(--muted); }
+.logbook-head .chats-search { flex: 0 1 280px; }
+.logbook-group > h2 { position: sticky; top: 0; z-index: var(--layer-raised); margin: 0; padding: 18px 10px 6px; background: var(--panel); font: 600 var(--text-md)/1.3 var(--font-title); color: var(--secondary); }
+.logbook-group[data-waiting] > h2 { color: var(--clay-ink); }
+.logbook-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: start; width: 100%; padding: 10px; border-radius: var(--radius); text-align: left; content-visibility: auto; contain-intrinsic-size: auto 62px; transition: background var(--motion-quick); }
+.logbook-row:hover { background: var(--recessed); }
+.logbook-row > .avatar-stack { justify-self: center; margin-top: 2px; }
+.logbook-row-text { display: grid; gap: 2px; min-width: 0; }
+.logbook-row-text strong { font-size: var(--text-md); font-weight: 500; line-height: 1.4; }
+.logbook-row-text small { font-size: var(--text-xs); line-height: 1.5; color: var(--muted); }
+.logbook-row-text b { font-weight: 600; color: var(--secondary); }
+.logbook-row-text [data-tone="waiting"] { font-weight: 600; color: var(--clay-ink); }
+.logbook-row-text [data-tone="done"] { color: var(--accent-ink); }
+.logbook-row-text em { font-style: normal; color: var(--accent-ink); }
+.logbook-row > time { padding-top: 2px; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Narrow pages: the filters become a row of chips above the list. */
+@container (max-width: 760px) {
+  .logbook { grid-template: "head" "filters" "main" / minmax(0, 1fr); gap: 8px; padding-top: 16px; }
+  .logbook-filters { display: flex; gap: 6px; overflow-x: auto; padding: 0 0 4px; scrollbar-width: none; }
+  .logbook-filters [role="group"] { display: flex; gap: 6px; }
+  .logbook-filters h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .logbook-filters button { width: auto; min-height: 32px; padding: 4px 12px; border: 1px solid var(--line); border-radius: var(--radius-pill); white-space: nowrap; }
+  .logbook-filters button:has(.avatar-stack) { padding-left: 4px; }
+  .logbook-head .chats-search { flex-basis: 100%; }
+}
+/* Where a New session begins in the transcript: the conversation's one drawn seam. */
+.session-break { display: flex; align-items: center; gap: 10px; margin: 6px 0 18px; font-size: var(--text-xs); color: var(--muted); }
+.session-break::before, .session-break::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--line-strong), transparent); }
+.session-break > span { font: 600 var(--text-md)/1.3 var(--font-title); color: var(--accent-ink); }
+/* Context windows (D28): the composer's meter shows the fullest window, and opens to every member's, the model and how they write. */
+.chat-topbar .tab { max-width: 270px; }
+.context-meter { anchor-name: --context-meter; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border-radius: var(--radius-small); font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* A room member's chip carries its own context fill as a hairline along the bottom. */
+.mention-chips button[style*="--fill"] { position: relative; }
+.mention-chips button[style*="--fill"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: 1px; height: 2px; border-radius: var(--radius-pill); background: linear-gradient(to right, var(--accent) var(--fill), color-mix(in oklab, var(--ink) 12%, transparent) 0); }
+.context-meter:hover, .context-meter:focus-visible { background: var(--recessed); color: var(--ink); }
+.context-meter b { color: var(--ink); font-weight: 700; }
+.context-meter[data-crowded] b { color: var(--error); }
+/* Today's replies on Atlaswork's model (agents-design D48): ochre once most are spent. */
+.context-meter[data-near], .context-row[data-near] { color: color-mix(in oklab, var(--ochre) 60%, var(--ink)); }
+.gauge-bar { display: flex; width: 34px; height: 6px; border-radius: var(--radius-pill); overflow: hidden; background: var(--recessed); box-shadow: inset 0 0 0 1px var(--line); }
+.gauge-bar i { height: 100%; transition: width var(--motion-quick); }
+.seg-instructions { --seg: color-mix(in oklab, var(--ink) 34%, transparent); }
+.seg-session { --seg: var(--accent); }
+.seg-knowledge { --seg: var(--ochre); }
+.gauge-bar i { background: var(--seg); }
+.context-panel { position: fixed; position-anchor: --context-meter; inset: auto; bottom: anchor(top); right: anchor(right); margin: 0 0 8px; width: min(300px, calc(100vw - 32px)); padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); color: var(--ink); }
+.context-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.context-row a { display: inline-flex; align-items: center; gap: 4px; flex: none; color: var(--accent-ink); }
+.context-panel:popover-open { animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.context-head { display: grid; gap: 2px; margin: 0 0 12px; font-size: var(--text-sm); }
+.context-head small, .context-agent small, .context-legend, .context-foot { font-size: var(--text-xs); color: var(--muted); }
+.context-agent { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 4px 8px; margin-bottom: 10px; font-size: var(--text-sm); }
+.context-agent img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.context-agent > span { font-size: var(--text-xs); font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.context-agent[data-crowded] > span { color: var(--error); }
+.context-agent .gauge-bar { grid-column: 1 / -1; width: auto; height: 5px; }
+.context-agent small { grid-column: 1 / -1; font-variant-numeric: tabular-nums; }
+.context-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; }
+.context-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.context-legend span::before { content: ""; width: 8px; height: 8px; border-radius: var(--radius-hair); background: var(--seg); }
+.context-foot { margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--line); line-height: 1.5; }
+.context-warn { margin: 8px 0 0; font-size: var(--text-xs); line-height: 1.45; color: var(--error); }
+.chats-more, .resources-more { width: calc(100% - 4px); margin: 10px 2px 4px; padding: 8px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius); font-size: var(--text-sm); color: var(--muted); }
+.chats-more:hover, .resources-more:hover { color: var(--accent-ink); border-color: var(--accent); }
+.chats-none { padding: 28px 16px; text-align: center; color: var(--muted); font-size: var(--text-sm); line-height: 1.6; }
+/* Details: who you're talking to, what needs you, and what to change. */
+.chat-rail-scroll > section { padding: 12px 8px; border-bottom: 1px solid var(--line); }
+.chat-rail-scroll > section:last-child { border-bottom: 0; }
+.chat-rail-scroll h2 { margin: 0 0 10px; font: 600 var(--text-xs)/1.3 var(--font-ui, inherit); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.conversation-fact { display: block; }
+.chat-rail-scroll dl { display: grid; gap: 10px; margin: 0; }
+.conversation-fact dt { font-size: var(--text-xs); color: var(--muted); }
+.conversation-fact dd { display: flex; align-items: baseline; gap: 8px; margin: 2px 0 0; font-size: var(--text-sm); line-height: 1.45; }
+.conversation-fact dd button { margin-left: auto; flex: none; font-size: var(--text-xs); color: var(--accent-ink); }
+.conversation-fact dd button:hover { text-decoration: underline; }
+.chat-rail-scroll > .conversation-needs { margin: 8px 0 4px; padding: 12px; border: 1px solid var(--accent); border-radius: var(--radius-small); background: color-mix(in oklab, var(--accent-soft) 45%, var(--panel)); }
+.conversation-needs p { margin: 0 0 10px; font-size: var(--text-sm); }
+.conversation-needs p:last-child { margin: 0; }
+.conversation-actions { display: grid; gap: 2px; }
+.conversation-actions .quiet-button { justify-content: flex-start; gap: 8px; }
+.conversation-actions .danger-text { color: var(--error); }
+.conversation-members { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.conversation-members button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px; border-radius: var(--radius); text-align: left; }
+.conversation-members button:hover { background: var(--recessed); }
+.conversation-members img { width: 32px; height: 32px; border-radius: 50%; }
+.conversation-members strong, .conversation-members small { display: block; }
+.conversation-members small { font-size: var(--text-xs); color: var(--muted); }
+/* Messages: the time sits by the name; back-to-back messages from one voice tuck under the first. */
+.message-speaker > time { font-size: var(--text-xs); font-weight: 400; color: var(--muted); }
+.chat-message.grouped { margin-top: -16px; }
+/* "To" picks who answers in a room; the chosen chip stays lit. */
+.mention-label { align-self: center; margin-right: 2px; font-size: var(--text-xs); color: var(--muted); }
+.mention-chips button:not(:has(img)) { padding-left: 8px; }
+.mention-chips button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+/* Narrow pages: the rail floats over the chat instead of squeezing it. */
+@container (max-width: 820px) {
+  .chats-page[data-rail] { grid-template-columns: minmax(0, 1fr); }
+  .chat-rail { position: absolute; z-index: var(--layer-panel); top: 66px; right: var(--page-padding); bottom: 16px; width: min(360px, calc(100% - 2 * var(--page-padding))); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+}
+/* Phones already show chat full-screen, so there is no page to move it into; New gives its word to the title. */
+@media (max-width: 760px) {
+  .agent-expand { display: none; }
+  .agent-new { padding-inline: 8px; }
+  .agent-new > span { display: none; }
+}

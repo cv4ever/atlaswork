@@ -1,0 +1,370 @@
+/* First-run onboarding (D34): the stepping stones, Hello, domains, crew and the guide. */
+/* First-run onboarding (agents-design D34): one dialog, four stepping stones, one page at a time at a fixed height. */
+.onboarding-dialog { width: min(820px, calc(100vw - 28px)); height: min(680px, calc(100dvh - 40px)); max-height: none; overflow: hidden; }
+.onboarding-dialog[open] { display: flex; flex-direction: column; }
+.onboarding-dialog .dialog-head { padding-bottom: 6px; }
+.onboarding-stones { display: flex; gap: 6px; margin: 0 24px 6px; padding: 0; list-style: none; }
+.onboarding-stones li { flex: 1; }
+.onboarding-stones button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  transition: background var(--motion-quick), color var(--motion-quick);
+}
+.onboarding-stones button:disabled { opacity: 1; cursor: default; }
+.onboarding-stones button:not(:disabled):hover { background: var(--recessed); }
+.onboarding-stones button > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 15px;
+  background: var(--recessed);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: rotate var(--motion-pop) var(--ease-settle), background var(--motion-quick);
+}
+.onboarding-stones li[data-state="current"] button { color: var(--ink); font-weight: 500; }
+.onboarding-stones li[data-state="current"] button > span { background: var(--accent-soft); box-shadow: 0 2px 0 var(--line-strong); rotate: -8deg; }
+.onboarding-stones li[data-state="done"] button > span { background: var(--accent); color: var(--on-accent); box-shadow: none; font-size: 13px; font-weight: 700; }
+.onboarding-page { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; scrollbar-gutter: stable; padding: 16px 28px 24px; animation: panel-in var(--motion-settle) var(--ease-settle); }
+.onboarding-page > .settings-group, .onboarding-page > .area-picks { flex: none; }
+.onboarding-aside { margin-top: 14px; font-size: var(--text-sm); color: var(--secondary); line-height: 1.6; }
+.onboarding-actions { padding: 14px 24px 20px; border-top: 1px solid var(--line); margin-top: 0; }
+.onboarding-actions .quiet-button { margin-right: auto; }
+/* Hello: Atlas, larger, says who he is in his bubble; under it your own card, round where his face is square: your
+   picture (a tap uploads a photo), your name, and the picture's choices. The two centre as one group (2026-11-18:
+   his portrait beside "What should Atlas call you?" read as your own avatar). */
+.guide-head[data-pose="hello"] { width: 100%; max-width: 560px; margin: auto auto 18px; align-items: center; }
+.guide-head[data-pose="hello"] .guide-face { width: 80px; height: 80px; }
+.hello-you { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 16px 20px; align-items: center; width: 100%; max-width: 560px; margin: 0 auto auto; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); box-shadow: var(--panel-shadow); }
+.hello-you-picture { position: relative; width: 88px; height: 88px; border-radius: 50%; }
+.hello-you-picture img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--line-strong); }
+.hello-you-picture > span { position: absolute; right: -2px; bottom: -2px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--panel); color: var(--secondary); box-shadow: var(--shadow-raised); transition: color var(--motion-quick), rotate var(--motion-settle) var(--ease-settle); }
+.hello-you-picture:hover > span { color: var(--accent-ink); rotate: -12deg; }
+.hello-you-picture:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.hello-you-name { display: grid; gap: 6px; }
+.hello-you-name > span { font-size: var(--text-xs); font-weight: 600; color: var(--secondary); }
+.hello-you-name input { width: 100%; padding: 10px 14px; border-color: var(--line-field); border-radius: var(--radius-control); font: 500 var(--text-xl)/1.3 var(--font-title); }
+.hello-pictures, .hello-you .picture-faces, .hello-you-note { grid-column: 1 / -1; }
+.hello-pictures { gap: 8px; }
+.hello-pictures .picture-choice img, .hello-pictures .picture-upload { width: 36px; height: 36px; }
+.hello-you .picture-faces { margin-top: 0; max-height: 180px; }
+.hello-you-note { margin-top: -6px; font-size: var(--text-xs); color: var(--muted); }
+/* A shared check badge for anything you can pick: hidden until pressed, then it pops in. */
+.pick-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  scale: 0;
+  transition: scale var(--motion-settle) var(--ease-settle);
+}
+[aria-pressed="true"] > .pick-check { scale: 1; }
+/* Areas: tiles in their own hue, lifted when picked. */
+.area-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.area-pick {
+  --hue: var(--accent);
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 14px 14px 12px;
+  text-align: left;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  animation: bed-rise var(--motion-enter) calc(min(var(--i), 11) * 35ms) var(--ease-spring) backwards;
+  transition: translate var(--motion-settle) var(--ease-settle), border-color var(--motion-quick), background var(--motion-quick), box-shadow var(--motion-quick);
+}
+.area-pick:hover { translate: 0 -2px; border-color: color-mix(in oklab, var(--hue) 50%, var(--line)); }
+.area-pick[aria-pressed="true"] { border-color: color-mix(in oklab, var(--hue) 70%, var(--line)); background: color-mix(in oklab, var(--hue) 9%, var(--panel)); box-shadow: none; }
+.area-pick-emoji {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 6px;
+  border-radius: var(--radius-control);
+  font-size: 22px;
+  background: color-mix(in oklab, var(--hue) 18%, var(--panel));
+  rotate: -6deg;
+  transition: rotate var(--motion-pop) var(--ease-settle);
+}
+.area-pick:hover .area-pick-emoji, .area-pick[aria-pressed="true"] .area-pick-emoji { rotate: 6deg; }
+.area-pick strong { font: 600 var(--text-lg)/1.25 var(--font-title); letter-spacing: -0.2px; }
+.area-pick small { font-size: var(--text-xs); color: var(--secondary); line-height: 1.45; }
+/* Your own: a dashed tile that turns into a name field in place (D34). */
+.area-own { grid-template-columns: minmax(0, 1fr); border-style: dashed; color: inherit; }
+.area-own[data-naming] { border-style: solid; border-color: color-mix(in oklab, var(--accent) 60%, var(--line)); }
+.area-own button.area-pick-emoji { border: 0; color: inherit; cursor: pointer; }
+.area-own-name { display: flex; align-items: center; gap: 4px; justify-self: stretch; }
+.area-own small.field-error { color: var(--error); }
+.area-own-name input, .area-own-about {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  font: 600 var(--text-lg)/1.25 var(--font-title);
+  color: inherit;
+  border: 0;
+  border-bottom: 1.5px solid var(--line-field);
+  border-radius: 0;
+  background: transparent;
+}
+.area-own-about { justify-self: stretch; font: 400 var(--text-xs)/1.45 var(--font-body, inherit); color: var(--secondary); border-bottom-style: dashed; }
+.area-own-name input:focus, .area-own-about:focus { outline: none; border-bottom-color: var(--accent); }
+/* The emoji choices open under the tile's emoji as a small grid, one tap each. */
+.emoji-grid {
+  position: fixed;
+  inset: auto;
+  top: anchor(bottom);
+  left: anchor(left);
+  margin: 6px 0 0;
+  padding: 8px;
+  display: none;
+  grid-template-columns: repeat(6, 36px);
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.emoji-grid:popover-open { display: grid; animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.emoji-grid button { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius); font-size: 20px; }
+.emoji-grid button:hover, .emoji-grid button[aria-checked="true"] { background: color-mix(in oklab, var(--accent) 16%, var(--panel)); }
+/* Crew: a row per agent. Face, name and role toggle the pick; the chevron opens what they do (progressive disclosure). */
+.onboarding-page .settings-group + .settings-group { margin-top: 22px; }
+.onboarding-page .settings-group h4 small { margin-left: 8px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+.crew-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; align-items: start; }
+.crew-pick {
+  --hue: var(--accent);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  transition: translate var(--motion-settle) var(--ease-settle), border-color var(--motion-quick), background var(--motion-quick), transform var(--motion-quick);
+}
+.crew-pick:hover { translate: 0 -2px; border-color: color-mix(in oklab, var(--hue) 50%, var(--line)); }
+.crew-pick[data-on] { border-color: color-mix(in oklab, var(--hue) 70%, var(--line)); background: color-mix(in oklab, var(--hue) 8%, var(--panel)); }
+.crew-pick-main { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 32px 10px 10px; text-align: left; border-radius: 16px 0 0 16px; }
+.crew-pick-main img { flex: none; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--line); transition: rotate var(--motion-settle) var(--ease-settle), box-shadow var(--motion-quick); }
+.crew-pick[data-on] .crew-pick-main img { rotate: -6deg; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--hue); }
+.crew-pick-copy { display: grid; gap: 1px; min-width: 0; }
+.crew-pick-copy strong { font: 600 var(--text-lg)/1.25 var(--font-title); }
+.crew-pick-copy small { font-size: var(--text-sm); color: var(--ink); }
+.crew-pick-copy em { font-style: normal; font-size: var(--text-xs); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-pick-main .pick-check { top: 50%; translate: 0 -50%; right: 8px; }
+.crew-pick-more { display: grid; place-items: center; width: 34px; border-left: 1px solid var(--line); border-radius: 0 16px 16px 0; color: var(--muted); transition: background var(--motion-quick), color var(--motion-quick); }
+.crew-pick-more:hover { background: var(--recessed); color: var(--ink); }
+.crew-pick-more svg { transition: rotate var(--motion-settle) var(--ease-settle); }
+.crew-pick[data-open] .crew-pick-more svg { rotate: 180deg; }
+.crew-pick-details { grid-column: 1 / -1; padding: 0 12px 10px; animation: panel-in var(--motion-quick) var(--ease-settle); }
+.crew-pick-details p { font-size: var(--text-sm); color: var(--secondary); line-height: 1.5; }
+.crew-pick-details small { display: block; margin-top: 6px; font-size: var(--text-xs); color: var(--muted); }
+.crew-pick .burst { inset: 50% auto auto 30px; }
+.area-pick .burst { inset: 28px auto auto 28px; }
+/* Crew in onboarding: three columns of tiles, like the domain tiles a step earlier (Carlos, 2026-11-14). A tile
+   stacks face, name, role and hook, so a third of the dialog is enough down to small windows; the tick sits on the
+   portrait's corner and the arrow in the top corner. */
+.onboarding-page { container-type: inline-size; }
+.onboarding-page .crew-picks { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@container (max-width: 440px) { .onboarding-page .crew-picks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 280px) { .onboarding-page .crew-picks { grid-template-columns: minmax(0, 1fr); } }
+.onboarding-page .crew-pick { grid-template-columns: minmax(0, 1fr); }
+.onboarding-page .crew-pick-main { display: grid; justify-items: start; align-content: start; gap: 10px; padding: 14px 14px 12px; border-radius: var(--radius-card); }
+.onboarding-page .crew-pick-main img { width: 44px; height: 44px; }
+.onboarding-page .crew-pick-copy { gap: 2px; }
+.onboarding-page .crew-pick-copy em { display: -webkit-box; margin-top: 2px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; color: var(--secondary); line-height: 1.45; }
+.onboarding-page .crew-pick-more { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-left: 0; border-radius: var(--radius-pill); }
+.onboarding-page .crew-pick .burst { inset: 36px auto auto 36px; }
+.crew-pick-face { position: relative; flex: none; display: grid; }
+.crew-pick-face .pick-check { top: auto; right: -5px; bottom: -5px; translate: none; width: 20px; height: 20px; box-shadow: 0 0 0 2px var(--panel); }
+.crew-pick[data-on] .crew-pick-face .pick-check { scale: 1; }
+/* The other agents' faces in the slot a short row leaves; it scrolls down to them (D48). */
+.crew-more-tile {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 4px;
+  align-self: stretch;
+  padding: 14px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-card);
+  text-align: left;
+  transition: border-color var(--motion-quick) var(--ease-settle);
+}
+.crew-more-tile:hover { border-color: var(--accent); }
+.crew-more-tile .ready-stack { margin-bottom: 6px; }
+.crew-more-tile .ready-stack > * { width: 34px; height: 34px; margin-left: -10px; }
+.crew-more-tile .ready-stack > :first-child { margin-left: 0; }
+.crew-more-tile strong { font: 600 var(--text-lg)/1.25 var(--font-title); color: var(--ink); }
+.crew-more-tile small { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--secondary); line-height: 1.45; }
+/* Everyday: ticked, quieter, nothing to toggle. */
+.area-pick[aria-disabled="true"] { cursor: default; }
+.onboarding-page .area-pick[aria-disabled="true"]:hover { box-shadow: none; }
+.area-pick[aria-disabled="true"] > .pick-check { background: var(--secondary); color: var(--panel); }
+/* A tile's details (D34): what they'd say to you, in a bubble like Atlas's own, then how they work, one fact a line. */
+.onboarding-page .crew-pick-details { display: grid; gap: 10px; padding: 0 14px 14px; }
+.crew-pick-details .crew-pick-says {
+  padding: 8px 10px;
+  border-radius: var(--radius-hair) var(--radius-card) var(--radius-card) var(--radius-card);
+  background: color-mix(in oklab, var(--hue) 14%, var(--panel));
+  color: var(--ink);
+  line-height: 1.45;
+}
+.crew-pick-facts { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: var(--text-xs); color: var(--secondary); }
+.crew-pick-facts li { display: flex; align-items: center; gap: 6px; }
+.crew-pick-facts svg { flex: none; color: var(--muted); }
+.crew-pick-rules { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* The Atlas button and chat panel sit under the dialog's backdrop; their view-transition name would lift them above
+   it for every step change's morph, so the button flashed undimmed. The guide is the only name while it's open. */
+html:has(.onboarding-dialog[open]) :is(.atlas-button, .agent-panel, .agent-panel-embedded) { view-transition-name: none; }
+.dialog-head h2 { flex: 1; }
+/* The trail between stones, the plant at its end, the pointer tilt and Atlas the guide (D34). */
+.onboarding-stones { position: relative; isolation: isolate; }
+.onboarding-stones::before, .onboarding-stones::after {
+  content: ""; position: absolute; left: 24px; right: 60px; top: 50%; height: 0; z-index: var(--layer-behind);
+  border-top: 2px dashed var(--line-strong);
+}
+.onboarding-stones::after { right: auto; width: calc((100% - 84px) * var(--progress)); border-top: 2px solid var(--accent); transition: width var(--motion-flourish) var(--ease-settle); }
+.onboarding-stones li { display: flex; justify-content: flex-start; }
+.onboarding-stones button { width: auto; padding-right: 14px; background: var(--panel); }
+.onboarding-stones li[data-state="current"] button { background: var(--accent-soft); }
+.onboarding-plant { flex: none !important; display: grid; place-items: center; width: 36px; font-size: 22px; animation: sticker-in var(--motion-flourish) var(--ease-spring); }
+.onboarding-page .area-pick, .onboarding-page .crew-pick {
+  transform: perspective(600px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform var(--motion-quick) ease-out, translate var(--motion-settle) var(--ease-settle), border-color var(--motion-quick), background var(--motion-quick);
+}
+.onboarding-page .area-pick:hover, .onboarding-page .crew-pick:hover { translate: 0; box-shadow: var(--shadow-hover); }
+.guide-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+.guide-face { flex: none; width: 56px; height: 56px; rotate: -6deg; animation: sticker-in var(--motion-enter) var(--ease-spring); }
+.guide-face img { width: 100%; height: 100%; border-radius: var(--radius-tile); object-fit: cover; box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--accent-soft); }
+/* Atlas's portrait keeps one name on every step, so a step change morphs it from the Hello sticker to the guide face. */
+.atlas-guide { view-transition-name: atlas-guide; }
+/* Settle, not spring: he now crosses the whole dialog, and a spring's overshoot carried him past its edge. */
+::view-transition-group(atlas-guide) { animation-duration: var(--motion-flourish); animation-timing-function: var(--ease-settle); }
+::view-transition-old(atlas-guide), ::view-transition-new(atlas-guide) { animation: none; mix-blend-mode: normal; height: 100%; object-fit: cover; }
+html:has(.onboarding-dialog[open])::view-transition-old(root), html:has(.onboarding-dialog[open])::view-transition-new(root) { animation-duration: var(--motion-settle); }
+.guide-bubble { position: relative; padding: 12px 16px; border-radius: 4px 18px 18px 18px; background: var(--accent-soft); animation: bubble-in var(--motion-pop) var(--motion-settle) var(--ease-spring) backwards; transform-origin: 0 0; }
+.guide-bubble strong { display: block; font: 600 var(--text-xl)/1.25 var(--font-title); letter-spacing: -0.3px; }
+.guide-bubble p { margin-top: 4px; font-size: var(--text-sm); color: var(--secondary); line-height: 1.5; }
+@keyframes bubble-in { from { opacity: 0; scale: 0.85; } }
+/* Atlas walks the dialog (D34, D48): beside the bubble on the left for Domains, on the right for Crew, centre stage
+   on Ready; the view transition carries his portrait between the places. Each pick makes him hop once. */
+.guide-head[data-pose="end"] { flex-direction: row-reverse; }
+.guide-head[data-pose="end"] .guide-face { rotate: 6deg; }
+.guide-head[data-pose="end"] .guide-bubble { border-radius: 18px 4px 18px 18px; transform-origin: 100% 0; }
+.guide-head[data-pose="centre"] { justify-content: center; align-items: center; max-width: 600px; margin: 0 auto 16px; }
+.guide-head[data-pose="centre"] .guide-face { width: 64px; height: 64px; rotate: -3deg; }
+.guide-face.is-hopping { animation: atlas-hop var(--motion-pop) var(--ease-spring); }
+@keyframes atlas-hop { 40% { translate: 0 -6px; scale: 1.06; } }
+@media (prefers-reduced-motion: reduce) { .guide-face.is-hopping { animation: none; } }
+/* Ready: what you'll open to, as two seals, then who answers. */
+.onboarding-ready { display: grid; gap: 16px; width: 100%; max-width: 640px; margin-inline: auto; }
+.ready-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.ready-seal { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); text-align: left; transition: border-color var(--motion-quick) var(--ease-settle); }
+.ready-seal:hover { border-color: var(--line-strong); }
+.ready-seal-copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.ready-seal u { color: var(--accent-ink); font-weight: 500; text-decoration: none; }
+.ready-seal:hover u { text-decoration: underline; text-underline-offset: 3px; }
+.ready-seal-copy strong { font: 600 var(--text-lg)/1.25 var(--font-title); color: var(--ink); }
+.ready-seal-copy small { font-size: var(--text-xs); color: var(--secondary); }
+.ready-seal .ready-stack > * { width: 34px; height: 34px; margin-left: -10px; font-size: 16px; }
+.ready-seal .ready-stack > :first-child { margin-left: 0; }
+.ready-stack > .ready-more { font-size: var(--text-xs); font-weight: 600; color: var(--accent-ink); }
+.ready-stack { display: flex; flex: none; }
+.ready-stack > * {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -12px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-style: normal;
+  object-fit: cover;
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--panel);
+  rotate: calc((var(--n) - 1) * 4deg);
+  animation: sticker-in var(--motion-enter) calc(var(--n) * 60ms) var(--ease-spring) backwards;
+}
+.ready-stack > :first-child { margin-left: 0; }
+@media (max-width: 640px) {
+  .onboarding-stones button { justify-content: center; padding: 6px; font-size: 0; gap: 0; }
+  .onboarding-stones button > span { font-size: 15px; }
+  .onboarding-page { padding: 12px 16px 20px; }
+  .hello-you { grid-template-columns: 64px minmax(0, 1fr); padding: 16px; }
+  .hello-you-picture { width: 64px; height: 64px; }
+  .guide-head[data-pose="hello"] .guide-face { width: 64px; height: 64px; }
+  .onboarding-actions { flex-wrap: wrap; }
+}
+/* The same cards on the Agents page: a plus instead of a check, always shown. */
+.community-picks { margin-top: 24px; }
+.community-picks .pick-check { scale: 1; background: var(--recessed); color: var(--ink); }
+.community-picks .crew-pick:hover .pick-check { background: var(--accent); color: var(--on-accent); }
+.community-picks .crew-pick { grid-template-columns: 1fr; }
+.community-picks .crew-pick-main { border-radius: 16px 16px 0 0; }
+.community-picks .crew-pick-details p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* Ready's model part (agents-design D48): one card per way to answer, the one in use ticked, then its facts or setup. */
+.ready-model.settings-group { margin: 0; }
+.model-picks { display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 8px; }
+.model-pick {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-content: start;
+  gap: 6px;
+  min-height: 88px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  text-align: left;
+  transition: border-color var(--motion-quick) var(--ease-settle), background var(--motion-quick) var(--ease-settle);
+}
+.model-pick:hover:not(:disabled) { border-color: var(--line-strong); }
+.model-pick[aria-checked="true"] { border-color: color-mix(in oklab, var(--accent) 70%, var(--line)); background: var(--accent-soft); }
+.model-pick:disabled { border-style: dashed; background: transparent; cursor: default; opacity: 1; }
+.model-pick-icon { display: inline-flex; margin-right: 6px; vertical-align: -2px; color: var(--accent-ink); }
+.model-pick:disabled .model-pick-icon { color: var(--muted); }
+.model-pick-copy { display: grid; gap: 2px; }
+.model-pick-copy strong { font: 600 var(--text-lg)/1.25 var(--font-title); color: var(--ink); }
+.model-pick-copy small { font-size: var(--text-xs); line-height: 1.4; color: var(--secondary); }
+.model-pick-use { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); font-weight: 500; color: var(--accent-ink); }
+.model-detail { display: grid; gap: 14px; margin-top: 14px; }
+.model-detail .settings-group { margin: 0; }
+.model-detail > .segmented-control { justify-self: start; }
+.model-detail .setting-row > strong { white-space: nowrap; }
+.trial-trail { display: flex; align-items: center; gap: 12px; }
+.trial-trail > span { display: grid; flex: 1; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; }
+.trial-trail i { height: 8px; border-radius: var(--radius-hair); background: var(--recessed); }
+.trial-trail i[data-left] { background: var(--accent); }
+.trial-trail small { font-size: var(--text-xs); font-weight: 500; color: var(--secondary); white-space: nowrap; }
+.model-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
+.model-facts div { display: grid; gap: 2px; }
+.model-facts dt { font-size: var(--text-xs); color: var(--muted); }
+.model-facts dd { margin: 0; font-size: var(--text-sm); line-height: 1.45; color: var(--ink); }
+.model-facts-line { font-size: var(--text-sm); color: var(--secondary); }
+.ready-model-note { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); }
+.ready-model-note > svg { flex: none; color: var(--muted); }
+.ready-model-note[data-needed] > svg { color: var(--ochre); }
+.ready-model-note p { flex: 1; font-size: var(--text-md); color: var(--secondary); }
+.ready-model-note strong { color: var(--ink); }
+.ready-model-note > .secondary-button { flex: none; }
+@media (max-width: 640px) {
+  .model-picks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .model-facts { grid-template-columns: 1fr; }
+  .ready-model-note { flex-wrap: wrap; }
+}

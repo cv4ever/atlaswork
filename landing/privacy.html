@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy notice | Atlaswork</title>
+<link rel="canonical" href="https://atlaswork.app/privacy">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+  @font-face { font-family: "DM Sans"; src: url(dm-sans.woff2) format("woff2"); font-weight: 100 1000; font-display: swap; }
+  @font-face { font-family: Fraunces; src: url(fraunces.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+  body { margin: 0; background: #f7f5ef; color: #34382f; font: 17px/1.6 "DM Sans", system-ui, sans-serif; }
+  main { width: min(42rem, 100% - 48px); margin: 0 auto; padding: 48px 0 72px; }
+  h1, h2 { font-family: Fraunces, Georgia, serif; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+  h1 { font-size: 2.2rem; margin: 1.5rem 0 .5rem; }
+  h2 { font-size: 1.3rem; margin: 2rem 0 .5rem; }
+  p, li { color: #5b6054; }
+  a { color: #416b57; }
+  :focus-visible { outline: 3px solid #416b57; outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <a href="/">← Atlaswork</a>
+  <h1>Privacy notice</h1>
+  <p>Last updated 26 November 2026. It covers the waitlist on this site and the Atlaswork app, at <a href="https://app.atlaswork.app">app.atlaswork.app</a> and in Atlaswork for Windows.</p>
+
+  <h2>Who is responsible</h2>
+  <p>Carlos Oliveira, an individual based in Portugal, is the controller. Contact: <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>.</p>
+
+  <h2>Without an account, your work stays in your browser</h2>
+  <p>If you use the app signed out, your notes, tasks, projects, agents and chats stay in your browser's storage. We don't receive them, and the agents' replies are worked out in your browser. The only thing the app sends is the anonymous step counts described below.</p>
+
+  <h2>What we collect and why</h2>
+  <ul>
+    <li><strong>Waitlist:</strong> the email address you enter, when you joined, and which shared link brought you. We use it for two things only: to invite you to the closed beta, and to email you when Atlaswork opens. No newsletter, no marketing from others, no sale or sharing of your address.</li>
+    <li><strong>Account:</strong> your email address and, if you sign in with Google, the name and picture Google shares. We use them to sign you in. Each signed-in session keeps the IP address and browser it came from, so a stolen session can be spotted.</li>
+    <li><strong>Your workspace:</strong> when you're signed in, your notes, tasks, projects, agents and chats are stored in your account so they open on every device where you sign in. Files and images you add stay on the device that added them and are never uploaded.</li>
+    <li><strong>Plan and usage:</strong> your plan and trial dates, and how many live agent replies you used each day, to apply the daily limits.</li>
+    <li><strong>Live agents:</strong> when you ask a live agent, the app sends what that agent may read (the notes and open tasks you gave it access to, an attached note) and the conversation's recent messages to our agent service, which passes them to an AI model and puts the reply in your workspace's chat. While the agent works on it, that request, and what the agent has looked up for it so far, is stored with the job in your account, so the answer still arrives if you close the app or lose the connection, and longer work can go on in several steps; it's deleted when the job ends, and at most 24 hours after you asked. A record that the job ran (which agent, which chat its answer goes to, how it went, nothing you wrote) stays 7 days so your devices can show it. We don't store these requests or replies anywhere else. Our own code, not the AI model, also checks what an agent reads and writes for common scams (remote-access tools, gift cards or crypto as payment, someone asking for a password or code) and shows a warning above the reply; only which warnings showed is kept, on that reply.</li>
+    <li><strong>Folders you link:</strong> you can link a folder to a project, in a desktop browser or in Atlaswork for Windows. When you ask, an agent that may read files searches and reads its text files, PDFs and images, and what it reads goes to our agent service and the AI model for that reply, like a note it may read. Reading never changes, moves or deletes your files. A folder linked in a browser stays in that browser. One linked in the Windows app is stored with its project in your account: its name, which computer it's on and where it is there (its path, such as C:\Users\you\Documents\Taxes), so your other devices can show it and ask about it. Its files never are.</li>
+    <li><strong>Atlaswork for Windows:</strong> if you install it and let agents work on that computer, your account keeps the computer's name, when it was last seen, which version of the app it runs and a fingerprint of its key; the key itself stays in Windows Credential Manager on that computer. Work that reads that computer's folders runs there, and each step asks our agent service for the AI model, so the same models and daily limits apply. The app keeps a short log on that computer of what it did, never what you asked. To update itself, it downloads a small file from our storage at Supabase when it starts and every hour, and a new version when there is one, which it installs only if we signed it; those downloads send nothing about you or your account, only what any download sends, such as the computer's IP address. You can remove a computer in Settings → Account, which stops it at once.</li>
+    <li><strong>Searching a computer:</strong> in Atlaswork for Windows you can let agents search that computer, only in the folders you add to its search list. The list, and an index of those files' names and their documents' text, stay on that computer; your account keeps only whether search is on. When you ask, from any of your devices, an agent that may read files searches every one of your computers with search on at once: the words it looks for go to each of them through our agent service, and the names of the files they find, a line from each and the text of any file it opens go to our agent service and the AI model for that reply, as a linked folder's do. While a search runs, its words and what each computer found are stored in your account so the reply can read them, deleted once it has, within 15 seconds, and any left behind within 15 minutes. When the file it needs is on another of your computers, the reply moves to that computer to read it there, taking what it has found so far with it, stored with the job as above. When you ask in the app's own window, an agent may also open a document, image or folder it found, on that computer's screen. Searching never changes your files; only tidying, below, moves them.</li>
+    <li><strong>Tidying a computer:</strong> while search is on and Documents is on its search list, you can also let agents tidy that computer, and give each agent you want to do it the Tidy files permission. An agent then proposes to move files a search found into folders it makes in Documents, or to give them clearer names, saying for each what goes where and why. Depending on how you set that agent, it waits for your OK or moves up to 10 files at a time on its own, and you can undo it. The app on that computer makes the moves itself, only inside the folders on the search list, and never deletes a file or replaces another. The proposal, with the files' paths and new names, is kept in your chat like any message. The job that takes it to the computer keeps the moves until it ends, at most 24 hours. That computer keeps its own record of what it moved, for Undo. Your account keeps only whether tidying is on.</li>
+    <li><strong>What agents remember:</strong> an agent may keep a short line about something lasting you told it, from your own words, and each shows under its reply with Undo and in the agent's Briefing with Forget. After a search on a computer it may also offer to remember where something is there (for example "Bank letters: Documents\Bank on Office PC"): the few words it chose, the folder's path and the computer's name, never what the files say. That is kept only if you tap Keep. Memories are part of your workspace, stored with it, and go to the AI model with the requests of agents that may read them; removing a computer forgets the ones learned on it.</li>
+    <li><strong>People you keep:</strong> you can keep people in your Library, with who they are to you, dates such as birthdays, a small photo, and notes about them. This is part of your workspace and is stored like it, the photo included. If you add people from your phone's contacts (Settings → People), you pick them in your browser's own contact picker, and the app receives only their names and pictures, never their phone numbers, emails or addresses. The agent that looks after a person's domain, and Atlas, may read what you keep about them and send it to the AI model like any note it may read. Agents are told never to remember what you say about someone else's health, beliefs, sexuality or politics. Only keep what that person would expect you to.</li>
+    <li><strong>Your own AI model:</strong> if you connect one (OpenRouter, or an API key for another provider), we store its key encrypted and use it only to send your agents' requests to that provider. The provider handles those requests under your own agreement with it; its privacy terms apply to them. You can disconnect it at any time, which deletes the key.</li>
+    <li id="google-calendar"><strong>Google Calendar:</strong> only if you connect it (Settings → Connections), which asks Google for three permissions: to see which calendars you have, to read their events, and to add events to calendars you own. We store the access Google gives us, encrypted, with the Google account's email address and the date you connected. From your calendars we use the names of the calendars you show and, for each event, its title, start and end, whether it's busy and which calendar it's in; we ignore descriptions, guests and attachments. They're read when you open Today (to show your day), when you look at what an agent read, and when an agent you allowed uses your calendar: you choose, per agent, whether it sees only when you're busy, reads your events, or may also offer to add dates, whether it may do so in routines while you're away, and which calendars. What an agent reads goes to the AI model that answers, for that reply only, as described under Live agents. We don't keep your events: they're read fresh each time. While an agent works on a reply, what it read is kept with that job and deleted when the job ends, at most 24 hours later; what an agent writes about them in its reply stays in that chat like any reply. We add an event to your main calendar only when you tap "Add to Google Calendar". Disconnecting tells Google to cancel our access and deletes what we stored; you can also remove Atlaswork in your Google Account's permissions.</li>
+    <li><strong>Security and errors:</strong> a Cloudflare Turnstile check on the sign-in form tells people from bots. If the app crashes, it sends a technical error report with the error and the page it happened on, without your name, email, IP address or cookies.</li>
+    <li><strong>Getting-started counts:</strong> when you reach a step of the first-run setup, skip or finish it, add a domain of your own or create a starter project, the app adds one to that day's count for that step. The count is all we keep: no account, device ID, cookie, IP address or anything you wrote, so it can't be linked to you. We use the totals to see where people get stuck.</li>
+    <li><strong>Service logs:</strong> like any web service, our providers log requests (including IP addresses) to run and protect their systems. On our plans Supabase keeps these logs for 1 day.</li>
+  </ul>
+  <p>Atlaswork's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. We use your Google data only to provide the features above that you can see in the app. We don't sell it, use it for advertising, or use it to train AI models, and no person reads it unless you ask us to (for example, to look into a problem), it's needed for security, or the law requires it.</p>
+
+  <h2>Legal basis</h2>
+  <p>The waitlist relies on your consent (GDPR Article 6(1)(a)), which you can withdraw at any time. The account, your workspace, live agents, the folders you link and Atlaswork for Windows are how we provide the service you signed up for (Article 6(1)(b)). The sign-in check, error reports and backups rely on our legitimate interest in keeping the service secure and working (Article 6(1)(f)). The getting-started counts are anonymous, so no personal data is involved.</p>
+
+  <h2>Who processes it</h2>
+  <ul>
+    <li><strong>Supabase</strong> runs the accounts, the database and the agent service in its Paris (EU) region.</li>
+    <li><strong>Cloudflare</strong> hosts this site and the app, forwards email sent to hello@atlaswork.app, counts page visits without cookies, runs the sign-in check, runs the AI model (Workers AI, which doesn't keep requests), and stores the nightly database backups in Western Europe.</li>
+    <li><strong>Groq</strong> runs the same AI model when Cloudflare's is busy. It may process requests outside the EU, including in the United States, under the EU's standard contractual clauses. Zero data retention is on for our account, so it doesn't keep requests.</li>
+    <li><strong>Resend</strong> sends the sign-in emails from its Ireland (EU) region and keeps a copy of each for 30 days.</li>
+    <li><strong>Google</strong> signs you in, only if you choose "Continue with Google", and holds your calendar, only if you connect Google Calendar.</li>
+    <li><strong>The AI provider you connect</strong>, if you bring your own model: it receives your agents' requests directly from our agent service, under your agreement with it. Where it processes them depends on the provider you chose.</li>
+    <li><strong>Sentry</strong> receives the error reports in its EU (Germany) region.</li>
+  </ul>
+
+  <h2>How long we keep it</h2>
+  <ul>
+    <li>Waitlist: until we send the launch email, and at most 30 days after it, unless you create an account. If Atlaswork doesn't launch, we delete the list within 30 days of deciding that.</li>
+    <li>Account, workspace, plan, usage and your own model's key: until you delete your account (or, for the key, until you disconnect it). Deleting removes them at once. The nightly backups keep a copy (the key only in encrypted form) for up to 30 days, then it's gone.</li>
+    <li>Google Calendar access: until you disconnect it or delete your account. Events aren't kept.</li>
+    <li>A computer in Atlaswork for Windows, a linked folder's name and path, and where agents remembered things are on that computer: until you remove the computer, unlink the folder or forget the memory, or delete your account.</li>
+    <li>A computer's search index: on that computer only, until you turn its search off or remove the computer, which delete it.</li>
+    <li>A search across your computers: its words and what each computer found, until the reply has read them, at most 15 minutes (a nightly backup taken meanwhile keeps them up to 30 days).</li>
+    <li>What a computer moved when tidying, for Undo: on that computer only, its last 200 tidies, until you remove the computer, which deletes it.</li>
+    <li>A live agent's request: until its job ends, at most 24 hours (a nightly backup taken meanwhile keeps it up to 30 days); the record that the job ran, 7 days.</li>
+    <li>Error reports: 30 days. Sign-in emails at Resend: 30 days. Service logs at Supabase: 1 day. Getting-started counts are anonymous totals and are kept as long as they're useful.</li>
+  </ul>
+
+  <h2>Your rights</h2>
+  <p>You can delete your account and everything in it yourself, in the app ("Delete account" in your account settings). You can download your whole workspace in the app too ("Export workspace backup"). For anything else (to see, correct or delete other data, or to withdraw consent) email <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>. You can also complain to the Portuguese data protection authority, the CNPD (<a href="https://www.cnpd.pt">cnpd.pt</a>).</p>
+</main>
+</body>
+</html>

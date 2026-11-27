@@ -1,0 +1,33 @@
+/* Every style outside the shell (WorkbenchShell.css) and the tokens (WarmEditorial.module.css), one sheet per part of
+ * the app. The order is the cascade: a later sheet wins over an earlier one at equal specificity, so a new sheet goes
+ * last, and a new rule goes in the sheet that owns its class (scripts/check-tokens.mjs holds each class to one sheet). */
+@import "./styles/base.css";
+@import "./styles/profile.css";
+@import "./styles/first-morning.css";
+@import "./styles/account.css";
+@import "./styles/parts.css";
+@import "./styles/today.css";
+@import "./styles/tasks.css";
+@import "./styles/chat-panel.css";
+@import "./styles/feedback.css";
+@import "./styles/editor.css";
+@import "./styles/collections.css";
+@import "./styles/settings.css";
+@import "./styles/dialogs.css";
+@import "./styles/responsive.css";
+@import "./styles/domains.css";
+@import "./styles/resources.css";
+@import "./styles/archive.css";
+@import "./styles/projects.css";
+@import "./styles/agents.css";
+@import "./styles/masthead.css";
+@import "./styles/agent-dialog.css";
+@import "./styles/chats.css";
+@import "./styles/routines.css";
+@import "./styles/widgets.css";
+@import "./styles/onboarding.css";
+@import "./styles/gate.css";
+@import "./styles/widget-views.css";
+@import "./styles/popups.css";
+@import "./styles/people.css";
+@import "./styles/emblems.css";

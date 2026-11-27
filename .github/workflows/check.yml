@@ -1,0 +1,22 @@
+# The full `pnpm run check` on demand (gh workflow run check.yml): types, accessibility lint, tests, build.
+# Manual only, to save the account's Actions minutes; .githooks/pre-commit and `pnpm run release` gate changes locally.
+name: check
+on:
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Reads the version from package.json "packageManager".
+      - uses: pnpm/action-setup@v4
+      # The agent Edge Function's tests (supabase/functions) run under Deno.
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check

@@ -1,0 +1,144 @@
+/* A page's masthead (a project's and a domain's): two rows in one band, then the agent's brief under it. */
+/* restyles: .workspace-content */
+/* The band spans the content area edge to edge (the page is 1120px wide inside it) so it reads as the page's frame,
+   not a block. It is the theme's own second tone with a hairline under it; the place's colour appears only on the
+   tile's ring, the title and the stage chip (Carlos dropped the coloured top rule, 2026-11-20). Row one: the tile, the
+   title with its pencil and the actions; row two: the intention or outcome, and on its right the domain's sections as
+   tabs on the band's lower edge or the project's stage strip (Carlos, 2026-11-20: lower bands, domain and project
+   alike; the project's fold and crew row went). */
+.workspace-content:has(.page-masthead) { container-type: inline-size; }
+.page-masthead {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "tile title actions" "tile intent foot";
+  align-items: center;
+  column-gap: 14px;
+  width: 100cqw;
+  margin: -28px 0 20px calc(50% - 50cqw);
+  padding: 20px max(var(--page-padding), calc(50cqw - 560px)) 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--sidebar);
+  overflow: clip;
+}
+.page-masthead > .page-heading { display: contents; }
+.page-masthead h1 { color: color-mix(in oklab, var(--hue) 55%, var(--ink)); }
+.page-masthead .page-heading p { grid-area: intent; align-self: baseline; min-width: 0; margin: 0; }
+.masthead-plant {
+  grid-area: tile;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-top: 6px;
+  border-radius: var(--radius-card);
+  font-size: var(--text-3xl);
+  line-height: 1;
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--hue) 35%, transparent), var(--panel-shadow);
+}
+/* The title and its edit pencil: the pencil is the page's one way into its settings, muted until pointed at. */
+.masthead-title { grid-area: title; display: flex; align-items: center; gap: 4px; min-width: 0; }
+.masthead-title h1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title-edit { flex: none; color: var(--muted); }
+.title-edit:is(:hover, :focus-visible) { color: var(--accent-ink); }
+.masthead-actions { grid-area: actions; justify-self: end; display: flex; align-items: center; gap: 4px; }
+.masthead-actions > .widgets-button { margin-top: 0; }
+/* Faces among the actions: round, a panel fill and hairline under the pointer; the words are the tooltip. */
+.masthead-actions > :is(.crew-chat, .crew-lead-pick) { min-height: 32px; padding: 2px; gap: 0; border: 1px solid transparent; border-radius: var(--radius-pill); background: transparent; }
+.masthead-actions > :is(.crew-chat, .crew-lead-pick):is(:hover, [aria-expanded="true"]) { border-color: var(--line); background: var(--panel); }
+/* Who leads: the face and a small chevron, the menu that changes it one click away. */
+.crew-lead-pick { display: flex; align-items: center; color: inherit; }
+.crew-lead-pick > img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.crew-lead-pick > svg { flex: none; margin: 0 2px; color: var(--muted); transition: color var(--motion-quick); }
+.crew-lead-pick:is(:hover, [aria-expanded="true"]) > svg { color: var(--accent-ink); }
+.crew-lead-pick > .crew-speaking { width: 26px; height: 26px; }
+/* Nobody leads: a dashed person-plus, the same size as a face. */
+.crew-add { display: grid; place-items: center; width: 32px; height: 32px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-pill); color: var(--muted); }
+.crew-add:hover { color: var(--accent-ink); border-color: var(--accent); }
+/* Sections as tabs standing on the band's lower edge (a domain's, the Agents page's), so the band ends where the tabs do. */
+.page-masthead:has(> .masthead-tabs) { padding-bottom: 0; }
+.page-masthead .masthead-tabs { grid-area: foot; justify-self: end; align-self: baseline; gap: 24px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+.page-masthead .masthead-tabs > button { gap: 8px; min-height: 0; padding: 8px 0 12px; border-radius: 0; font-size: var(--text-sm); box-shadow: none; }
+.page-masthead .masthead-tabs > button:hover { color: var(--ink); }
+/* The open section: ink text standing on a 2px line in the accent ink, just above the band's hairline. */
+.page-masthead .masthead-tabs > button[aria-pressed="true"] { background: none; color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent-ink); }
+.page-masthead .masthead-tabs .crew-count { color: var(--muted); font-variant-numeric: tabular-nums; }
+/* A page without a place of its own (PageBand without a tile: Agents, Domains, Library, Routines…): no tile column, so
+   the title and its line start at the band's edge. */
+.page-masthead[data-plain] { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title actions" "intent foot"; row-gap: 4px; }
+.page-masthead .masthead-tabs .crew-unread { position: static; box-shadow: none; }
+/* A crumb back to the page this one sits in (a topic's Library), quiet before the title. */
+.masthead-crumb { flex: none; font-size: var(--text-md); color: var(--muted); }
+.masthead-crumb-sep { flex: none; color: var(--muted); }
+/* A project: the stage strip on one line, the chip and bar keeping their size; the sentence truncates and is whole in
+   the strip's tooltip, and on a narrow band gives way to its count. */
+.masthead-stage { grid-area: foot; justify-self: end; align-self: baseline; display: flex; align-items: center; gap: 12px; min-width: 0; max-width: 100%; font-size: var(--text-sm); color: var(--secondary); white-space: nowrap; }
+.masthead-stage > :is(.stage-chip, .progress-track) { flex: none; }
+.masthead-steps { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.masthead-count { display: none; font-variant-numeric: tabular-nums; }
+.masthead-stage .progress-track { width: 96px; height: 5px; margin: 0; border-radius: var(--radius-small); background: color-mix(in oklab, var(--ink) 8%, transparent); }
+.masthead-stage .progress-track > span { display: block; height: 100%; background: var(--hue); transform-origin: left; border-radius: var(--radius-small); }
+@container (max-width: 900px) { .masthead-steps { display: none; } .masthead-count { display: inline; } }
+.stage-chip {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  color: color-mix(in oklab, var(--hue) 60%, var(--ink));
+  background: color-mix(in oklab, var(--hue) 18%, var(--panel));
+}
+.masthead-stage .stage-chip { padding: 2px 10px; font-size: var(--text-xs); }
+/* The managing agent's brief (D40): the first morning's guide head, smaller, opening the page just under the band
+   (page content, not the header's; Carlos, 2026-11-20); a line seen before arrives without the pop. Dismissed, it is a
+   speech icon among the band's actions, its words in the tooltip. */
+.project-brief { align-items: center; }
+.page-masthead + .project-brief { margin: 0 0 20px; }
+.project-brief:not(.is-fresh) .guide-face, .project-brief:not(.is-fresh) .guide-bubble { animation: none; }
+.project-brief .guide-face { width: 44px; height: 44px; }
+.project-brief .guide-face img { border-radius: var(--radius-card); }
+.project-brief .guide-bubble { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; }
+.project-brief .guide-bubble > div { flex: 1; min-width: 0; }
+.project-brief .guide-bubble strong { font-size: var(--text-lg); }
+.project-brief .guide-bubble p { margin-top: 1px; min-height: 1.5em; }
+.brief-action { flex: none; background: var(--panel); }
+.brief-dismiss { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-height: 0; padding: 0; border-radius: var(--radius-pill); background: var(--panel); box-shadow: var(--panel-shadow); opacity: 0; transition: opacity var(--motion-quick) ease; }
+.project-brief:hover .brief-dismiss, .project-brief:focus-within .brief-dismiss { opacity: 1; }
+@media (hover: none) { .brief-dismiss { opacity: 1; } }
+.brief-note { color: var(--accent-ink); }
+/* A new project's welcome: the first morning's full-size face, the line, then numbered tips arriving one by one. */
+.project-brief.is-welcome { align-items: flex-start; }
+.project-brief.is-welcome .guide-face { width: 56px; height: 56px; }
+.project-brief.is-welcome .guide-face img { border-radius: var(--radius-tile); }
+.project-brief.is-welcome .guide-bubble { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 18px; }
+.project-brief.is-welcome .guide-bubble strong { font-size: var(--text-xl); }
+.brief-tips { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; counter-reset: tip; font-size: var(--text-sm); line-height: 1.45; }
+.brief-tips[hidden] { display: none; }
+.brief-tips li { display: flex; gap: 10px; align-items: baseline; counter-increment: tip; }
+.brief-tips li::before { content: counter(tip); flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--panel); color: var(--accent-ink); font-size: var(--text-xs); font-weight: 600; translate: 0 -1px; }
+.project-brief.is-fresh .brief-tips li { animation: bed-rise var(--motion-pop) calc(var(--i) * 120ms) var(--ease-settle) backwards; }
+.brief-actions { display: flex; align-items: center; gap: 14px; }
+/* One face per agent on the page: while an agent speaks in the brief, its face on the band shows a speech mark instead. */
+.crew-speaking { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1.5px dashed color-mix(in oklab, var(--accent) 60%, transparent); color: var(--accent-ink); }
+.crew-chat-icon { display: grid; place-items: center; width: 22px; height: 22px; color: var(--accent-ink); }
+/* The menu that changes who leads. */
+.crew-picker {
+  width: 260px;
+  max-height: min(340px, var(--available-height));
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.crew-picker[data-open] { animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.crew-picker [role="menuitem"] { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 8px; border-radius: var(--radius); text-align: left; }
+.crew-picker [role="menuitem"][aria-current] { background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.crew-picker [role="menuitem"]:is(:hover, [data-highlighted]) { background: var(--recessed); }
+.crew-picker img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.crew-picker strong { display: block; font-size: var(--text-sm); font-weight: 600; }
+.crew-picker small { display: block; font-size: var(--text-xs); color: var(--muted); }
+.crew-picker-new { border-top: 1px solid var(--line); border-radius: 0 0 10px 10px !important; color: var(--accent-ink); }
+.crew-picker-new > svg { width: 32px; }
+.crew-picker-group { margin-top: 4px; padding: 10px 8px 4px; border-top: 1px solid var(--line); font-size: var(--text-xs); font-weight: 600; color: var(--muted); }

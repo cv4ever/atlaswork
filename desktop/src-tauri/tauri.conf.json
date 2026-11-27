@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Atlaswork",
+  "version": "0.6.0",
+  "identifier": "app.atlaswork.desktop",
+  "build": {
+    "frontendDist": "https://app.atlaswork.app"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "capabilities": ["app"]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Atlaswork",
+    "shortDescription": "Atlaswork, with agents that work on this computer",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "externalBin": ["binaries/atlaswork-helper"],
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJBOTgyMjk3MUVCM0I1QzkKUldUSnRiTWVseUtZS21RemVwYWlxRUdtNVlWUGxQMW9wcnZ1U0dMeEdWbjN5bng1eCsvcVFnYUgK",
+      "endpoints": ["https://mcihsugblojunfpuohim.supabase.co/storage/v1/object/public/desktop/latest.json"],
+      "windows": {
+        "installMode": "quiet"
+      }
+    }
+  }
+}

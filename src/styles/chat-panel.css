@@ -1,0 +1,710 @@
+/* The chat panel: the conversations rail, header, transcript, messages, proposals and the composer. */
+/* The side panel is a rail down its left edge beside one column of conversation; phones stack them (agents.css). */
+.agent-panel {
+  min-width: 0;
+  min-height: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  flex-direction: column;
+}
+.agent-panel > :not(.chat-strip) { grid-column: 1; }
+/* The header is the name (the rail shows the face): large, a hand-drawn underline in the chat's colour drawn in when you
+   arrive; under it what this conversation is about, and a status line only when there is something to act on. */
+.agent-header {
+  --hue-ink: var(--hue, var(--accent));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0 4px;
+  padding: 16px 10px 10px 18px;
+  animation: header-in var(--motion-pop) var(--ease-settle);
+}
+/* The name shares its row with the actions; the underline, topic and status run the header's full width under them. */
+.agent-title { display: contents; }
+.agent-title > * { grid-column: 1 / -1; }
+.agent-title > strong { grid-column: 1; grid-row: 1; }
+.agent-header-actions { grid-column: 2; grid-row: 1; }
+.agent-title strong { display: block; font: 600 var(--text-3xl)/1.2 var(--font-title); letter-spacing: -0.6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-squiggle { display: block; width: min(100%, 9em); height: 7px; margin: 0 0 4px; overflow: visible; }
+.agent-squiggle path { fill: none; stroke: color-mix(in oklab, var(--hue-ink) 75%, var(--ink)); stroke-width: 2.2; stroke-linecap: round;
+  stroke-dasharray: 140; stroke-dashoffset: 140; animation: squiggle-draw var(--motion-fill) var(--motion-quick) var(--ease-settle) forwards; }
+@keyframes squiggle-draw { to { stroke-dashoffset: 0; } }
+/* The conversation on screen (its title, D28) with a chevron: a tap opens this chat's conversations (D29). A quiet
+   line after it says how long it runs, or who they are while the chat is clear. */
+.agent-topic-line { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; margin: 0 0 2px -6px; }
+/* The title gives way before the count beside it, down to a few words. */
+.agent-topic { display: flex; align-items: center; gap: 6px; flex: 0 10 auto; min-width: 7em; min-height: 26px; padding: 2px 6px; border-radius: var(--radius-small);
+  font-size: var(--text-sm); color: var(--secondary); text-align: left; transition: background var(--motion-quick), color var(--motion-quick); }
+.agent-topic > svg { flex: none; color: color-mix(in oklab, var(--hue-ink) 70%, var(--ink)); }
+.agent-topic > svg:last-child { color: var(--muted); }
+.agent-topic > span { min-width: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-topic[data-fresh] > span { flex: none; font-weight: 400; font-style: italic; color: var(--muted); }
+.agent-topic:is(:hover, [aria-expanded="true"]) { background: var(--recessed); color: var(--ink); }
+.agent-meta { flex: none; max-width: 60%; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-status { display: block; max-width: 100%; font-size: var(--text-xs); color: var(--muted); text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-status[data-kind="working"] { color: var(--accent-ink); font-weight: 600; }
+.agent-status[data-kind="stuck"] { color: var(--error); font-weight: 600; }
+/* Waiting on you: ink words after an attention dot; a tap brings the first card that waits into view. */
+.agent-status:is([data-kind="approval"], [data-kind="question"]) { color: var(--ink); font-weight: 600; }
+.agent-status:is([data-kind="approval"], [data-kind="question"])::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--attention); vertical-align: 1px; }
+button.agent-status:hover { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+.agent-header-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+.agent-header-actions .icon-button:disabled { opacity: 0.4; }
+/* New conversation, when a fresh start helps (D28): the window is filling up, or you're back after a while. */
+.agent-header-actions [data-recommended] { background: var(--accent-soft); color: var(--accent-ink); }
+/* On the Chats page New conversation names itself; it shows only while there is a conversation to end. */
+.agent-new { display: inline-flex; align-items: center; gap: 6px; height: 30px; margin: 0 2px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+  font-size: var(--text-xs); font-weight: 600; color: var(--secondary); transition: background var(--motion-quick), color var(--motion-quick); }
+.agent-new:hover { background: var(--recessed); color: var(--ink); }
+.agent-new[data-recommended] { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+/* Where a tab already names the chat (the Chats page), the header is one row: topic and status, then actions. */
+.agent-header[data-compact] { align-items: center; padding-block: 6px; }
+.agent-header[data-compact] > .agent-title { display: flex; align-items: center; gap: 12px; min-width: 0; grid-column: 1; grid-row: 1; }
+.agent-header[data-compact] .agent-topic-line { flex: 0 1 auto; margin-block: 0; }
+/* On one row what waits on you keeps its words; the count gives way first. */
+.agent-header[data-compact] .agent-meta { flex: 0 1 auto; min-width: 0; }
+.agent-header[data-compact] .agent-status { flex: none; max-width: 40%; }
+/* The conversation New conversation folded away, named, one step back: a tap reads it on its own. */
+.chat-previous { display: flex; align-items: center; gap: 10px; font-size: var(--text-xs); color: var(--muted); }
+.chat-previous::before, .chat-previous::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.chat-previous > button { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 80%; min-height: 28px; padding: 0 8px; border-radius: var(--radius-small); color: var(--secondary); }
+.chat-previous > button:hover { background: var(--recessed); color: var(--ink); }
+.chat-previous strong { min-width: 0; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-previous small { flex: none; font-size: var(--text-xs); color: var(--muted); }
+.chat-previous small::before { content: "· "; }
+/* This chat's conversations: what came of each under its title, when on the right. */
+.chat-list.conversation-list { width: min(420px, calc(100vw - 32px)); max-height: min(560px, 72vh, var(--available-height)); }
+.conversation-list [role="menuitem"] strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-list .chats-search { margin: 2px 2px 4px; }
+.conversation-list [role="menuitem"] > time { flex: none; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.conversation-list small[data-tone="waiting"] { color: var(--ink); font-weight: 600; }
+.conversation-list .chat-list-group[data-waiting]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--attention); vertical-align: 1px; }
+.conversation-new { font-weight: 600; }
+/* Reading an earlier conversation: the bar takes the message box's place, so nothing written lands in the wrong one. */
+.reading-bar { display: flex; align-items: center; gap: 10px; margin: 0 16px 16px; padding: 8px 8px 8px 12px; border-radius: var(--radius-card); background: var(--recessed);
+  font-size: var(--text-xs); color: var(--secondary); }
+.reading-bar > svg { flex: none; color: var(--muted); }
+.reading-bar > p { flex: 1; min-width: 0; margin: 0; }
+.reading-bar strong { color: var(--ink); font-weight: 600; }
+.reading-step { display: inline-flex; align-items: center; gap: 2px; flex: none; }
+.reading-step small { font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reading-step .icon-button:disabled { opacity: 0.4; }
+.reading-bar > .primary-button { flex: none; }
+@media (prefers-reduced-motion: reduce) {
+  .agent-squiggle path { animation: none; stroke-dashoffset: 0; }
+}
+.simulation-badge {
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.context-chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 8px;
+  max-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  font-size: var(--text-xs);
+  color: var(--secondary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.context-chip:hover {
+  border-color: var(--accent);
+}
+.context-chip > svg:last-child {
+  margin-left: 4px;
+}
+/* Messages fade out under the header as they scroll up, so the cut-off reads as "more above"; at the top the fade
+   only covers the padding. */
+.agent-transcript {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 22px 20px;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(to bottom, transparent, var(--ink) 16px);
+}
+.chat-message {
+  margin: 0 0 24px;
+  font-size: var(--text-md);
+}
+/* Messages fill the transcript's width, as its cards and the composer do (Carlos, 2026-11-22: a 56ch measure left
+   half the Chats page empty beside full-width cards). */
+.chat-message > p {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  /* Line breaks you typed (Shift Enter) stay. */
+  white-space: pre-line;
+}
+/* A Markdown reply (agents-design D64): the same width and rhythm as a plain one, lists and quotes indented, a
+   table compact and scrolling sideways rather than squeezing. */
+.message-rich { line-height: 1.8; overflow-wrap: anywhere; }
+.message-rich > * + * { margin-top: 10px; }
+.message-rich :is(ul, ol) { margin: 0; padding-left: 22px; }
+.message-rich li + li { margin-top: 2px; }
+.message-rich li > :is(ul, ol) { margin-top: 2px; }
+.message-rich li[data-task] { list-style: none; margin-left: -18px; }
+.message-rich li[data-task]::before { content: "○ "; color: var(--muted); }
+.message-rich li[data-task="done"]::before { content: "✓ "; color: var(--accent-ink); }
+.message-rich strong { font-weight: 600; }
+.message-rich a { color: var(--accent-ink); text-underline-offset: 2px; }
+.message-rich code { padding: 2px 6px; border-radius: var(--radius-xs); background: color-mix(in oklab, var(--line) 55%, transparent); font-size: 0.9em; }
+.message-rich pre { padding: 10px 12px; border-radius: var(--radius-small); background: color-mix(in oklab, var(--line) 40%, transparent); overflow-x: auto; line-height: 1.5; }
+.message-rich pre code { padding: 0; background: none; }
+.message-rich blockquote { margin: 0; padding-left: 12px; border-left: 2px solid var(--line-strong); color: var(--muted); }
+.message-rich hr { border: 0; border-top: 1px solid var(--line); }
+.rich-table { max-width: 100%; overflow-x: auto; }
+.rich-table table { border-collapse: collapse; font-size: var(--text-sm); line-height: 1.5; }
+.rich-table :is(th, td) { padding: 6px 12px 6px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.rich-table th { color: var(--muted); font-weight: 600; font-size: var(--text-xs); }
+.rich-table tr:last-child td { border-bottom: 0; }
+.message-speaker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.message-speaker img {
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+/* A room, or another agent answering in a one-to-one chat, names each voice with its face in the margin; otherwise
+   nobody repeats who is talking. */
+.chat-message.gutter { padding-left: 32px; }
+.chat-message.gutter > .message-speaker { color: var(--ink); font-weight: 600; }
+.chat-message.gutter > .message-speaker img { position: absolute; width: 24px; height: 24px; margin-left: -32px; }
+/* What an agent did on its own or for another (a check-in, an answer, a follow-up): one quiet line above its words. */
+.message-label { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-bottom: 4px; font-size: var(--text-xs); color: var(--muted); }
+.message-label > span { display: inline-flex; align-items: center; gap: 4px; }
+.message-label svg { color: color-mix(in oklab, var(--ochre) 70%, var(--ink)); }
+/* Scam warnings (agents-design D79): the app's fixed words above a reply, in the error tint, always open. */
+.message-warnings { display: grid; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
+.message-warnings li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in oklab, var(--error) 40%, var(--line));
+  border-radius: var(--radius-control);
+  background: var(--error-soft);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.message-warnings svg { flex: none; margin-top: 2px; color: var(--error); }
+/* What a reply read (agents-design D81), above its words: a connected account as a chip with the service's mark and
+   what it did; your own notes, tasks, pages and files as bare icons, their words in the tooltip. */
+.message-sources { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 0 0 8px; padding: 0; list-style: none; }
+.message-sources li { display: contents; }
+.source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 26px;
+  padding: 2px 10px 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.source-chip small { overflow: hidden; color: var(--muted); font-size: inherit; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.source-chip small::before { content: "·"; margin-right: 6px; }
+.source-icon { display: inline-grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--muted); }
+.source-icon:hover, button.source-icon[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent-ink); }
+button.source-chip { font-family: inherit; cursor: pointer; }
+button.source-chip:hover, button.source-chip[aria-expanded="true"] { border-color: var(--line-strong); background: var(--accent-soft); }
+/* What a tapped source read, under the line: a calendar's days with their events, else the source's words. */
+.source-read { margin: -4px 0 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); font-size: var(--text-xs); }
+.source-read-note { margin: 0; color: var(--muted); }
+.source-read-days { display: grid; gap: 8px; margin: 0; }
+.source-read-days dt { font-weight: 600; color: var(--ink); }
+.source-read-days dd { display: flex; gap: 8px; margin: 2px 0 0; color: var(--ink); }
+.source-read-days dd > span { flex: none; min-width: 84px; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* A calendar that couldn't be read: dashed in clay on a faint clay wash, its mark greyed, Reconnect beside it when revoked. */
+.message-sources [data-failed] .source-chip {
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--clay) 70%, var(--line));
+  background: color-mix(in oklab, var(--clay) 10%, var(--panel));
+  color: var(--clay-ink);
+}
+.message-sources [data-failed] .brand-mark { filter: grayscale(1); opacity: 0.7; }
+.source-reconnect {
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.source-reconnect:hover { background: var(--accent-soft); color: var(--accent-ink); }
+.brand-mark { flex: none; }
+.chat-message.user {
+  margin-left: 18px;
+}
+/* Your words hug the right edge at their own width, so a glance down the chat tells the two voices apart; the bubble
+   tucks its corner toward you. */
+.chat-message.user > p {
+  width: fit-content;
+  margin-left: auto;
+  background: var(--accent-soft);
+  padding: 10px 14px;
+  border-radius: var(--radius-control) var(--radius-control) var(--radius-xs) var(--radius-control);
+  color: var(--ink);
+}
+/* The page's selection tint is this bubble's fill, so a selection here would not show. */
+.chat-message.user > p::selection,
+.chat-message.user > p ::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+/* Agents a message of yours asked who never answered it (D28): who, why, the fix if there is one, and Retry. */
+.message-unanswered { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 8px; margin-top: 6px; font-size: var(--text-xs); color: var(--muted); }
+/* Why it failed, as the engine said it, under the line saying who didn't answer. */
+.message-unanswered > span { display: grid; gap: 2px; text-align: right; }
+.message-unanswered b { display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-weight: 600; color: var(--clay-ink); }
+.message-unanswered small { max-width: 40ch; font-size: var(--text-xs); line-height: 1.5; color: var(--muted); }
+.message-unanswered :is(button, a) { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); color: var(--accent-ink); text-decoration: none; }
+.message-unanswered :is(button, a):hover { border-color: var(--accent); background: var(--accent-soft); }
+/* The message's time and place, and Copy: shown on hover or keyboard focus, in the gap under it, so the text stays the
+   only thing you read. */
+.chat-message { position: relative; }
+.message-tools { position: absolute; left: 0; bottom: -24px; display: flex; align-items: center; gap: 6px; height: 22px; font-size: var(--text-xs); color: var(--muted);
+  opacity: 0; transition: opacity var(--motion-quick); }
+.chat-message.user > .message-tools { left: auto; right: 0; }
+.chat-message.gutter > .message-tools { left: 32px; }
+.chat-message:hover > .message-tools, .message-tools:focus-within, .message-tools:has(.lucide-check) { opacity: 1; }
+.message-copy { display: grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-xs); color: var(--muted); }
+.message-copy:hover { color: var(--ink); background: var(--recessed); }
+/* A card an agent hands you (tasks, changes, an agent, a question): flat paper, each section headed by its icon, its
+   name in ink and its count in words; while it waits on you the count wears the attention dot, as the header's status does. */
+.proposal {
+  margin-top: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--panel);
+  overflow: hidden;
+  transform-origin: top center;
+}
+.proposal-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: var(--text-xs);
+  color: var(--secondary);
+  border-bottom: 1px solid var(--line);
+}
+.proposal-heading > span:first-child { display: inline-flex; align-items: center; gap: 6px; min-width: 0; font-weight: 600; color: var(--ink); }
+.proposal-heading > span:first-child > svg { flex: none; color: var(--accent-ink); }
+.proposal-heading > span:last-child {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.proposal.pending:not(.ask) > .proposal-heading:first-child > span:last-child::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--attention); vertical-align: 1px; }
+.proposal:not(.pending) .proposal-heading > span:first-child { color: var(--secondary); }
+.proposal ol {
+  padding: 0 12px 0 36px;
+  margin: 0;
+  list-style: decimal;
+}
+.proposal li {
+  padding: 12px 4px;
+  line-height: 1.7;
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--line);
+}
+.proposal li:last-child {
+  border-bottom: 0;
+}
+.proposal li::marker {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+/* A sorted capture (agents-design D53): each row says where it goes and when, and the notes it keeps follow the tasks. */
+.proposal-where { display: block; color: var(--muted); font-size: var(--text-xs); line-height: 1.4; }
+.proposal-subheading { border-top: 1px solid var(--line); }
+.proposal-notes { margin: 0; padding: 0 12px; list-style: none; }
+.proposal .proposal-notes > li { display: flex; gap: 10px; align-items: baseline; }
+.proposal-notes > li > svg { flex-shrink: 0; color: var(--muted); translate: 0 2px; }
+/* Suggested changes lead with what each does, its icon in the kind's colour: a tick in the accent, a new date in ochre,
+   an archive in muted ink. */
+.proposal .proposal-changes { padding: 0 12px; list-style: none; }
+.proposal .proposal-changes > li { display: grid; grid-template-columns: 16px 1fr; gap: 0 10px; }
+.proposal-changes > li > svg { color: var(--secondary); translate: 0 4px; }
+.proposal-changes > li > small { grid-column: 2; }
+.proposal-changes > li[data-kind="complete"] > svg { color: var(--accent-ink); }
+.proposal-changes > li[data-kind="reschedule"] > svg { color: color-mix(in oklab, var(--ochre) 70%, var(--ink)); }
+.proposal-changes > li[data-kind="page"] > svg { color: color-mix(in oklab, var(--sage) 70%, var(--ink)); }
+.proposal-changes > li[data-kind="archive"] > svg { color: var(--muted); }
+/* A tidy's files once its computer answered (D79): moved like a completed task, back muted, one that stayed in the error
+   tint. Paths have no spaces to break at, so they wrap anywhere. */
+.proposal-changes > li[data-kind="moved"] > svg { color: var(--accent-ink); }
+.proposal-changes > li[data-kind="back"] > svg { color: var(--muted); }
+.proposal-changes > li[data-kind="stayed"] > svg { color: var(--error); }
+.proposal-changes > li[data-kind] > :is(span, small) { min-width: 0; overflow-wrap: anywhere; }
+/* A domain the proposal plants on its own (D61), in the colour it will wear. */
+.proposal-projects { margin: 0; padding: 0 12px; list-style: none; }
+.proposal .proposal-projects > li { display: flex; gap: 10px; align-items: baseline; }
+.proposal-projects > li > svg { flex-shrink: 0; color: var(--hue); translate: 0 3px; }
+/* Its keeper's face inline, the size of the words. */
+.proposal-planted small img { width: 16px; height: 16px; margin-inline-end: 4px; border-radius: 50%; vertical-align: -3px; object-fit: cover; }
+/* A project the proposal makes (D61): a seed packet with the plant it starts as in the colour it will wear, the title
+   in Fraunces and the goal on one line until More. While it waits on you the seed wears the attention dot, as a
+   heading's count does, and the project dialog's fact chips follow (`.project-fact`, D62), each unfolding its detail
+   in a recessed panel under the row, one at a time. */
+.proposal-packet { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 12px; padding: 14px 14px 12px; }
+.proposal-packet + .proposal-packet { border-top: 1px solid var(--line); }
+.proposal-packet strong { display: block; font: 600 var(--text-md)/1.3 var(--font-title); color: var(--ink); text-wrap: balance; }
+.proposal-goal { display: -webkit-box; margin: 2px 0 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; font-size: var(--text-xs); line-height: 1.5; color: var(--secondary); }
+.proposal-goal[data-whole] { display: block; }
+.proposal-packet .text-button { padding: 0; font-size: var(--text-xs); }
+.proposal-packet .project-idea-plant { position: relative; }
+.proposal.pending > .proposal-packet:first-child .project-idea-plant::after { content: ""; position: absolute; top: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--attention); box-shadow: 0 0 0 2px var(--panel); }
+.proposal-facts { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 12px; }
+.proposal-facts .project-fact { min-height: 28px; padding-block: 2px; font-size: var(--text-xs); }
+.proposal-facts .project-fact-face + .project-fact-face { margin-left: -10px; box-shadow: 0 0 0 2px var(--panel); }
+.proposal > .proposal-panel { margin: 0 14px 12px; padding: 10px 12px; font-size: var(--text-sm); }
+.proposal .proposal-panel li { padding: 4px 0; border: 0; line-height: 1.5; }
+.proposal-panel-line { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; line-height: 1.5; color: var(--ink); }
+.proposal-panel-line > :is(span, li) { display: flex; align-items: center; gap: 8px; }
+.proposal-panel-line .project-fact-face { margin: 0; }
+.proposal .proposal-steps { padding: 0 0 0 18px; }
+.proposal-steps li > div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.proposal .proposal-panel .proposal-notes { padding: 0; }
+/* Domains Atlas suggests while sorting: a Plant button each, opening the domain dialog. */
+.proposal-plant { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.proposal-plant > small { flex-basis: 100%; color: var(--muted); font-size: var(--text-xs); }
+.proposal-plant > button, .proposal-plant > span { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-xs); }
+.proposal-plant > span { color: var(--muted); }
+.proposal-source {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  padding: 4px 12px 12px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.proposal-source:hover {
+  color: var(--accent);
+}
+.proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+}
+.proposal-actions > .primary-button {
+  flex: 1;
+  font-size: var(--text-xs);
+}
+.proposal-actions > .quiet-button {
+  font-size: var(--text-xs);
+}
+/* Reject and Decline say no in the error colour, outlined and quieter than Apply, so the two answers never look alike. */
+.reject-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--control-height);
+  padding: 4px 12px;
+  border: 1px solid color-mix(in oklab, var(--error) 40%, var(--line));
+  border-radius: var(--radius-small);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--error);
+  white-space: nowrap;
+  transition: background var(--motion-quick), border-color var(--motion-quick), transform var(--motion-settle) var(--ease-settle);
+}
+.reject-button:hover { border-color: var(--error); background: var(--error-soft); }
+.reject-button:active { transform: translateY(1px) scale(0.97); }
+.proposal > .inline-error {
+  margin: 0 12px 12px;
+}
+/* What became of it: done in the accent with Undo beside it; rejected, declined or undone in quiet ink on a well. */
+.proposal-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 8px 6px 12px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--accent-ink);
+  border-top: 1px solid var(--line);
+  background: var(--accent-soft);
+}
+.proposal-result > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.proposal-result .quiet-button { color: var(--accent-ink); }
+.proposal-result .quiet-button:hover { background: var(--panel); }
+.proposal-result[data-tone="quiet"] { color: var(--muted); font-weight: 400; background: var(--recessed); }
+.proposal-result:first-child { border-top: 0; }
+.proposal.rejected,
+.proposal.undone,
+.proposal.declined {
+  border-color: var(--line);
+  border-style: dashed;
+}
+.proposal.rejected ol,
+.proposal.undone ol,
+.proposal.rejected .proposal-notes,
+.proposal.undone .proposal-notes,
+.proposal.rejected .proposal-projects,
+.proposal.undone .proposal-projects {
+  display: none;
+}
+/* An undone tidy keeps its files in view while one of them couldn't go back, with why (D79). */
+.proposal.undone ol:has(> li[data-kind="moved"]) { display: block; }
+/* An agent Atlas drafted (agents-design D57): who and where, the house rules as a quote clamped to three lines (all of
+   it on hover or focus), what it gets beyond the defaults, and quiet agents to archive. Rejected, it folds to its line. */
+.agent-draft-who { display: flex; align-items: center; gap: 10px; padding: 12px 12px 4px; }
+.agent-draft-who img, .agent-draft-face { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.agent-draft-face { display: grid; place-items: center; color: var(--muted); border: 1px dashed var(--line-strong); }
+.agent-draft-who strong { display: block; font-size: var(--text-sm); }
+.agent-draft-who small { display: block; font-size: var(--text-xs); color: var(--muted); line-height: 1.4; }
+/* House rules read as a quotation: indented, in italic Fraunces, never a stripe down the side. */
+.agent-draft-rules {
+  margin: 8px 12px 12px; padding-left: 12px; font: italic 400 var(--text-md)/1.6 var(--font-title); color: var(--secondary);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+}
+.agent-draft-card:hover .agent-draft-rules, .agent-draft-card:focus-within .agent-draft-rules { -webkit-line-clamp: unset; }
+.agent-draft-extra { margin: 0 12px 12px; font-size: var(--text-xs); color: var(--secondary); }
+.agent-draft-quiet { margin: 0; padding: 8px 12px; list-style: none; border-top: 1px solid var(--line); }
+.proposal .agent-draft-quiet > li { display: flex; align-items: center; gap: 8px; padding: 4px 0; border: 0; font-size: var(--text-xs); color: var(--secondary); }
+.agent-draft-quiet img { border-radius: 50%; }
+.agent-draft-quiet .text-button { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; font-size: var(--text-xs); }
+.agent-draft-card.rejected :is(.agent-draft-rules, .agent-draft-extra, .agent-draft-quiet) { display: none; }
+/* A question for another agent (agents-design D50): the question as a quotation (indent and italic Fraunces); declined,
+   the card folds to its line. */
+.ask-question {
+  margin: 0;
+  padding: 12px 14px 12px 24px;
+  font: italic 400 var(--text-md)/1.6 var(--font-title);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.proposal.ask.declined .ask-question { display: none; }
+.ask-heading-end { display: inline-flex; align-items: center; gap: 8px; }
+/* The pencil stays quiet until you reach for the card (progressive disclosure); touch screens always show it. */
+.ask-edit { display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--radius-small); color: var(--muted); opacity: 0; transition: opacity var(--motion-quick) ease; }
+.proposal.ask:hover .ask-edit, .ask-edit:focus-visible { opacity: 1; }
+@media (hover: none) { .ask-edit { opacity: 1; } }
+.ask-edit:hover { color: var(--accent); background: var(--recessed); }
+/* Rewording the question: a field, so it takes the field edge and the focus ring. */
+.ask-editor { display: block; width: calc(100% - 24px); margin: 10px 12px; padding: 8px 10px; resize: vertical; font: inherit; font-size: var(--text-sm); font-style: normal;
+  color: inherit; background: var(--panel); border: 1px solid var(--line-field); border-radius: var(--radius-base); }
+.ask-editor:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ask-note { margin: 0; padding: 0 14px 10px; font-size: var(--text-xs); color: var(--muted); }
+.ask-note[data-short] { color: var(--clay-ink); }
+.agent-composer {
+  padding: 12px 16px 14px;
+}
+.composer-box {
+  border: 1px solid var(--line-field);
+  border-radius: var(--radius-card);
+  background: var(--canvas);
+  padding: 10px 12px 8px;
+}
+.composer-box:focus-within {
+  border-color: var(--accent);
+}
+.composer-box textarea {
+  width: 100%;
+  min-height: 48px;
+  max-height: 130px;
+  resize: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.composer-box textarea:focus-visible {
+  outline: none;
+}
+/* The note they read sits in the box above what you type once attached, as a filled chip. Until then the paperclip
+   offers the note you're on, with a dot (`NoteOffer`). */
+.composer-note { display: flex; min-width: 0; margin: -2px 0 8px -4px; }
+.composer-note .context-chip { max-width: 100%; min-height: 28px; background: var(--panel); }
+.composer-note .context-chip.attached { background: var(--accent-soft); }
+.note-offer-button { position: relative; }
+.note-offer-dot { position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-ink); box-shadow: 0 0 0 2px var(--panel); }
+.chat-list.note-offer { width: min(320px, calc(100vw - 32px)); }
+.note-offer [role="menuitem"] strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The model line (agents-design D82): who answers and how, in words above what you type. Either half opens the picker,
+   which sits over the transcript at the box's width. */
+.composer-box { anchor-name: --composer-box; container: composer / inline-size; }
+/* A heading inside the model list: Recent, then the maker or provider the rows below come from. */
+.model-group { margin: 6px 8px 2px; font-size: var(--text-2xs); font-weight: 600; color: var(--muted); }
+/* In the side panel the model's name keeps the room: Thinking shows as its plant alone, its word in the button's label. */
+@container composer (max-width: 300px) { .model-line-word { display: none; } }
+.model-line { display: flex; align-items: center; gap: 2px; min-width: 0; margin: -4px 0 4px -6px; font-size: var(--text-xs); color: var(--muted); }
+.model-line-who { flex: none; padding: 0 2px 0 6px; white-space: nowrap; }
+.model-line > button { display: inline-flex; align-items: center; gap: 4px; min-width: 0; height: 24px; padding: 0 6px; border-radius: var(--radius-small);
+  color: var(--secondary); white-space: nowrap; transition: background var(--motion-quick), color var(--motion-quick); }
+.model-line > button:hover:not(:disabled), .model-line > button:focus-visible { background: var(--recessed); color: var(--ink); }
+.model-line > button:disabled { opacity: 0.6; }
+.model-line > button > svg { flex: none; }
+.model-line-model { flex: 0 1 auto; }
+.model-line-model > span { overflow: hidden; text-overflow: ellipsis; }
+/* A choice this chat made over the agent's usual: a dot after the name. */
+.model-line-model[data-chosen]::after { content: ""; flex: none; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.model-line-sep { color: var(--line-strong); }
+.model-line-note { padding-left: 6px; }
+.vendor-mark { flex: none; fill: currentColor; color: var(--muted); }
+.vendor-mark[data-vendor="claude"] { color: var(--vendor-claude); }
+.vendor-mark[data-vendor="openai"] { color: var(--vendor-openai); }
+.vendor-mark[data-vendor="gemini"] { color: var(--vendor-gemini); }
+.vendor-mark[data-vendor="deepseek"] { color: var(--vendor-deepseek); }
+.vendor-mark[data-vendor="mistral"] { color: var(--vendor-mistral); }
+.vendor-mark[data-vendor="meta"] { color: var(--vendor-meta); }
+.vendor-mark[data-vendor="other"] { fill: none; }
+img.vendor-mark { width: 12px; height: 12px; }
+.model-picker { position: fixed; position-anchor: --composer-box; inset: auto; bottom: anchor(top); left: anchor(left); width: min(anchor-size(width), 400px);
+  max-height: min(480px, calc(100vh - 120px)); margin: 0 0 8px; padding: 6px; display: none; flex-direction: column; border: 1px solid var(--line);
+  border-radius: var(--radius-card); background: var(--panel); box-shadow: var(--shadow); color: var(--ink); font-size: var(--text-sm); }
+.model-picker:popover-open { display: flex; animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.model-picker-note { margin: 0; padding: 8px; font-size: var(--text-xs); color: var(--muted); }
+.model-picker-note p { margin: 0 0 8px; color: var(--secondary); }
+.model-picker-note b { color: var(--ink); }
+.model-vendors { display: flex; gap: 2px; padding: 2px 2px 6px; margin-bottom: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.model-vendors button { display: grid; justify-items: center; gap: 2px; flex: 1 0 auto; min-width: 48px; padding: 6px 4px; border-radius: var(--radius-md);
+  font-size: var(--text-2xs); color: var(--muted); }
+.model-vendors button:hover { background: var(--recessed); color: var(--ink); }
+.model-vendors button[aria-selected="true"] { background: var(--recessed); color: var(--ink); font-weight: 600; }
+.model-search { display: flex; align-items: center; gap: 6px; flex: none; height: 32px; margin: 2px 2px 4px; padding: 0 8px; border: 1px solid var(--line-field);
+  border-radius: var(--radius-md); background: var(--canvas); color: var(--muted); }
+.model-search:focus-within { border-color: var(--accent); }
+.model-search input { flex: 1; min-width: 0; border: 0; padding: 0; background: transparent; font-size: var(--text-xs); color: var(--ink); }
+.model-search input:focus-visible { outline: none; }
+.model-rows { flex: 1 1 auto; min-height: 72px; overflow-y: auto; }
+.model-row { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 34px; padding: 4px 8px; border-radius: var(--radius-md); text-align: left; }
+.model-row:hover { background: var(--recessed); }
+.model-row[aria-selected="true"] { background: var(--accent-soft); }
+.model-row > .lucide-check { flex: none; color: var(--accent-ink); }
+.model-row-name { display: grid; flex: 1; min-width: 0; line-height: 1.3; }
+.model-row-name b { overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.model-row-name small { overflow: hidden; color: var(--muted); font-size: var(--text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.model-cost { flex: none; color: var(--line-strong); font-size: var(--text-xs); font-weight: 600; letter-spacing: -0.5px; }
+.model-cost b { color: var(--secondary); font-weight: 600; }
+/* Thinking: four stops on one track, the plant growing with each; the track fills to the pick. */
+.model-thinking { flex: none; margin: 4px 0 0; padding: 8px 8px 4px; border: 0; border-top: 1px solid var(--line); }
+.model-thinking legend { display: flex; justify-content: space-between; gap: 8px; width: 100%; float: left; margin-bottom: 6px; font-size: var(--text-xs); font-weight: 600; color: var(--secondary); }
+.model-thinking legend small { font-weight: 400; color: var(--muted); text-align: right; }
+.thinking-track { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); clear: both; }
+.thinking-track::before, .thinking-track::after { content: ""; position: absolute; top: 12px; left: 12.5%; height: 3px; border-radius: var(--radius-pill); }
+.thinking-track::before { right: 12.5%; background: var(--recessed); }
+.thinking-track::after { width: calc(var(--at) * 25%); background: var(--accent); transition: width var(--motion-settle) var(--ease-settle); }
+.thinking-track label { position: relative; z-index: var(--layer-raised); display: grid; justify-items: center; gap: 4px; font-size: var(--text-2xs); color: var(--muted); cursor: pointer; }
+.thinking-track input { position: absolute; opacity: 0; pointer-events: none; }
+.thinking-stop { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--panel);
+  transition: border-color var(--motion-quick), color var(--motion-quick); }
+.thinking-track label:hover .thinking-stop { border-color: var(--accent); color: var(--accent-ink); }
+.thinking-track label:has(input:checked) { color: var(--accent-ink); font-weight: 600; }
+.thinking-track label:has(input:checked) .thinking-stop { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+.thinking-track label:has(input:focus-visible) .thinking-stop { outline: 2px solid var(--accent); outline-offset: 2px; }
+.model-thinking:disabled .thinking-track { opacity: 0.45; }
+.model-thinking:disabled label { cursor: default; }
+.model-picker-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; flex: none; margin: 4px 0 0; padding: 8px 8px 2px; border-top: 1px solid var(--line);
+  font-size: var(--text-xs); color: var(--muted); }
+.model-picker-foot > span { margin-right: auto; }
+/* A member's model in a room's "To" chip: its maker's mark on the portrait's corner. */
+.mention-chips button:has(.mention-model) { position: relative; }
+.mention-model { position: absolute; left: 17px; bottom: 1px; display: grid; place-items: center; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--panel); box-shadow: 0 0 0 1px var(--line); }
+/* The model a reply was written on, in its hover tools; and a line where an agent's model or Thinking changed. */
+.message-model { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.message-model .thinking-glyph { margin-left: 2px; }
+.model-switch { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; font-size: var(--text-xs); color: var(--muted); }
+.model-switch::before, .model-switch::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.model-switch > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+/* The tools keep their size in a narrow panel (Send once shrank to 18px beside a long label); only the dictation
+   status gives way, cut short with its full words in the tooltip. */
+.composer-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.composer-tools > * {
+  flex: none;
+}
+.composer-tools > .icon-button {
+  width: 25px;
+  height: 25px;
+  margin-left: -6px;
+}
+/* Only the first tool tucks into the box's edge. */
+.composer-tools > .icon-button:not(:first-child) {
+  margin-left: 0;
+}
+.composer-tools > span:not(.composer-count) {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+/* The context meter takes the free space; the count and Send follow it. */
+.composer-tools > .context-meter {
+  margin-left: auto;
+}
+.composer-tools > .composer-count {
+  font-variant-numeric: tabular-nums;
+}
+.composer-tools > .composer-count[data-over] {
+  color: var(--error);
+  font-weight: 600;
+}
+.context-meter ~ .send-button {
+  margin-left: 0;
+}
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: var(--radius-small);
+  margin-left: auto;
+}
+.inline-error {
+  font-size: var(--text-xs);
+  color: var(--error);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}

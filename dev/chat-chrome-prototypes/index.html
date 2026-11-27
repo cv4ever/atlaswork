@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="stylesheet" href="./prototypes.css" />
+    <title>Chat controls, history and the message box · Atlaswork mockups</title>
+  </head>
+  <body>
+    <main class="page">
+      <h1>The chat page, reorganised</h1>
+      <p class="lede">Three questions: where each control lives (H), how you reach an older conversation (E), and where the note offer goes once its line leaves the message box (A). Frames are the Chats page at its real size on the Graphite theme. Each part's options mix freely with the others'.</p>
+
+      <ul class="findings">
+        <li><span class="code">F1</span><b>Controls sit in the wrong row.</b> Details is about this agent but sits in the tab bar; Move to side panel and Close act on the whole page but sit in the chat's row.</li>
+        <li><span class="code">F2</span><b>Two kinds of ×.</b> The tab's × closes a tab; the header's × closes the whole Chats page, 40px under it.</li>
+        <li><span class="code">F3</span><b>+ by the tabs starts a room.</b> Every browser trained + there as "new tab". All chats, the thing that opens a chat, is a speech-bubble icon.</li>
+        <li><span class="code">F4</span><b>One icon, three meanings.</b> Speech bubbles mark All chats, the conversation title and Earlier conversations.</li>
+        <li><span class="code">F5</span><b>New conversation looks broken.</b> It is greyed out whenever the chat is clear, which is most of the time you see it.</li>
+        <li><span class="code">F6</span><b>No way to one older conversation.</b> Earlier conversations unfolds all of them at once; the title opens the Logbook, a different page.</li>
+        <li><span class="code">F7</span><b>The attach line costs 26px in every chat</b> to offer what the paperclip already does.</li>
+      </ul>
+
+      <h2>Today</h2>
+      <div class="frames" id="now"></div>
+
+      <h2>H · Where each control lives</h2>
+      <p class="thesis">One rule: a control sits with what it acts on. The page (which chats are open, side panel, close) owns the tab bar; the chat (its conversations, find, details) owns the row under it.</p>
+
+      <h3><span class="code">H1</span> Page above, chat below <span class="rec">Recommended</span></h3>
+      <ul class="tradeoffs"><li><b>For:</b> + behaves like a browser's; the two × are a tab and a window, far apart; the chat's row reads left to right as which conversation, then what to do in it.</li><li><b>Against:</b> still icon-only for Find, Details and the far-right pair, per the progressive-disclosure rule; tooltips carry the words.</li></ul>
+      <div class="frames" id="h1"></div>
+
+      <h3><span class="code">H2</span> One toolbar</h3>
+      <ul class="tradeoffs"><li><b>For:</b> every action in one place, grouped by what it acts on.</li><li><b>Against:</b> six icons in a row again; page actions under the tabs keep F1's split of scope, only tidier.</li></ul>
+      <div class="frames" id="h2"></div>
+
+      <h3><span class="code">H3</span> Words in a menu</h3>
+      <ul class="tradeoffs"><li><b>For:</b> nothing to decode; the quietest header.</li><li><b>Against:</b> Find and Details become two clicks; a ⋯ menu hides what the page can do.</li></ul>
+      <div class="frames" id="h3"></div>
+
+      <h2>E · Earlier conversations</h2>
+      <p class="thesis">A chat with Atlas holds many conversations. You should be able to see which ones, what came of each, and open any single one, without leaving Atlas's tab.</p>
+
+      <h3><span class="code">E1</span> The title is a switcher <span class="rec">Recommended</span></h3>
+      <ul class="tradeoffs"><li><b>For:</b> the place you already look (the title) answers "which conversation is this, and what else is there"; no width lost; New conversation lives in the same list.</li><li><b>Against:</b> the list is hidden until tapped; the "previous" line at the top keeps the one-step-back path visible.</li></ul>
+      <div class="frames" id="e1"></div>
+
+      <h3><span class="code">E2</span> A history column</h3>
+      <ul class="tradeoffs"><li><b>For:</b> always visible, fastest for hopping between conversations.</li><li><b>Against:</b> 260px off the conversation, a third column beside Details; on the side panel it can't fit.</li></ul>
+      <div class="frames" id="e2"></div>
+
+      <h3><span class="code">E3</span> Folds in the transcript</h3>
+      <ul class="tradeoffs"><li><b>For:</b> one scroll, no popover; scrolling up is the history.</li><li><b>Against:</b> the stack grows with every conversation; finding last month's means scrolling or Find.</li></ul>
+      <div class="frames" id="e3"></div>
+
+      <h2>A · The note offer</h2>
+      <p class="thesis">The attach line goes in every option. What's left to decide is whether the note you're on is still offered, and where.</p>
+
+      <h3><span class="code">A1</span> Inside the paperclip <span class="rec">Recommended</span></h3>
+      <ul class="tradeoffs"><li><b>For:</b> exactly your point: the paperclip is the attach button, and it now knows which note you mean.</li><li><b>Against:</b> attaching the note you're on takes two clicks instead of one.</li></ul>
+      <div class="frames" id="a1"></div>
+
+      <h3><span class="code">A2</span> A ghost chip in the tool row</h3>
+      <ul class="tradeoffs"><li><b>For:</b> keeps the one-tap offer at no height.</li><li><b>Against:</b> still always there, and crowds the row on the side panel.</li></ul>
+      <div class="frames" id="a2"></div>
+
+      <h3><span class="code">A3</span> At the end of the model line</h3>
+      <ul class="tradeoffs"><li><b>For:</b> one tap, no height, uses an empty stretch.</li><li><b>Against:</b> mixes the note with the model setting.</li></ul>
+      <div class="frames" id="a3"></div>
+
+      <h2>Extras, pick any</h2>
+      <ul class="extras">
+        <li><span class="code">X1</span> <b>Continue it.</b> From an older conversation, start a new one that hands the agent that conversation to pick up from (drawn in E1's second frame). New behaviour: today an old conversation can only be read.</li>
+        <li><span class="code">X2</span> <b>A shortcut for New conversation</b> (Ctrl Shift O, as in ChatGPT), shown in the switcher.</li>
+        <li><span class="code">X3</span> <b>Search inside the switcher matches message text</b>, not just titles, so "the one about the dentist" finds it.</li>
+      </ul>
+    </main>
+    <script src="./icons.js"></script>
+    <script src="./prototypes.js"></script>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+/* The Projects page: garden beds, plants and soil lines. */
+/* Projects page: garden beds. The plant grows with finished tasks; the stem is its progress. */
+.project-beds { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.project-bed {
+  --bed: var(--accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 220px;
+  padding: var(--card-padding);
+  overflow: hidden;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  animation: bed-rise var(--motion-enter) calc(min(var(--i), 8) * 50ms) var(--ease-spring) backwards;
+  transition: border-color var(--motion-quick), translate var(--motion-settle) var(--ease-settle), box-shadow var(--motion-quick);
+}
+.project-bed:hover { border-color: color-mix(in oklab, var(--bed) 50%, var(--line)); translate: 0 -3px; box-shadow: var(--shadow); }
+.project-bed-top { display: flex; align-items: center; gap: 10px; width: 100%; margin-bottom: 6px; }
+.project-bed-top small { color: var(--muted); font-size: var(--text-xs); letter-spacing: 0.04em; }
+.project-plant {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  font-size: 24px;
+  color: var(--bed);
+  border-radius: 50% 50% 35% 50%;
+  background: color-mix(in oklab, var(--bed) 18%, var(--panel));
+  transform-origin: 50% 90%;
+}
+.project-bed:hover .project-plant { animation: plant-sway 1.4s ease-in-out infinite; }
+.project-bed h2 { font: 600 var(--text-2xl)/1.3 var(--font-title); letter-spacing: -0.4px; overflow-wrap: anywhere; }
+.project-bed p {
+  flex: 1;
+  color: var(--secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.project-stem { width: 100%; height: 6px; border-radius: var(--radius-pill); background: var(--recessed); overflow: hidden; }
+.project-stem > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bed);
+  transform-origin: left;
+  transition: transform var(--motion-settle) var(--ease-settle);
+}
+.project-bed-meta { display: flex; align-items: center; gap: 14px; width: 100%; color: var(--muted); font-size: var(--text-xs); }
+.project-bed-meta > span { display: inline-flex; align-items: center; gap: 6px; }
+.project-bed-meta > svg { margin-left: auto; color: var(--bed); transition: translate var(--motion-quick); }
+.project-bed:hover .project-bed-meta > svg { translate: 3px 0; }
+.project-bed-new { justify-content: center; align-items: center; text-align: center; border-style: dashed; background: transparent; }
+.project-bed-new::after { display: none; }
+.project-bed-new .project-plant { color: var(--muted); background: var(--recessed); transition: rotate var(--motion-settle) var(--ease-settle); }
+.project-bed-new:hover .project-plant { animation: none; rotate: 90deg; color: var(--accent-ink); }
+.project-bed-new h2 { font-size: var(--text-xl); }
+.project-bed-new p { flex: none; color: var(--muted); }
+@keyframes bed-rise { from { opacity: 0; translate: 0 14px; scale: 0.97; } }
+@keyframes plant-sway {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-8deg) scale(1.06); }
+  70% { transform: rotate(6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-bed, .project-bed:hover .project-plant { animation: none; }
+}

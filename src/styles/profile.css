@@ -1,0 +1,184 @@
+/* Settings → Profile: the portrait, the plant and its vine of steps, and the account card. */
+/* Your profile: a plant on your portrait grows as the vine of steps fills in. Profile and Settings share PanelTabs. */
+.profile-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px 18px;
+  padding: 20px 20px 16px;
+  margin-bottom: 6px;
+  border-radius: var(--radius-tile);
+  background: color-mix(in oklab, var(--accent) 10%, var(--panel));
+  border: 1px solid color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.profile-portrait { position: relative; width: 84px; height: 84px; border-radius: 50%; }
+.profile-portrait-camera {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--scrim);
+  opacity: 0;
+  transition: opacity var(--motion-quick);
+}
+.profile-portrait:hover .profile-portrait-camera, .profile-portrait:focus-visible .profile-portrait-camera { opacity: 1; }
+.picture-choices { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.picture-upload {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--line-strong);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  transition: color var(--motion-quick), border-color var(--motion-quick);
+}
+.picture-upload:hover { color: var(--accent-ink); border-color: var(--accent); }
+.picture-choice { position: relative; cursor: pointer; border-radius: 50%; }
+.picture-choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.picture-choice img { display: block; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; transition: transform var(--motion-settle) var(--ease-settle); }
+.picture-choice:hover img { transform: translateY(-2px) rotate(-4deg); }
+.picture-choice:has(:checked) img { box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--accent); }
+.picture-choice:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; }
+/* The crew's faces under the choices: a grid that scrolls in place, so fifty portraits never push the page down. */
+.picture-faces { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); justify-items: center; gap: 12px; max-height: 236px; margin-top: 16px; padding: 8px 4px 4px; overflow-y: auto; border-top: 1px solid var(--line); animation: panel-in var(--motion-settle) var(--ease-settle); }
+.picture-upload[aria-expanded="true"] { color: var(--accent-ink); border-style: solid; border-color: var(--accent); background: var(--accent-soft); }
+.profile-portrait img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+.profile-plant {
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--panel);
+  box-shadow: var(--shadow-drop);
+  font-size: 19px;
+  line-height: 1;
+  animation: plant-pop var(--motion-flourish) var(--ease-spring), seed-bob 3.2s var(--motion-flourish) ease-in-out infinite;
+}
+@keyframes plant-pop { from { scale: 0.2; rotate: -40deg; } }
+.profile-hero-copy { min-width: 0; }
+.profile-hero-copy p { margin-top: 6px; font-size: var(--text-sm); color: var(--secondary); }
+/* The name is the heading and its own field: no box until you point at it, a pencil and an underline say it's editable. */
+.profile-name-field { position: relative; display: flex; align-items: center; flex: 1; min-width: 0; cursor: text; }
+.profile-name-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 2px 32px 2px 6px;
+  margin-left: -6px;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--ink);
+  font: 600 var(--text-3xl)/1.2 var(--font-title);
+  letter-spacing: -0.6px;
+  text-overflow: ellipsis;
+  box-shadow: inset 0 -1.5px 0 transparent;
+  transition: background var(--motion-quick), box-shadow var(--motion-quick);
+}
+.profile-name-field input::placeholder { color: var(--muted); }
+.profile-name-field input:placeholder-shown, .profile-name-field:hover input { box-shadow: inset 0 -1.5px 0 var(--line-strong); }
+.profile-name-field input:focus { outline: none; background: var(--panel); box-shadow: inset 0 -2px 0 var(--accent); }
+.profile-name-field > svg { position: absolute; right: 8px; color: var(--muted); opacity: 0; pointer-events: none; transition: opacity var(--motion-quick); }
+.profile-name-field:is(:hover, :focus-within) > svg, .profile-name-field:has(:placeholder-shown) > svg { opacity: 1; }
+.profile-next {
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+  text-underline-offset: 3px;
+}
+.profile-next:hover { text-decoration-color: var(--accent); }
+/* The vine: a dashed stem between leaf centres, filled up to the last step done. */
+.profile-vine {
+  --stem: calc(100% / var(--steps) / 2);
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--steps), 1fr);
+  list-style: none;
+  padding-top: 4px;
+}
+.profile-vine::before, .profile-vine::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: var(--stem);
+  height: 2px;
+  border-radius: var(--radius-hair);
+}
+.profile-vine::before { right: var(--stem); background: repeating-linear-gradient(90deg, var(--line-strong) 0 6px, transparent 6px 10px); }
+.profile-vine::after { width: calc((100% - 2 * var(--stem)) * var(--grown)); background: var(--accent); transition: width var(--motion-flourish) var(--ease-settle); }
+.profile-vine li { position: relative; z-index: var(--layer-raised); display: grid; justify-items: center; gap: 6px; text-align: center; }
+.profile-vine li > span { font-size: var(--text-xs); color: var(--muted); }
+.profile-vine li[data-done] > span { color: var(--ink); }
+.profile-leaf {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 60% 6px;
+  border: 1.5px dashed var(--line-strong);
+  background: var(--panel);
+  color: var(--on-accent);
+  transition: transform var(--motion-settle) var(--ease-settle), border-color var(--motion-quick);
+}
+.profile-leaf:not(:disabled):hover { transform: rotate(-12deg) scale(1.12); border-color: var(--accent); }
+.profile-leaf:disabled { cursor: default; opacity: 1; }
+[data-done] > .profile-leaf { border: 0; background: var(--accent); animation: leaf-grow var(--motion-enter) var(--ease-spring); }
+@keyframes leaf-grow { from { scale: 0.3; rotate: -60deg; } }
+.profile-name-row, .account-form { display: flex; align-items: center; gap: 10px; }
+.settings-card input:not([type="checkbox"], [type="radio"]), .settings-card textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-color: var(--line-field);
+  border-radius: var(--radius);
+  font-size: var(--text-md);
+}
+.profile-name-row .capture-start { flex-shrink: 0; }
+.profile-starters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.profile-starters .capture-start[aria-pressed="true"] { color: var(--accent-ink); border-color: transparent; background: var(--accent-soft); }
+.account-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: var(--recessed);
+}
+.account-card strong { font-size: var(--text-md); overflow-wrap: anywhere; }
+.account-card p { margin-top: 4px; font-size: var(--text-xs); color: var(--secondary); line-height: 1.7; }
+/* Settings → AI model while the engine reloads: the provider until now stays, dimming only if the reload takes a moment. */
+.account-card { transition: opacity var(--motion-quick); }
+.account-card[aria-busy="true"] { opacity: 0.6; transition-delay: 150ms; }
+.account-orb {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+.account-perks { list-style: none; margin-top: 6px; display: grid; gap: 2px; font-size: var(--text-xs); color: var(--secondary); }
+.account-perks li { display: flex; align-items: center; gap: 6px; }
+.account-perks li:not(:has(svg)) { padding-left: 18px; color: var(--muted); }
+.account-perks svg { color: var(--accent); }
+.account-orb[data-on] { color: var(--on-accent); background: var(--accent); }

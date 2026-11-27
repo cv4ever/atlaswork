@@ -1,0 +1,31 @@
+# Atlaswork
+
+> Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life (home, health, family, money, career and your own), with an AI agent looking after each area. Agents read only what you allow, and every change they suggest can be applied, rejected or undone. It is in closed beta, with a waitlist at https://atlaswork.app/.
+
+Made in Portugal by Carlos Oliveira. Contact: hello@atlaswork.app.
+
+## What it does
+
+- Today: your day from morning to night, tasks at their times, the rest in Anytime, and each agent suggesting one next step at a free time, with its reason, for you to apply.
+- Agents: Atlas works across the areas you allow; Hearth (home), Vital (health), Kin (family), Ledger (money) and Compass (career) each focus on one. Atlas suggests ready-made agents (such as Forge for building an app or Tutor for homework) or helps you shape a new one.
+- Control: each agent either asks first, with changes arriving as proposals you apply or reject, or acts straight away with Undo. You choose what each agent may read and which tools it may use. Agents remember what matters, and you can undo any memory.
+- Projects: describe a project in a line and its agent fills in the name, finish date, first steps, helpers and routines; nothing is saved until you press Start. Project pages hold countdowns, trackers, habits, goals, checklists and milestones.
+- Routines: Atlas reads your notes each morning and turns bullets into tasks, and reviews on Mondays. Other agents suggest up to three improvements a week. Routines can run while the app is closed and send one quiet notification.
+- Capture: paste a link, type, drop a file or speak; Atlas can sort a brain dump into tasks and notes.
+- Phones: installable web app with its own phone layout; on Android it appears in the Share sheet. Notes written offline save when you're back online.
+
+## Data and AI
+
+- Signed in, notes and tasks live in your account and sync across devices; attached files stay on the device that added them. Full backup export at any time.
+- By default replies come from an open model on Cloudflare Workers AI, or Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them.
+- You can connect your own provider instead (OpenRouter, OpenAI, Anthropic or any OpenAI-compatible API) and pay it directly.
+
+## Status
+
+- Closed beta: invitations go out in small groups from the waitlist. No public launch date or public pricing yet.
+
+## Pages
+
+- [Home and waitlist](https://atlaswork.app/)
+- [Privacy notice](https://atlaswork.app/privacy)
+- [Terms](https://atlaswork.app/terms)

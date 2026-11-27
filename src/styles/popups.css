@@ -1,0 +1,23 @@
+/* restyles: .crew-picker .chat-list .view-menu */
+/* Base UI popups (src/Popups.tsx). Positioners float over sticky headers; the keyboard highlight is the hover tint,
+   so menus and their items drop the focus ring. */
+.picker-positioner { z-index: var(--layer-top); }
+.tip-positioner { z-index: calc(var(--layer-top) + 1); }
+:is(.chat-list, .crew-picker, .view-menu):focus-visible, :is(.chat-list, .crew-picker, .view-menu) [role^="menuitem"]:focus-visible { outline: none; }
+[role^="menuitem"] { cursor: default; user-select: none; }
+.tip {
+  max-width: 260px;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  background: var(--ink);
+  color: var(--panel);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  transform-origin: var(--transform-origin);
+  transition: opacity var(--motion-quick), scale var(--motion-quick) var(--ease-settle);
+}
+.tip:is([data-starting-style], [data-ending-style]) { opacity: 0; scale: 0.94; }
+.tip[data-instant] { transition: none; }
+/* A long press shows a control's tip on touch (Popups.tsx), so iOS must not open its own callout there. */
+[data-tip] { -webkit-touch-callout: none; }

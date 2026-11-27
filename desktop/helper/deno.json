@@ -1,0 +1,6 @@
+{
+  "nodeModulesDir": "none",
+  "lock": false,
+  // Jimp brings Node's types from 16.9, which predate node:sqlite (the search index); these replace them.
+  "compilerOptions": { "types": ["npm:@types/node@22.19.1"] }
+}

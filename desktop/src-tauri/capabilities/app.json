@@ -1,0 +1,19 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "app",
+  "description": "What the hosted app may ask of the desktop app: its state, pairing this computer, linking folders on it, its search list (agents-design D78), its tidying (D79), and a notification (D77). Nothing else, and only from app.atlaswork.app.",
+  "windows": ["main"],
+  "remote": { "urls": ["https://app.atlaswork.app/*"] },
+  "permissions": [
+    "allow-desktop-info",
+    "allow-pair",
+    "allow-unpair",
+    "allow-link-folder",
+    "allow-unlink-folder",
+    "allow-set-search",
+    "allow-set-tidy",
+    "allow-add-search-folder",
+    "allow-remove-search-folder",
+    "allow-notify"
+  ]
+}

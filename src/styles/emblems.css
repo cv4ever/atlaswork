@@ -1,0 +1,24 @@
+/* Domain and topic emblems (src/Emblem.tsx): the emoji as text, or the drawing of the family Settings → Appearance →
+   Emblems picks (`data-emblems` on the root, painted by skin.ts; Settings' samples name theirs with `data-family`).
+   A drawing is a box the glyph's size over the hidden glyph; Mono and Line are masks in the place's colour. */
+:root[data-emblems="flat"] .emblem[data-flat]:not([data-family]), .emblem[data-family="flat"][data-flat],
+:root[data-emblems="mono"] .emblem[data-mono]:not([data-family]), .emblem[data-family="mono"][data-mono],
+:root[data-emblems="line"] .emblem[data-line]:not([data-family]), .emblem[data-family="line"][data-line] {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.15em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-indent: 100%;
+  color: transparent;
+}
+:root[data-emblems="flat"] .emblem[data-flat]:not([data-family]), .emblem[data-family="flat"][data-flat] {
+  background: var(--emblem-flat) center / contain no-repeat;
+}
+:root[data-emblems="mono"] .emblem[data-mono]:not([data-family]), .emblem[data-family="mono"][data-mono],
+:root[data-emblems="line"] .emblem[data-line]:not([data-family]), .emblem[data-family="line"][data-line] {
+  background: color-mix(in oklab, var(--hue, var(--accent)) 70%, var(--ink));
+  mask: var(--emblem-mono) center / contain no-repeat;
+}
+:root[data-emblems="line"] .emblem[data-line]:not([data-family]), .emblem[data-family="line"][data-line] { mask-image: var(--emblem-line); }

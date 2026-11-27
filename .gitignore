@@ -1,0 +1,32 @@
+node_modules/
+dist/
+*.log
+*.tsbuildinfo
+.env.local
+# Written by `deno test` for the Edge Functions' jsr: imports; the functions pin their versions in the import itself.
+deno.lock
+
+# impeccable-ignore-start
+**/.impeccable/config.local.json
+**/.impeccable/hook.cache.json
+**/.impeccable/hook.pending.json
+**/.impeccable/*.png
+**/.impeccable/review/
+**/.impeccable/questions/
+**/.impeccable/live/server.json
+**/.impeccable/live/sessions/
+**/.impeccable/live/previews/
+**/.impeccable/live/annotations/
+**/.impeccable/live/cache/
+**/.impeccable/live/manual-edit-apply-transaction.json
+**/.impeccable/live/manual-edit-events.jsonl
+**/.impeccable/live/manual-edit-evidence/
+**/.impeccable/live/pending-manual-edits.json
+**/.impeccable/live/deferred-svelte-component-accepts.json
+**/.impeccable/live/*.png
+# impeccable-ignore-end
+
+# What the screenshot regression saw when a shot changed (scripts/check-visual.mjs).
+dev/design/golden/**/*.actual.png
+# Goldens another computer draws for its own comparisons; only the machine in machine.json commits goldens.
+dev/design/golden/local/

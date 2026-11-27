@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="stylesheet" href="./prototypes.css" />
+    <title>Avatar packs · Atlaswork mockups</title>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Avatar packs: one crew, many styles</h1>
+      <p class="lede">Eight new packs beside today's Storybook, among them the manga, superhero and villain ones you asked for. Each is drawn from the same six faces (Atlas, Hearth, Vital, Kin, Ledger, Compass) so you compare the style, not the people. Then three ways a pack reaches your crew. Carlos chose O2 on 2026-11-26: every pack is now in the app, all 49 faces each, under Settings → Appearance → Crew style (agents-design D16).</p>
+
+      <ul class="findings">
+        <li><span class="code">F1</span><b>One flat drawer today.</b> All faces is a single grid of 54: the gouache cast and six plain silhouettes mix with no label.</li>
+        <li><span class="code">F2</span><b>A face is a name, not a file.</b> An agent saves “vital” and the app draws <code>/agents/vital.webp</code>. A style can redraw that name without touching saved agents, community crews or which faces are free.</li>
+        <li><span class="code">F3</span><b>The emblem carries the domain.</b> Each cast face wears a pin: house, heartbeat, rings, coin, compass. Every pack keeps it, as a chest symbol, a clasp or a brooch.</li>
+        <li><span class="code">F4</span><b>Small sizes decide.</b> Faces show at 118px in the badge, about 80 on crew cards, 32 to 36 in chat rows and 20 in tabs and stacks. Each pack shows Kin at those sizes.</li>
+      </ul>
+
+      <h2>Today</h2>
+      <figure><img id="today" alt="The agent dialog's badge today: Vital, and All faces open as one grid" width="272" height="424" style="border-radius:16px 16px 0 0;box-shadow:var(--shadow-drop)" />
+        <figcaption><b>The agent dialog's badge, All faces open.</b> Arrows step through the free faces; the grid shows all 54.</figcaption></figure>
+
+      <h2>P · The packs</h2>
+      <p class="thesis">Same six people in the same order: Atlas, Hearth, Vital, then Kin, Ledger, Compass. Generated as one sheet per pack from today's portraits, so each person stays recognisable. Under each: the sizes the app uses, then one line for and one against.</p>
+      <div class="packs" id="packs"></div>
+
+      <h2>In the app</h2>
+      <p class="thesis">The Agents page in any pack. Pick one in the bar; it stays at the top while you scroll, and every frame below follows it.</p>
+      <div class="pickbar" id="pickbar"></div>
+      <div class="frames" id="crew"></div>
+
+      <h2>O · How you pick a pack</h2>
+      <p class="thesis">The real question is what a pack is: a shelf of extra faces you mix agent by agent, or a way of drawing the whole crew, like a theme.</p>
+
+      <h3><span class="code">O1</span> Shelves in All faces</h3>
+      <ul class="tradeoffs"><li><b>For:</b> no new setting; a pack can hold any cast (24 heroes need not match 24 manga faces); mix as you like.</li><li><b>Against:</b> a mixed crew reads as a collage in stacks and chat rows; switching an agent's pack swaps their person too; every face in a pack is a new name to keep free or taken.</li></ul>
+      <div class="frames" id="o1"></div>
+
+      <h3><span class="code">O2</span> One style for the crew <span class="rec">Recommended</span></h3>
+      <ul class="tradeoffs"><li><b>For:</b> one tap redraws everyone, Atlas included, and each stays the same person (F2); look choices already live in Appearance; hover to try it on, as with themes.</li><li><b>Against:</b> a pack ships only once it draws all 48 portraits and Atlas (the six silhouettes stay as they are), about nine sheets each; no way to make just Vital a hero.</li></ul>
+      <div class="frames" id="o2"></div>
+
+      <h3><span class="code">O3</span> Crew style, and any agent can differ</h3>
+      <ul class="tradeoffs"><li><b>For:</b> O2's one-tap crew, plus an exception for fun (Vital as a hero, the rest in Storybook).</li><li><b>Against:</b> one more control on the badge; the collage starts with the first exception; the same nine sheets per pack as O2.</li></ul>
+      <div class="frames" id="o3"></div>
+
+      <h2>Extras, pick any</h2>
+      <ul class="extras">
+        <li><span class="code">X1</span> <b>Your picture follows.</b> If your profile picture is a crew face, it changes with the crew style too (O2, O3).</li>
+        <li><span class="code">X2</span> <b>Themes suggest a style.</b> Paper and Graphite list Ink first in Crew style, Garden lists Storybook. A hint only; nothing switches on its own.</li>
+        <li><span class="code">X3</span> <b>A seasonal pack.</b> The crew in winter scarves for December or sun hats for July, worn for the month only if you opt in.</li>
+      </ul>
+    </main>
+    <script src="./icons.js"></script>
+    <script src="./prototypes.js"></script>
+  </body>
+</html>

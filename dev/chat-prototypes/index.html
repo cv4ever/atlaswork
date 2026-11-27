@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="preload" href="/fonts/dm-sans.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./prototypes.css" />
+    <title>Chat panel prototypes · Atlaswork</title>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Chat panel: three alternatives</h1>
+      <p class="lede">Each panel below runs on the same demo conversations at the real side-panel size (360 by 780). Click through them: switch chats, open the menus, review the cards, send a message. Then leave a verdict under each and pick parts in the table at the end.</p>
+
+      <h2>What makes today's panel hard to read</h2>
+      <ul class="findings">
+        <li><code>F1</code><b>The same face twice at the top.</b> The strip's selected avatar and the name card's portrait both show Atlas, and every reply repeats him a third time beside his name.</li>
+        <li><code>F2</code><b>Chrome takes almost half the height.</b> Strip 67px, name card 87px, context row 46px and composer 182px: 382 of 820px on desktop, before any message.</li>
+        <li><code>F3</code><b>Session and model facts sit in three places.</b> "ChatGPT plan" in the header; note, session dots, tokens and New session in the context row; "Proactive, with undo" under the box.</li>
+        <li><code>F4</code><b>The strip's buttons don't say what they do.</b> All chats and Start a room are the same dashed circle; the plus starts a room, not a new chat, and New session lives a row lower.</li>
+        <li><code>F5</code><b>Three frames around one check-in.</b> A tinted card, its own "Atlas · Check-in · 16:15" header, then the proposal card inside the message.</li>
+        <li><code>F6</code><b>The draft card crams a four-step tracker beside its title</b>, and the copy button floats alone between cards. The note chip cuts mid-word ("ideias de coisas p").</li>
+      </ul>
+
+      <div class="toolbar" role="group" aria-label="Show">
+        <span>Conversation</span>
+        <span class="seg"><button data-thread-pick="atlas" aria-pressed="true">Atlas, 1 to 1</button><button data-thread-pick="home" aria-pressed="false">Home front, a room</button></span>
+        <span>Theme</span>
+        <span class="seg"><button data-theme-pick="light" aria-pressed="true">Light</button><button data-theme-pick="dark" aria-pressed="false">Dark</button></span>
+        <button class="btn quiet" data-reset>Reset the demos</button>
+      </div>
+
+      <form id="feedback"></form>
+      <div class="frames">
+        <section class="column" data-col="current">
+          <h3>Today</h3>
+          <p class="thesis">Your screenshot: strip, name card, context row, transcript and composer stacked in five bands.</p>
+          <ul class="tradeoffs"><li>For comparison. Findings F1 to F6 above.</li></ul>
+          <div class="shot"><img src="./current.png" alt="The current chat panel: Atlas twice at the top, a context row, a drafted-agent card and a check-in card." /></div>
+        </section>
+
+        <section class="column" data-col="a">
+          <h3>A · One header line</h3>
+          <p class="thesis">Closest to today. Strip and name card merge into one row, so the face you talk to shows once and the other chats sit beside it. Session, context and model fold into one meter in the composer.</p>
+          <ul class="tradeoffs">
+            <li>Smallest change; every current control keeps a home.</li>
+            <li>Room for messages grows by about 170px.</li>
+            <li>Only three other chats fit in the row; the rest are under the ellipsis.</li>
+          </ul>
+          <div data-p="a"></div>
+          <div class="feedback">
+            <div class="verdict" role="radiogroup" aria-label="Verdict on A">
+              <label><input type="radio" form="feedback" name="verdict-a" value="Build this" />Build this</label>
+              <label><input type="radio" form="feedback" name="verdict-a" value="Take parts" />Take parts</label>
+              <label><input type="radio" form="feedback" name="verdict-a" value="Drop it" />Drop it</label>
+            </div>
+            <textarea form="feedback" name="notes-a" aria-label="Notes on A" placeholder="What works, what doesn't…"></textarea>
+          </div>
+        </section>
+
+        <section class="column" data-col="b">
+          <h3>B · Switcher and tray</h3>
+          <p class="thesis">Like a messenger. The name is the switcher: tap it for every chat, the ones waiting on you first. Proposals and questions collect in a "Waiting on you" tray above the box, so a decision never scrolls away.</p>
+          <ul class="tradeoffs">
+            <li>The most room for the conversation, and nothing to decide gets lost up the scroll.</li>
+            <li>Switching chats takes two taps instead of one.</li>
+            <li>Reviewing moves out of the message into the tray: a new place to learn.</li>
+          </ul>
+          <div data-p="b"></div>
+          <div class="feedback">
+            <div class="verdict" role="radiogroup" aria-label="Verdict on B">
+              <label><input type="radio" form="feedback" name="verdict-b" value="Build this" />Build this</label>
+              <label><input type="radio" form="feedback" name="verdict-b" value="Take parts" />Take parts</label>
+              <label><input type="radio" form="feedback" name="verdict-b" value="Drop it" />Drop it</label>
+            </div>
+            <textarea form="feedback" name="notes-b" aria-label="Notes on B" placeholder="What works, what doesn't…"></textarea>
+          </div>
+        </section>
+
+        <section class="column" data-col="c">
+          <h3>C · Crew rail</h3>
+          <p class="thesis">Bolder. Chats become a slim rail of faces down the left edge, like the sidebar's roster, and the main column is only the conversation, its name in large Fraunces with no second portrait. Session details fold into a drawer above the box.</p>
+          <ul class="tradeoffs">
+            <li>Any chat is one tap away, and every face shows what waits on you.</li>
+            <li>The rail costs 56px of the 360px width.</li>
+            <li>Phones would need the rail as a top row.</li>
+          </ul>
+          <div data-p="c"></div>
+          <div class="feedback">
+            <div class="verdict" role="radiogroup" aria-label="Verdict on C">
+              <label><input type="radio" form="feedback" name="verdict-c" value="Build this" />Build this</label>
+              <label><input type="radio" form="feedback" name="verdict-c" value="Take parts" />Take parts</label>
+              <label><input type="radio" form="feedback" name="verdict-c" value="Drop it" />Drop it</label>
+            </div>
+            <textarea form="feedback" name="notes-c" aria-label="Notes on C" placeholder="What works, what doesn't…"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <section class="mix" aria-labelledby="mix-title">
+        <h2 id="mix-title">Mix and match</h2>
+        <p>The parts are independent. Pick the version you want of each; leave a row empty if you don't mind.</p>
+        <table>
+          <thead><tr><th scope="col">Part</th><th scope="col">Today</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead>
+          <tbody>
+            <tr data-part="part-switch"><th scope="row">Switching chats<small>strip · faces in the header · name as switcher · rail</small></th>
+              <td><input type="radio" form="feedback" name="part-switch" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-switch" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-switch" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-switch" value="C" aria-label="C" /></td></tr>
+            <tr data-part="part-header"><th scope="row">Who you're talking to<small>name card · one line · name button · large name, no portrait</small></th>
+              <td><input type="radio" form="feedback" name="part-header" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-header" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-header" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-header" value="C" aria-label="C" /></td></tr>
+            <tr data-part="part-session"><th scope="row">Session, context and model<small>context row · session meter · context meter · drawer</small></th>
+              <td><input type="radio" form="feedback" name="part-session" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-session" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-session" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-session" value="C" aria-label="C" /></td></tr>
+            <tr data-part="part-messages"><th scope="row">Names and faces on messages<small>every reply · rooms only · rooms only · faces in the margin</small></th>
+              <td><input type="radio" form="feedback" name="part-messages" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-messages" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-messages" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-messages" value="C" aria-label="C" /></td></tr>
+            <tr data-part="part-review"><th scope="row">Things to review<small>cards in the message (Today, A, C) · tray above the box (B)</small></th>
+              <td><input type="radio" form="feedback" name="part-review" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-review" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-review" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-review" value="C" aria-label="C" /></td></tr>
+            <tr data-part="part-composer"><th scope="row">Composer and attaching a note<small>chip row · chip in the box · plus menu · chip in the drawer</small></th>
+              <td><input type="radio" form="feedback" name="part-composer" value="Today" aria-label="Today" /></td><td><input type="radio" form="feedback" name="part-composer" value="A" aria-label="A" /></td><td><input type="radio" form="feedback" name="part-composer" value="B" aria-label="B" /></td><td><input type="radio" form="feedback" name="part-composer" value="C" aria-label="C" /></td></tr>
+          </tbody>
+        </table>
+        <div class="overall">
+          <label for="overall">Anything else</label>
+          <textarea id="overall" form="feedback" name="overall" placeholder="What should the next round explore?"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn primary" data-copy>Copy feedback</button>
+          <button class="btn secondary" data-download>Download as Markdown</button>
+          <button class="btn quiet" data-clear>Clear</button>
+          <span class="saved-note" id="saved-note" role="status">Your answers stay in this browser until you clear them.</span>
+        </div>
+      </section>
+    </main>
+    <script src="./icons.js"></script>
+    <script src="./prototypes.js"></script>
+  </body>
+</html>

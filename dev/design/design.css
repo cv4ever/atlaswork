@@ -1,0 +1,149 @@
+/* The design showcase's own layout (Showcase.tsx). Only the frame lives here: every part and widget on the page uses
+ * the app's classes from src/styles/ and src/WorkbenchShell.css, on the same tokens. */
+/* The app locks the document to the viewport for its shell; the showcase scrolls inside its own frame. --ds-bar is the
+ * bar's measured height (Showcase.tsx): anchors stop under it and the strip of widget kinds sticks to it. */
+.ds-page { --ds-bar: 56px; height: 100dvh; overflow: auto; scroll-padding-top: calc(var(--ds-bar) + 16px); }
+.ds-bar {
+  position: sticky; top: 0; z-index: var(--layer-float); display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px;
+  padding: 10px var(--page-padding); background: color-mix(in oklab, var(--sidebar) 92%, transparent);
+  border-bottom: 1px solid var(--line); backdrop-filter: blur(6px);
+}
+.ds-bar > strong { font: 600 var(--text-lg)/1.2 var(--font-title); margin-right: auto; }
+.ds-bar nav, .ds-kinds nav { display: flex; flex-wrap: wrap; gap: 2px; }
+.ds-bar nav a, .ds-kinds nav a { padding: 4px 6px; border-radius: var(--radius-small); color: var(--secondary); font-size: var(--text-sm); text-decoration: none; }
+.ds-bar nav a:hover, .ds-kinds nav a:hover { background: var(--recessed); color: var(--accent-ink); }
+.ds-bar nav a[aria-current], .ds-kinds nav a[aria-current] { background: var(--accent); color: var(--on-accent); }
+.ds-jump { display: none; }
+.ds-domain { font-size: var(--text-xs); }
+.ds-main { max-width: 1240px; margin: 0 auto; padding: var(--section-gap) var(--page-padding) 80px; }
+.ds-lede { max-width: 58ch; color: var(--secondary); }
+.ds-section { margin-top: 44px; }
+.ds-section-lede { max-width: 58ch; margin: 6px 0 18px; color: var(--muted); font-size: var(--text-sm); }
+.ds-sub { margin: 0 0 10px; color: var(--muted); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.ds-probe { position: absolute; visibility: hidden; }
+code { font-size: var(--text-xs); color: var(--accent-ink); }
+.ds-main :where(ul, ol) { margin: 0; padding: 0; list-style: none; }
+.ds-main li > small { color: var(--muted); font-size: var(--text-xs); }
+
+.ds-group { margin-bottom: 18px; }
+.ds-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.ds-swatches li { display: grid; align-content: start; gap: 2px; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+.ds-swatches small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-swatches small.ds-use { margin-bottom: 4px; color: var(--secondary); white-space: normal; }
+.ds-swatches b { color: var(--ink); }
+.ds-swatches small[data-low], .ds-swatches small[data-low] b { color: var(--error); font-weight: 600; }
+.ds-swatch { height: 44px; margin-bottom: 6px; border-radius: var(--radius-small); box-shadow: inset 0 0 0 1px var(--line); }
+.ds-pair { display: flex; flex-wrap: wrap; gap: 24px 48px; }
+.ds-hues, .ds-washes { display: flex; flex-wrap: wrap; gap: 10px; }
+.ds-hues li, .ds-washes li { display: grid; justify-items: center; gap: 2px; font-size: var(--text-xs); }
+.ds-hues span { width: 44px; height: 44px; border-radius: 50% 50% 35% 50%; background: var(--hue); }
+.ds-washes span { display: flex; }
+.ds-washes i { width: 30px; height: 44px; box-shadow: inset 0 0 0 1px var(--line); }
+.ds-washes i:first-child { border-radius: var(--radius-small) 0 0 var(--radius-small); }
+.ds-washes i:last-child { border-radius: 0 var(--radius-small) var(--radius-small) 0; }
+
+.ds-ladder li { display: grid; grid-template-columns: 110px 56px 120px minmax(0, 1fr) minmax(0, 250px); align-items: baseline; gap: 14px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.ds-ladder strong { font-size: var(--text-sm); font-weight: 500; }
+.ds-ladder strong small { display: block; color: var(--muted); font-size: var(--text-xs); font-weight: 400; }
+.ds-samples { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 28px; min-width: 0; }
+.ds-samples span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-serif { font-family: var(--font-title); }
+
+.ds-grid-steps { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; margin-bottom: 22px; }
+.ds-grid-steps li { display: grid; justify-items: center; gap: 6px; color: var(--muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.ds-grid-steps span { background: var(--accent); }
+.ds-sizes, .ds-motion { display: grid; gap: 8px; max-width: 900px; }
+.ds-sizes li, .ds-motion li { display: grid; grid-template-columns: 150px 56px minmax(0, 1fr) 200px; align-items: center; gap: 12px; }
+.ds-size i { display: block; height: 10px; max-width: 100%; border-radius: var(--radius-hair); background: var(--accent); }
+
+.ds-corners { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px 12px; }
+.ds-corners li { display: grid; align-content: start; justify-items: center; gap: 2px; text-align: center; }
+.ds-corners span { width: 72px; height: 52px; margin-bottom: 6px; border: 1.5px solid var(--accent); background: var(--accent-soft); }
+
+.ds-depth { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px; margin-bottom: 28px; }
+.ds-depth li { display: grid; gap: 4px; padding: 18px; border-radius: var(--radius-card); background: var(--panel); color: var(--secondary); font-size: var(--text-sm); }
+.ds-depth li.ds-recessed { background: var(--recessed); }
+.ds-layers { max-width: 520px; }
+.ds-layers li { display: grid; grid-template-columns: 150px 40px minmax(0, 1fr); align-items: baseline; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--secondary); font-size: var(--text-sm); }
+
+.ds-motion-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+.ds-track { position: relative; height: 18px; border-radius: var(--radius-pill); background: var(--recessed); }
+.ds-track i { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); transition-property: left; }
+.ds-motion[data-played] .ds-track i { left: calc(100% - 15px); }
+@media (prefers-reduced-motion: reduce) { .ds-track i { transition: none; } }
+
+/* Each part across its states. The cells hold the app's own controls; these rules only seat them in a table. */
+.ds-states-scroll { overflow-x: auto; margin-bottom: 16px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); }
+.ds-states-table { width: 100%; min-width: 920px; border-collapse: collapse; }
+.ds-states-table :is(th, td) { padding: 10px 16px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--line); }
+.ds-states-table tbody tr:last-child :is(th, td) { border-bottom: 0; }
+.ds-states-table thead th { color: var(--muted); font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.ds-states-table tbody th { color: var(--secondary); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.ds-states-table td small { display: block; margin-top: 4px; color: var(--muted); font-size: var(--text-xs); }
+.ds-states-table td input:not([type]) { width: 130px; }
+.ds-states-table td .kind-chips, .ds-states-table td .switch-row, .ds-states-table td .nav-item { margin: 0; }
+.ds-states-table td .nav-item { width: auto; }
+.ds-states-table td .tab, .ds-states-table td .domain-chip { width: fit-content; }
+
+.ds-parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+.ds-part { display: grid; align-content: start; gap: 12px; padding: var(--card-padding); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); }
+.ds-part > .segmented-control { justify-self: start; }
+.ds-part > .secondary-button { justify-self: start; }
+.ds-part[data-wide] { grid-column: 1 / -1; }
+/* The folded bar pointed at: its chips stand up over what lies under the 24px row, as they do over the page. */
+.ds-folded-open { padding-bottom: 32px; }
+.ds-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ds-field { display: grid; gap: 4px; color: var(--secondary); font-size: var(--text-xs); font-weight: 500; }
+.ds-field :is(input, select, textarea) { color: var(--ink); font-size: var(--text-md); font-weight: 400; }
+/* The view menu drawn open in the page's flow: in the app it is a popover anchored to its button. */
+.ds-static-menu { position: static; margin: 0; }
+.ds-menu { color: var(--muted); font-size: var(--text-xs); }
+.ds-menu .view-button { opacity: 1; }
+.ds-dialog { display: grid; gap: 16px; justify-items: start; padding: 0 24px 24px; color: var(--secondary); }
+.ds-presence, .ds-plants, .ds-motifs { display: flex; flex-wrap: wrap; gap: 12px 18px; }
+.ds-presence li { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: var(--text-xs); }
+.ds-face { position: relative; display: inline-flex; }
+.ds-face img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.ds-plants li, .ds-motifs li { display: grid; justify-items: center; gap: 2px; font-size: var(--text-xs); }
+.ds-plants span { font-size: 36px; }
+.ds-motifs i { width: 76px; height: 52px; background: var(--tile); opacity: 0.6; mask: var(--motif) no-repeat center / contain; }
+
+/* The strip of widget kinds, with the sample and width choices, stays under the bar while Widgets scrolls. */
+.ds-kinds {
+  position: sticky; top: var(--ds-bar); z-index: var(--layer-chrome); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  margin-bottom: 8px; padding: 8px 0; background: var(--canvas); border-bottom: 1px solid var(--line);
+}
+.ds-kinds nav { margin-right: auto; }
+.ds-kind { margin-top: 28px; scroll-margin-top: 64px; }
+.ds-kind-title { display: flex; align-items: baseline; gap: 8px; margin: 0 0 12px; font: 600 var(--text-xl)/1.25 var(--font-title); }
+.ds-kind-title svg { align-self: center; color: var(--accent-ink); }
+.ds-kind-title small { color: var(--muted); font: 400 var(--text-sm) var(--font-body); }
+.ds-views { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; align-items: start; }
+/* One width of the page grid at a time, on the page's own 1040px of columns (1120px less its padding). A half block
+ * alone would take the whole row in the app (widgets.css), so its span is held here. */
+.ds-views[data-width] { grid-template-columns: minmax(0, 1040px); }
+.ds-views[data-width="half"] .page-block.width-half { grid-column: span 6; }
+.ds-view { display: grid; gap: 8px; margin: 0; min-width: 0; }
+.ds-view figcaption { color: var(--muted); font-size: var(--text-xs); }
+.ds-view figcaption strong { color: var(--ink); font-weight: 600; }
+.ds-view figcaption em { margin-left: 8px; color: var(--accent-ink); font-style: normal; font-weight: 500; }
+/* Pages and chat sit in a frame the size the shell would give them; toasts and the storage error leave the viewport's
+ * edge to sit in their card. */
+.ds-frame { overflow: visible; margin-bottom: 28px; border: 1px solid var(--line); border-radius: var(--radius-shell); background: var(--panel); container-type: inline-size; }
+.ds-frame > .overview-page { overflow: hidden; border-radius: inherit; }
+.ds-chat { display: flex; height: 620px; max-width: 420px; }
+.ds-chat > * { flex: 1; min-width: 0; }
+.ds-states :is(.toast, .storage-error) { position: static; transform: none; animation: none; }
+.ds-states .empty-state { min-height: 0; padding: 12px 0; }
+@media (max-width: 760px) {
+  /* One row that scrolls sideways, so the bar can stay stuck without taking the screen; the section list becomes a picker. */
+  .ds-bar { flex-wrap: nowrap; overflow-x: auto; padding: 8px 16px; }
+  .ds-bar > * { flex: none; }
+  .ds-bar > strong, .ds-bar nav, .ds-kinds nav { display: none; }
+  .ds-jump { display: block; }
+  .ds-main { padding: 16px 16px 80px; }
+  .ds-ladder li, .ds-sizes li, .ds-motion li { grid-template-columns: minmax(0, 1fr) auto; }
+  .ds-ladder li > :nth-child(n + 3), .ds-sizes li > :nth-child(n + 3), .ds-motion li > :nth-child(n + 3) { grid-column: 1 / -1; }
+  .ds-layers li { grid-template-columns: minmax(0, 1fr) 40px; }
+  .ds-layers li > :nth-child(n + 3) { grid-column: 1 / -1; }
+}

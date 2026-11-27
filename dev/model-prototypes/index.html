@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="stylesheet" href="./prototypes.css" />
+    <title>Model and thinking in chat · Atlaswork mockups</title>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Model and thinking, from the message box</h1>
+      <p class="lede">Three ways to change which model answers and how hard it thinks, without leaving the chat. Each frame is the side panel at its real width. Models come from the provider in Settings → AI model; these frames use OpenRouter, the case with the most choice.</p>
+
+      <ul class="findings">
+        <li><span class="code">F1</span><b>Today the choice is three clicks away.</b> Agent dialog → Profile → Model, folded. The chat's Details only reads it back.</li>
+        <li><span class="code">F2</span><b>It is per agent, never per chat.</b> Asking Atlas one hard question on a stronger model means changing Atlas for every chat and routine.</li>
+        <li><span class="code">F3</span><b>Model ids are raw strings.</b> "anthropic/claude-sonnet-4.5" with no vendor mark, no hint of what it is good for and no price unless you open the OpenRouter picker.</li>
+        <li><span class="code">F4</span><b>The provider decides what can change.</b> Hosted: nothing. Anthropic key: models, no Thinking. OpenRouter, OpenAI, ChatGPT plan: both. Each option below handles all three.</li>
+      </ul>
+
+      <div class="toolbar" role="group" aria-label="Show" style="margin-top:24px">
+        <span>Theme</span>
+        <span class="seg"><button data-theme-pick="light" aria-pressed="true">Light</button><button data-theme-pick="dark" aria-pressed="false">Dark</button></span>
+      </div>
+
+      <h2><span class="code">O1</span> One chip</h2>
+      <p class="thesis">The quietest: two icons in the tool row, one popover for both choices. Follows the app's rule that a compact state is an icon with its words on hover.</p>
+      <ul class="tradeoffs"><li><b>For:</b> no new line in the box; Thinking and model sit together; recent models make switching back one tap.</li><li><b>Against:</b> two small icons are easy to miss the first time; switching takes two clicks.</li></ul>
+      <div class="frames" id="o1"></div>
+
+      <h2><span class="code">O2</span> Mark and dial</h2>
+      <p class="thesis">The fastest: the model mark and the Thinking plant are separate buttons. Thinking steps up with one tap, pinned models are one tap away.</p>
+      <ul class="tradeoffs"><li><b>For:</b> quickest for people who switch often; pins keep the list short; the full sheet has room for prices.</li><li><b>Against:</b> a tap-to-cycle dial can surprise; a sheet over the chat hides the conversation while you choose.</li></ul>
+      <div class="frames" id="o2"></div>
+
+      <h2><span class="code">O3</span> A line in the box</h2>
+      <p class="thesis">The clearest: the box says "Atlas on Sonnet 4.5 · Balanced" in words above what you type, and it scales to rooms, where each face carries its model's mark.</p>
+      <ul class="tradeoffs"><li><b>For:</b> nobody has to guess what an icon means; rooms show every member's model at a glance.</li><li><b>Against:</b> one more line (22px) in every chat, words always shown, against the progressive disclosure rule.</li></ul>
+      <div class="frames" id="o3"></div>
+
+      <h2>When the provider limits the choice</h2>
+      <p class="thesis">Goes with any option (drawn with O1's chip). The control never disappears: it says what answers and why it can't change.</p>
+      <div class="frames" id="shared"></div>
+    </main>
+    <script src="./icons.js"></script>
+    <script src="./marks.js"></script>
+    <script src="./prototypes.js"></script>
+  </body>
+</html>

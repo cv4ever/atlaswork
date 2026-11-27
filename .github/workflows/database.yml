@@ -1,0 +1,25 @@
+# Database security tests: grants and RLS. Test database changes on main, not every intermediate branch push.
+# Functions and email templates have their own local release checks and do not need a fresh Postgres here.
+name: database
+on:
+  push:
+    branches: [main]
+    paths: ["supabase/migrations/**", "supabase/tests/**", "supabase/config.toml", "package.json", "pnpm-lock.yaml", ".github/workflows/database.yml"]
+  workflow_dispatch:
+concurrency:
+  group: database-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The pinned CLI from package.json; db start applies every migration to a fresh local database.
+      - run: pnpm exec supabase db start --agent no --output-format text
+      - run: pnpm exec supabase test db --agent no --output-format text

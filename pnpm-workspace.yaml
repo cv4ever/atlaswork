@@ -1,0 +1,3 @@
+# esbuild's install script checks its platform binary; Vite needs it. Without a decision, CI installs fail (ERR_PNPM_IGNORED_BUILDS).
+allowBuilds:
+  esbuild: true

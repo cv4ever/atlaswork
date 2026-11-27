@@ -1,0 +1,60 @@
+#!/bin/sh
+# Checks what is being committed. Enable once per clone: git config core.hooksPath .githooks
+# Every commit: Markdown keeps one sentence per line (scripts/check-doc-lines.mjs). Code commits also run the
+# type-check (TypeScript's native preview compiler, `tsgo`, in the background beside the rest: a few seconds where
+# `tsc` took over a minute), the lint on the staged source files plus the repo checks (`lint:repo`), the unit tests, and
+# the agent function's Deno tests when a staged file is one the functions load (scripts/function-files.mjs).
+# `pnpm run release` runs the full `pnpm run check` (`tsc` itself, every file linted, production build and bundle
+# check); the GitHub `check` workflow runs it only when started by hand.
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -n "$staged" ] || exit 0
+
+# Check the staged snapshot, not the working tree: park unstaged edits and untracked files until the check ends.
+# Edit nothing while it runs, or restoring them can conflict (they stay safe in `git stash list`).
+# Every worktree shares one stash list, so a parallel session's commit can push its own entry on top while this one
+# runs: the entry is named after this worktree and process, and only that entry is restored.
+label="pre-commit: unstaged edits ($(pwd) $$)"
+git stash push --keep-index --include-untracked --quiet -m "$label" || exit 1
+mine() { git stash list --format='%gd %gs' | grep -F "$label" | cut -d' ' -f1; }
+
+# Each step says how long it took ("pre-commit: tests 21s"), so the slow one is visible rather than guessed at.
+timed() {
+  name=$1; shift
+  start=$(date +%s)
+  "$@"; result=$?
+  echo "pre-commit: $name $(( $(date +%s) - start ))s" >&2
+  return $result
+}
+
+run() {
+  docs=$(echo "$staged" | grep -E '\.md$')
+  [ -z "$docs" ] || node scripts/check-doc-lines.mjs $docs || return 1
+  # Markdown and the static landing page need nothing more.
+  echo "$staged" | grep -qvE '\.md$|^landing/' || return 0
+  types_log=$(mktemp)
+  timed types pnpm run --silent typecheck >"$types_log" 2>&1 &
+  types=$!
+  failed=""
+  code=$(echo "$staged" | grep -E '^(src|dev)/.*\.(ts|tsx)$')
+  [ -z "$code" ] || timed eslint pnpm exec eslint --cache --cache-location node_modules/.cache/eslint $code || failed=1
+  timed lint:repo pnpm run --silent lint:repo || failed=1
+  tests_log=$(mktemp)
+  timed tests pnpm --silent test >"$tests_log" 2>&1 || { grep -vE '^ *(#|ok |---|\.\.\.|duration_ms|type:)' "$tests_log" | tail -40; failed=1; }
+  wait "$types" || failed=1
+  # The types job's own timing line went into its log with tsgo's output: show the timing, and the errors on failure.
+  if [ -n "$failed" ]; then cat "$types_log"; else grep '^pre-commit:' "$types_log" >&2; fi
+  grep '^pre-commit:' "$tests_log" >&2
+  rm -f "$types_log" "$tests_log"
+  [ -z "$failed" ] || return 1
+  if echo "$staged" | grep -qE '^supabase/functions/' || node scripts/function-files.mjs | grep -qxF "$staged"; then
+    timed functions pnpm run --silent test:functions || return 1
+  fi
+}
+run
+status=$?
+
+entry=$(mine)
+if [ -n "$entry" ]; then
+  git stash pop --quiet "$entry" || { echo "pre-commit: couldn't restore unstaged edits; they are '$label' in 'git stash list'." >&2; exit 1; }
+fi
+exit $status

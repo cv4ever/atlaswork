@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlaswork: AI agents for your notes and tasks that ask first</title>
+<meta name="description" content="Notes, tasks and projects for every part of your life, with an AI agent for each. They plan, check in and suggest; you apply or undo. Join the closed beta.">
+<link rel="canonical" href="https://atlaswork.app/">
+<meta name="theme-color" content="#f7f5ef">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atlaswork">
+<meta property="og:url" content="https://atlaswork.app/">
+<meta property="og:title" content="Atlaswork: AI agents for your life that ask first">
+<meta property="og:description" content="Notes, tasks and projects for home, family, health, money and career, with an AI agent for each. They suggest, you decide. In closed beta: join the waitlist for an invitation.">
+<meta property="og:image" content="https://atlaswork.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Atlaswork's Today page: your day as a line from morning to night, with your agents suggesting next steps beside it.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preload" href="fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<!-- What search engines and AI answer engines read about the product. Keep it to what the page itself says. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://atlaswork.app/#org",
+      "name": "Atlaswork",
+      "url": "https://atlaswork.app/",
+      "logo": "https://atlaswork.app/icon-512.png",
+      "email": "hello@atlaswork.app",
+      "founder": { "@type": "Person", "name": "Carlos Oliveira" },
+      "address": { "@type": "PostalAddress", "addressCountry": "PT" }
+    },
+    {
+      "@type": "WebApplication",
+      "name": "Atlaswork",
+      "url": "https://atlaswork.app/",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "Any modern browser; installs as an app",
+      "browserRequirements": "Requires JavaScript",
+      "publisher": { "@id": "https://atlaswork.app/#org" },
+      "description": "A personal workspace for notes, tasks and projects across the areas of your life, with an AI agent for each area. Agents read only what you allow and every change they suggest can be applied, rejected or undone. In closed beta.",
+      "featureList": [
+        "An AI agent for each area of life: home, health, family, money, career and your own",
+        "Agents propose changes you apply, reject or undo",
+        "You choose what each agent may read",
+        "Today: your day hour by hour, with each agent suggesting a next step at a free time",
+        "Agents fill in new projects with steps, dates and routines",
+        "Project pages with countdowns, trackers, habits, goals and checklists",
+        "Morning check-ins, weekly reviews and suggested improvements",
+        "Capture by typing, pasting, dropping files or speaking",
+        "Installable on phones, with an Android Share sheet target",
+        "Bring your own AI provider: OpenRouter, OpenAI, Anthropic"
+      ],
+      "screenshot": "https://atlaswork.app/today.webp"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "What is Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira and is in closed beta." } },
+        { "@type": "Question", "name": "Can the agents change my notes without asking?", "acceptedAnswer": { "@type": "Answer", "text": "Only if you let them. You set each agent to ask first, so every change arrives as a proposal you apply or reject, or to act straight away with Undo. You also choose what each agent may read and which tools it may use." } },
+        { "@type": "Question", "name": "Which AI answers, and is my data used for training?", "acceptedAnswer": { "@type": "Answer", "text": "By default an open model on Cloudflare Workers AI answers, or on Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them." } },
+        { "@type": "Question", "name": "Can I use my own AI provider?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay that provider directly. Every agent and routine then answers through it." } },
+        { "@type": "Question", "name": "Does it work on my phone?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Install Atlaswork from your phone's browser. Phones get their own layout with Today, Projects, Capture and Chat one tap away, and on Android Atlaswork appears in the Share sheet." } },
+        { "@type": "Question", "name": "Do my notes sync between devices?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Signed in, your notes and tasks live in your account and open on every device. Files you attach stay on the device that added them. You can export a full backup at any time and delete your account from Settings." } },
+        { "@type": "Question", "name": "When can I use Atlaswork?", "acceptedAnswer": { "@type": "Answer", "text": "Atlaswork is in closed beta. Join the waitlist at atlaswork.app and invitations go out in small groups. There is no public launch date yet." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  /* Tokens from the app's Warm editorial skin (src/WarmEditorial.module.css), so the page and the app look like one product. */
+  @font-face { font-family: "DM Sans"; src: url(dm-sans.woff2) format("woff2"); font-weight: 100 1000; font-display: swap; }
+  @font-face { font-family: Fraunces; src: url(fraunces.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+  :root {
+    --canvas: #f7f5ef; --sidebar: #f0eee6; --panel: #fffdf8; --recessed: #eeece3; --ink: #34382f; --secondary: #4f5348;
+    --line: #e2e2d7; --line-field: #898f82; --accent: #416b57; --accent-hover: #345944; --accent-soft: #e7ece2; --clay: #ad7761; --error: #a14232;
+    --measure: 34rem;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font: 17px/1.6 "DM Sans", system-ui, sans-serif; }
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .wrap { width: min(1120px, 100% - 48px); margin-inline: auto; }
+  h1, h2 { font-family: Fraunces, Georgia, serif; font-weight: 600; letter-spacing: -0.02em; line-height: 1.08; margin: 0; text-wrap: balance; }
+  h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); max-width: 14ch; }
+  h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); max-width: 18ch; }
+  h3 { font-size: 1.05rem; margin: 0 0 .25rem; }
+  p { margin: 0; }
+  .lede { font-size: 1.2rem; color: var(--secondary); max-width: var(--measure); margin-top: 1.25rem; }
+
+  header { padding: 22px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: Fraunces, Georgia, serif; font-size: 1.35rem; font-weight: 600; text-decoration: none; color: var(--ink); }
+  .brand img { width: 36px; height: 36px; border-radius: 50%; }
+  .to-join { font-weight: 600; font-size: .95rem; }
+
+  /* The hand-drawn underline the app puts under agent names, used once, under the headline. */
+  .underline { display: block; width: 180px; height: 12px; margin-top: 14px; color: var(--clay); }
+
+  .hero { padding: 48px 0 72px; display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 900px) { .hero { grid-template-columns: 1fr minmax(0, 30rem); gap: 64px; } }
+
+  /* The cast leads the page: Atlas large, the five he works beside around him, each tilted like a badge pinned up. */
+  .cast { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .cast li { position: relative; aspect-ratio: 1; rotate: -1.2deg; transition: rotate 280ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .cast li:nth-child(even) { rotate: 1.4deg; }
+  .cast li:hover { rotate: 0deg; }
+  .cast .lead { grid-column: span 2; grid-row: span 2; }
+  .cast img { width: 100%; height: 100%; object-fit: cover; border-radius: 22px; border: 4px solid var(--panel); box-shadow: 0 18px 40px -24px #323c2966; }
+  .cast .lead img { border-radius: 28px; }
+  .cast span { position: absolute; left: 12px; bottom: 12px; padding: 3px 10px; border-radius: 999px; background: var(--panel); font-size: .85rem; font-weight: 600; line-height: 1.5; }
+  .cast .lead span { font: 600 1.15rem/1.4 Fraunces, Georgia, serif; padding: 4px 14px; left: 16px; bottom: 16px; }
+  @media (prefers-reduced-motion: reduce) { .cast li { transition: none; } }
+  /* Phones: the cast is one row of faces above the headline, so the headline and the waitlist stay in the first screen. */
+  @media (max-width: 899px) {
+    .cast { order: -1; display: flex; align-items: center; gap: 0; }
+    .cast li, .cast li:nth-child(even) { rotate: none; width: 52px; flex: none; }
+    .cast li + li { margin-left: -8px; }
+    .cast .lead { width: 68px; margin-right: 6px; }
+    .cast img, .cast .lead img { border-radius: 50%; border-width: 3px; box-shadow: none; }
+    .cast span { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); }
+    .hero { padding-top: 16px; gap: 24px; }
+  }
+  .soon { margin-top: 1.5rem; font-weight: 600; }
+  .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 10px;
+    font: 600 1rem "DM Sans", sans-serif; border: 1px solid transparent; cursor: pointer; background: var(--accent); color: var(--panel); }
+  .button:hover { background: var(--accent-hover); }
+  .button:disabled { opacity: .7; cursor: progress; }
+  figure { margin: 0; }
+  section figure { margin-top: 2.5rem; }
+  .split figure { margin-top: 0; }
+  .shot { border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 24px 70px #323c2924; background: var(--panel); }
+  figcaption { margin-top: .85rem; font-size: .92rem; color: var(--secondary); max-width: 60ch; }
+
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .split { display: grid; gap: 40px; align-items: center; }
+  @media (min-width: 900px) {
+    .split { grid-template-columns: 1fr 1.1fr; gap: 64px; }
+    /* Picture first on alternate sections, so the page doesn't read as one column of text beside one of pictures. */
+    .split.flip > :first-child { order: 2; }
+  }
+
+  .crew { list-style: none; padding: 0; margin: 2.5rem 0 0; display: grid; gap: 20px 32px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .crew h3 { font-family: Fraunces, Georgia, serif; font-size: 1.2rem; font-weight: 600; }
+  .crew p { color: var(--secondary); font-size: .95rem; }
+  .more-crew { margin-top: 2rem; max-width: var(--measure); color: var(--secondary); }
+
+  .facts { display: grid; gap: 22px; margin-top: 2rem; }
+  .facts p { color: var(--secondary); max-width: var(--measure); }
+  .facts strong { color: var(--ink); }
+
+  /* Two phone screens side by side, in the app's phone frame radius. */
+  .phones { display: flex; gap: 20px; justify-content: center; }
+  .phones img { width: min(260px, calc(50% - 10px)); border-radius: 28px; border: 6px solid var(--panel); box-shadow: 0 24px 60px -20px #323c2940; }
+  .phones img + img { margin-top: 48px; }
+  /* Phones: desktop screenshots shrink past reading, so their figures switch to the phone layout (<picture>), and the
+     phone pair keeps only Capture, since Today on a phone already showed above. */
+  @media (max-width: 600px) {
+    .adaptive img { width: min(280px, 100%); margin-inline: auto; border-radius: 28px; border: 6px solid var(--panel); }
+    .phones .wide-only { display: none; }
+    .phones img + img { margin-top: 0; width: min(280px, 100%); }
+  }
+
+  .faq { margin-top: 1rem; max-width: 46rem; }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0;
+    font: 600 1.15rem/1.35 Fraunces, Georgia, serif; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; flex: none; width: 10px; height: 10px; border-right: 2px solid var(--secondary); border-bottom: 2px solid var(--secondary);
+    rotate: 45deg; translate: 0 -3px; transition: rotate 200ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .faq details[open] summary::after { rotate: 225deg; translate: 0 3px; }
+  @media (prefers-reduced-motion: reduce) { .faq summary::after { transition: none; } }
+  .faq details p { padding: 0 0 20px; color: var(--secondary); max-width: 62ch; }
+
+  .waitlist { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; max-width: 30rem; }
+  .waitlist label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .waitlist input { flex: 1 1 16rem; min-height: 48px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-field); background: var(--panel); color: var(--ink); font: inherit; }
+  .waitlist .human-check { flex-basis: 100%; }
+  .waitlist .human-check:empty { display: none; }
+  .waitlist [role=status] { flex-basis: 100%; min-height: 1.6em; font-size: .95rem; }
+  .waitlist [role=status].error { color: var(--error); }
+  .waitlist .privacy { flex-basis: 100%; font-size: .88rem; color: var(--secondary); }
+
+  footer { padding: 40px 0 56px; border-top: 1px solid var(--line); color: var(--secondary); font-size: .92rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  footer nav { display: flex; gap: 20px; }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="brand" href="#top"><img src="atlas.webp" alt="">Atlaswork</a>
+  <a class="to-join" href="#join">Join the waitlist</a>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <h1>AI agents for your life that ask before they change anything.</h1>
+      <svg class="underline" viewBox="0 0 180 12" aria-hidden="true"><path d="M2 8 C 40 2, 70 12, 110 6 S 160 3, 178 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <p class="lede">Atlaswork keeps your notes, tasks and projects for home, family, health, money and career, with an AI agent looking after each. They plan, check in and suggest. You apply what you want and undo the rest.</p>
+      <p class="soon">Atlaswork is in closed beta. Join the waitlist and we'll invite people in small groups.</p>
+      <form class="waitlist" data-placement="hero" novalidate>
+        <label for="email-top">Email address</label>
+        <input id="email-top" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button class="button" type="submit">Join the waitlist</button>
+        <div class="human-check"></div>
+        <p role="status"></p>
+        <p class="privacy">We'll use your email only to invite you to the beta and to tell you when Atlaswork opens. To request removal, contact <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>. Read the <a href="privacy.html">privacy notice</a>.</p>
+      </form>
+    </div>
+    <ul class="cast" aria-label="The agents">
+      <li class="lead"><img src="atlas.webp" width="464" height="464" alt="" fetchpriority="high"><span>Atlas</span></li>
+      <li><img src="hearth.webp" width="464" height="464" alt=""><span>Hearth</span></li>
+      <li><img src="vital.webp" width="464" height="464" alt=""><span>Vital</span></li>
+      <li><img src="kin.webp" width="464" height="464" alt=""><span>Kin</span></li>
+      <li><img src="ledger.webp" width="464" height="464" alt=""><span>Ledger</span></li>
+      <li><img src="compass.webp" width="464" height="464" alt=""><span>Compass</span></li>
+    </ul>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>Your whole day on one page</h2>
+      <p class="lede">Today lays your day out from morning to night. Tasks with a time stand at their hour, the rest wait in Anytime until you give them a place, and each agent suggests one next step at a free time, with its reason. Nothing moves until you apply it.</p>
+      <figure class="adaptive">
+        <picture>
+          <source media="(max-width: 600px)" srcset="phone-today.webp" width="780" height="1688">
+          <img class="shot" src="today.webp" width="1920" height="1200" loading="lazy" alt="Atlaswork's Today page at 14:40: Good afternoon, 0 done, 10 to go, 4 carried over. A line from 07 to 23 has the sun at now, tasks at their hours and the agents' suggested steps dashed with their faces. Below, Anytime today lists tasks with no time yet and the rituals to tick, then Morning, Afternoon and Evening. Beside it, Your crew today: Atlas says Book blood work matters most, then suggests times at 17:30, 19:30 and 21:00, each with a reason and Apply, Other time, See it and Not now.">
+        </picture>
+        <figcaption>Today in the closed beta, from the demo workspace. The app may change before it opens to everyone.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>An agent for each part of your life</h2>
+      <p class="lede">Atlas helps across the areas you allow. Hearth, Vital, Kin, Ledger and Compass each focus on one part of your life. You choose what every agent may read.</p>
+      <ul class="crew">
+        <li><h3>Atlas</h3><p>Your thinking partner across the areas you allow.</p></li>
+        <li><h3>Hearth</h3><p>Home, chores and the small fixes.</p></li>
+        <li><h3>Vital</h3><p>Training, sleep and check-ups.</p></li>
+        <li><h3>Kin</h3><p>Family plans, visits and birthdays.</p></li>
+        <li><h3>Ledger</h3><p>Savings, bills and subscriptions.</p></li>
+        <li><h3>Compass</h3><p>Career, portfolio and learning.</p></li>
+      </ul>
+      <p class="more-crew">Need someone else? Tell Atlas what you need help with and he suggests who fits: an agent already on your crew, a ready-made one such as Forge for an app or Tutor for homework, or a new one you shape yourself. Every area you add gets an agent of its own.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split">
+      <div>
+        <h2>They suggest. You decide.</h2>
+        <div class="facts">
+          <p>Ask Atlas to lay out a project page and you get a proposal, not a surprise. <strong>Apply it, reject it, or undo it later.</strong></p>
+          <p>Agents you trust can act straight away, always with Undo. You choose what each one may read: notes, tasks, both or neither.</p>
+          <p>Agents remember what matters between conversations, and you can undo anything they remember. They ask each other for help only once you say yes.</p>
+        </div>
+      </div>
+      <figure>
+        <img class="shot" src="proposal.webp" width="1520" height="1000" loading="lazy" alt="Atlas replies: I suggest a board of what's left across most of the page, your kept things as a short list beside it, and a countdown to the desk delivery. Nothing changes until you approve. Below it, a Suggested changes card with Apply 1 change and Reject.">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split flip">
+      <div>
+        <h2>Say what you want. The agent fills in the rest.</h2>
+        <div class="facts">
+          <p>Every area opens with project ideas from its agent. Pick one, or type or say what you have in mind, and the agent fills in the name, finish date, first steps, who helps and the routines.</p>
+          <p>It lists what it guessed so you can check it, and <strong>nothing is saved until you press Start.</strong></p>
+          <p>Ask for something that fits none of your areas and Atlas offers a new one with an agent to look after it. One Undo takes both back.</p>
+        </div>
+      </div>
+      <figure>
+        <img class="shot" src="dialog.webp" width="1140" height="1024" loading="lazy" alt="Start a project: Plan the family trip, Dates agreed, places booked, everyone looking forward to it. Chips for the Family domain, when you leave, Kin joining, and three first steps: agree on dates with everyone, shortlist three places, book where you'll stay. A Start button below.">
+      </figure>
+    </div>
+    <div class="wrap">
+      <figure class="adaptive">
+        <picture>
+          <source media="(max-width: 600px)" srcset="phone-project.webp" width="780" height="1688">
+          <img class="shot" src="project.webp" width="1920" height="1200" loading="lazy" alt="The First 10K project page in Health: Vital says we're behind and offers to plan a catch-up. A countdown shows 143 days to race day, and a chart tracks weekly distance against a 25 km target with a field to log today's run.">
+        </picture>
+        <figcaption>Each project gets a page built for what it's about: countdowns, trackers you log numbers into, habits, goals, checklists and milestones.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split">
+      <div>
+        <h2>Routines that work while you're away</h2>
+        <div class="facts">
+          <p>Each morning Atlas reads your notes and turns loose bullets into tasks. On Mondays he reviews: ticks off what your notes mark done and moves overdue tasks to today.</p>
+          <p>Every other agent suggests up to three improvements once a week, each with its reason. <strong>Tap the one you want</strong> and the agent drafts it for you to apply.</p>
+          <p>Routines can run with the app closed and send one quiet notification when they have something for you. Add your own check-ins, status reports and reviews, on the days and times you pick.</p>
+        </div>
+      </div>
+      <figure>
+        <img class="shot" src="improve.webp" width="1520" height="1000" loading="lazy" alt="Vital's weekly improvement: 1. Move Friday's session to 07:30, since two of the last three Friday evenings slipped. 2. Book the blood work today. 3. Read the check-up list on Mondays only. Buttons: Do 1, Do 2, Do 3, Not now.">
+      </figure>
+    </div>
+    <div class="wrap">
+      <figure>
+        <img class="shot" src="routines.webp" width="1620" height="263" loading="lazy" alt="The Routines page: 16 routines on, next up Atlas's check-in tomorrow at 08:00, and the next seven days as agents' faces on a timeline.">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split flip">
+      <div>
+        <h2>On your phone in a few seconds</h2>
+        <div class="facts">
+          <p>Paste a link, type, drop a file or just speak. Capture saves it where you are, or <strong>Sort with Atlas</strong> turns a brain dump into tasks and notes where they belong.</p>
+          <p>Install Atlaswork from your browser. Today, Projects, Capture and Chat sit one tap away; swipe a task right to tick it off or left to move it to tomorrow. On Android, Atlaswork appears in the Share sheet.</p>
+          <p>Notes you write offline wait on your phone and save when you're back.</p>
+        </div>
+      </div>
+      <figure class="phones">
+        <img class="wide-only" src="phone-today.webp" width="780" height="1688" loading="lazy" alt="Today on a phone: Good afternoon, then Your crew today with Atlas's line on what matters most and his next steps at 17:30 and 19:30 with their reasons and Apply, above a bottom bar with Today, Projects, Capture, Chat and More.">
+        <img src="phone-capture.webp" width="780" height="1688" loading="lazy" alt="Capture on a phone, saving to Health: Long run Sunday, 12 km. Ask Sofia if she wants the second race bib. New running shoes before December. Buttons: Sort with Atlas and Save.">
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Your notes on every device. AI only when you ask.</h2>
+      <div class="facts">
+        <p>Signed in, your notes and tasks live in your account and open on your phone and computer. Files you attach stay on the device that added them. Export a full backup any time.</p>
+        <p>Live AI replies need an internet connection. Your message and recent conversation, with only the notes and tasks that agent may read, go to an open model on Cloudflare, or on Groq when Cloudflare is busy. Neither keeps them or trains on them.</p>
+        <p>Prefer your own AI? Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay it directly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Your Google Calendar, if you connect it</h2>
+      <div class="facts">
+        <p>Connect Google Calendar in Settings and your events stand on Today's day line, so agents suggest steps only when you're free and can answer "What's on tomorrow?".</p>
+        <p>You choose for each agent whether it sees only when you're busy, reads your events, or may also offer to add dates, and which calendars. Agents read an event's title and times, never its description or guests, and Atlaswork doesn't keep your events.</p>
+        <p>An event is added only when you tap <strong>Add to Google Calendar</strong>. Disconnect any time and Atlaswork's access is gone. Read <a href="privacy.html#google-calendar">how we use Google Calendar data</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Questions</h2>
+      <div class="faq">
+        <details>
+          <summary>What is Atlaswork?</summary>
+          <p>Atlaswork is a personal workspace for notes, tasks and projects across the areas of your life, with an AI agent looking after each area. It runs in the browser on computers and phones and installs like an app. It is made in Portugal by Carlos Oliveira and is in closed beta.</p>
+        </details>
+        <details>
+          <summary>Can the agents change my notes without asking?</summary>
+          <p>Only if you let them. You set each agent to ask first, so every change arrives as a proposal you apply or reject, or to act straight away with Undo. You also choose what each agent may read and which tools it may use.</p>
+        </details>
+        <details>
+          <summary>Which AI answers, and is my data used for training?</summary>
+          <p>By default an open model on Cloudflare Workers AI answers, or on Groq when Cloudflare is busy. A reply sends only your message, the recent conversation and the notes and tasks that agent may read. Neither provider keeps them or trains on them.</p>
+        </details>
+        <details>
+          <summary>Can I use my own AI provider?</summary>
+          <p>Yes. Connect OpenRouter in one click, or an API key from OpenAI, Anthropic or any OpenAI-compatible provider, and pay that provider directly. Every agent and routine then answers through it.</p>
+        </details>
+        <details>
+          <summary>Does it work on my phone?</summary>
+          <p>Yes. Install Atlaswork from your phone's browser. Phones get their own layout with Today, Projects, Capture and Chat one tap away, and on Android Atlaswork appears in the Share sheet.</p>
+        </details>
+        <details>
+          <summary>Do my notes sync between devices?</summary>
+          <p>Yes. Signed in, your notes and tasks live in your account and open on every device. Files you attach stay on the device that added them. You can export a full backup at any time and delete your account from Settings.</p>
+        </details>
+        <details>
+          <summary>When can I use Atlaswork?</summary>
+          <p>Atlaswork is in closed beta. Join the waitlist below and invitations go out in small groups. There is no public launch date yet.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="join">
+    <div class="wrap">
+      <h2>Get an invitation to the beta</h2>
+      <p class="lede">Join the waitlist. We invite people in small groups, and early testers shape what Atlaswork becomes.</p>
+      <form class="waitlist" data-placement="footer" novalidate>
+        <label for="email-end">Email address</label>
+        <input id="email-end" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button class="button" type="submit">Join the waitlist</button>
+        <div class="human-check"></div>
+        <p role="status"></p>
+        <p class="privacy">We'll use your email only to invite you to the beta and to tell you when Atlaswork opens. To request removal, contact <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a>. Read the <a href="privacy.html">privacy notice</a>.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Atlaswork is made in Portugal by Carlos Oliveira. Questions: <a href="mailto:hello@atlaswork.app">hello@atlaswork.app</a></p>
+    <nav aria-label="Legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav>
+  </div>
+</footer>
+
+<script src="waitlist.js" defer></script>
+</body>
+</html>

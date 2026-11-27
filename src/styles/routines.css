@@ -1,0 +1,285 @@
+/* Routines: rows, chips and the editor in the agent dialog, and the Routines page's week line, rows and sheet. */
+/* restyles: .workspace-content */
+/* Routines. Each kind keeps one colour through its seal, chips, leaves, and badges: ochre for the morning check-in it
+   grew from, sage for reports, clay for reviews, the accent for weekly improvements. The one flourish is the leaves:
+   next runs as tear-off calendar pages. On the page, faces grow on stems along the week, and an agent whose routine
+   is off sleeps (D70). */
+.routine-row, .routine-chip, .routine-kind, .routine-line, .routine-detail { --kind: var(--ochre); }
+:is(.routine-row, .routine-chip, .routine-kind, .routine-line, .routine-detail).report { --kind: var(--sage); }
+:is(.routine-row, .routine-chip, .routine-kind, .routine-line, .routine-detail).review { --kind: var(--clay); }
+:is(.routine-row, .routine-chip, .routine-kind, .routine-line, .routine-detail).improve { --kind: var(--accent); }
+.routine-list { display: flex; flex-direction: column; gap: 8px; }
+.routine-row { --hue: var(--kind); border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); transition: border-color var(--motion-quick), opacity var(--motion-quick); }
+.routine-row[data-paused] .routine-head { opacity: 0.62; }
+.routine-head { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 10px; }
+.routine-seal { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; color: var(--kind);
+  background: color-mix(in oklab, var(--kind) 14%, var(--panel));
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--kind) 35%, transparent); }
+.routine-summary { display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0; padding: 2px 4px; text-align: left; border-radius: var(--radius-md); }
+.routine-summary strong { font: 600 var(--text-lg)/1.3 var(--font-title); }
+.routine-summary span { font-size: var(--text-xs); color: var(--secondary); }
+.routine-summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.routine-next { flex: none; padding: 4px 8px; border-radius: var(--radius-pill); background: var(--recessed); color: var(--secondary); font-size: var(--text-sm); white-space: nowrap; }
+.routine-next.due { background: color-mix(in oklab, var(--kind) 20%, var(--panel)); color: var(--ink); font-weight: 600; }
+.routine-switch { position: relative; display: flex; flex: none; cursor: pointer; margin: 0 !important; }
+.routine-switch input { position: absolute; width: 1px !important; height: 1px; opacity: 0; }
+.routine-switch input:checked + .switch { background: var(--kind); }
+.routine-switch input:checked + .switch::after { translate: 16px 0; }
+.routine-switch input:focus-visible + .switch { outline: 2px solid var(--accent); outline-offset: 2px; }
+.routine-add, .routine-new { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--secondary); }
+.routine-add { padding: 4px 2px 0; }
+.routine-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px dashed color-mix(in oklab, var(--kind) 55%, var(--line)); border-radius: var(--radius-pill);
+  color: var(--ink); font-size: var(--text-xs); transition: background var(--motion-quick), border-style var(--motion-quick); }
+.routine-chip svg { color: var(--kind); }
+.routine-chip:hover { border-style: solid; background: color-mix(in oklab, var(--kind) 12%, var(--panel)); }
+
+.routine-editor { display: flex; flex-direction: column; gap: 18px; }
+@keyframes routine-open { from { opacity: 0; translate: 0 -4px; } }
+.routine-question { min-width: 0; margin: 0; padding: 0; border: 0; }
+.routine-question > legend { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 0; font: 600 var(--text-md)/1.3 var(--font-title); color: var(--ink); }
+.routine-question > legend img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.routine-question .day-chips { margin-top: 8px; }
+.routine-question .field-error, .routine-question .agent-hint { display: block; margin-top: 8px; font-size: var(--text-xs); }
+.routine-kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.routine-kind { position: relative; display: flex !important; margin: 0 !important; cursor: pointer; }
+.routine-kind input { position: absolute; width: 1px !important; height: 1px; opacity: 0; }
+.routine-kind > span { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 10px 10px; border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink);
+  transition: border-color var(--motion-quick), background var(--motion-quick), translate var(--motion-settle) var(--ease-settle); }
+.routine-kind svg { color: var(--kind); }
+.routine-kind strong { font-size: var(--text-sm); }
+.routine-kind small { font-size: var(--text-xs); line-height: 1.45; color: var(--secondary); }
+.routine-kind input:checked + span { border-color: var(--kind); background: color-mix(in oklab, var(--kind) 12%, var(--panel)); translate: 0 -2px; box-shadow: 0 3px 0 color-mix(in oklab, var(--kind) 30%, transparent); }
+.routine-kind input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.routine-cadence { width: fit-content; max-width: 100%; flex-wrap: wrap; }
+.month-grid { display: grid; grid-template-columns: repeat(7, 36px); gap: 4px; margin-top: 8px; }
+.month-grid > button { display: grid; place-items: center; height: 30px; border: 1px solid transparent; border-radius: var(--radius-md); font-size: var(--text-xs); font-variant-numeric: tabular-nums; color: var(--secondary); }
+.month-grid > button:hover { border-color: var(--line); }
+.month-grid > button[aria-pressed="true"] { border-color: var(--hue); background: color-mix(in oklab, var(--hue) 20%, var(--panel)); color: var(--ink); font-weight: 600; }
+.month-grid > button:last-child { grid-column: span 2; }
+.routine-times { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; }
+.routine-time { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; border: 1px solid var(--line); border-radius: var(--radius-control); text-align: left; }
+.routine-time > span { display: flex; flex-direction: column; font-size: var(--text-sm); line-height: 1.25; }
+.routine-time small { font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.routine-time svg { color: var(--muted); }
+.routine-time[aria-pressed="true"] { border-color: var(--hue); background: color-mix(in oklab, var(--hue) 14%, var(--panel)); }
+.routine-time[aria-pressed="true"] svg { color: var(--hue); }
+.routine-exact { display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; margin: 0 0 0 4px !important; font-size: var(--text-xs); color: var(--muted); }
+.routine-editor .routine-exact input { width: auto; padding: 6px 8px; border: 1px solid var(--line-field); border-radius: var(--radius); font-variant-numeric: tabular-nums; }
+.routine-preview { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 16px; padding-top: 4px; }
+.routine-leaves { display: flex; gap: 8px; padding-top: 4px; }
+.routine-leaf { --paper: var(--panel); position: relative; display: flex; flex-direction: column; align-items: center; width: 62px; padding: 12px 0 8px; border-radius: 4px 4px 9px 9px; background: var(--paper);
+  border: 1px solid var(--line); box-shadow: 0 2px 0 var(--line); rotate: calc((var(--i) - 1.5) * 1.6deg); font-variant-numeric: tabular-nums;
+  animation: leaf-in var(--motion-enter) var(--ease-spring) backwards; animation-delay: calc(var(--i) * 60ms); }
+/* The torn top: a band in the routine's colour, perforated. */
+.routine-leaf::before { content: ""; position: absolute; inset: -1px -1px auto; height: 9px; border-radius: 4px 4px 0 0; background:
+  radial-gradient(circle at 4px 9px, var(--paper) 2px, transparent 2.5px) 0 0 / 8px 9px repeat-x, var(--kind); }
+.routine-leaf small { font-size: var(--text-xs); color: var(--muted); }
+.routine-leaf b { font: 600 var(--text-3xl)/1 var(--font-title); }
+.routine-leaf > span { font-size: var(--text-xs); line-height: 1.35; color: var(--secondary); white-space: nowrap; }
+.routine-leaf b + span { margin-top: 4px; }
+/* Weekend leaves are warmer paper, as Today's week strip draws weekends, with the day's name in clay and a dashed fold
+   under the band: a Saturday or Sunday run reads as one before its name does. */
+.routine-leaf[data-weekend] { --paper: color-mix(in oklab, var(--ochre) 16%, var(--panel)); border-color: color-mix(in oklab, var(--ochre) 40%, var(--line));
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--ochre) 30%, var(--line)); }
+.routine-leaf[data-weekend] b + span { color: var(--clay-ink); font-weight: 600; }
+.routine-leaf[data-weekend]::after { content: ""; position: absolute; top: 11px; left: 8px; right: 8px; border-top: 1px dashed color-mix(in oklab, var(--ochre) 55%, var(--line)); }
+.routine-leaf em { position: absolute; bottom: -20px; font-size: var(--text-xs); font-style: normal; color: var(--kind); font-weight: 600; white-space: nowrap; }
+.routine-leaves:has(em) { padding-bottom: 18px; }
+.proposal-changes { list-style: none; }
+.proposal-changes li { display: flex; align-items: baseline; gap: 8px; }
+.proposal-changes svg { flex: none; translate: 0 2px; color: var(--secondary); }
+@keyframes leaf-in { from { opacity: 0; translate: 0 -10px; rotate: -8deg; } }
+.routine-today { margin: 0; }
+.routine-today figcaption { text-align: left; }
+.routine-fieldset { min-width: 0; margin: 0 0 16px; padding: 0; border: 0; }
+.routine-fieldset > legend { margin-bottom: 8px; padding: 0; font-size: var(--text-xs); color: var(--secondary); }
+.routine-fieldset > legend small { color: var(--muted); }
+.routine-fieldset .routine-preview { grid-template-columns: minmax(0, 1fr); }
+.inherited-routines { display: flex; flex-direction: column; gap: 6px; padding: 0; list-style: none; font-size: var(--text-sm); }
+.inherited-routines li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.inherited-routines li[data-paused] { opacity: 0.6; }
+.inherited-routines svg { color: var(--secondary); }
+.inherited-routines small { width: 100%; padding-left: 20px; color: var(--muted); font-size: var(--text-xs); }
+
+/* The Routines page (agents-design D68, D70): one sentence of how it's going, the week as faces on stems, filters,
+   then one row each; a row opens its sheet beside the list. */
+.routine-new { margin-bottom: 20px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel);
+  animation: routine-open var(--motion-settle) var(--ease-settle); }
+.routine-new label { display: flex; align-items: center; gap: 8px; }
+.routine-new select { padding: 6px 8px; }
+.routine-new > small { margin-right: 6px; color: var(--muted); }
+.routine-glance { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 14px; }
+.routine-glance > img { width: 24px; height: 24px; flex: none; border-radius: 50%; object-fit: cover; rotate: -6deg; }
+.routine-glance > p { flex: 1 1 360px; min-width: 0; margin: 0; font-size: var(--text-sm); color: var(--secondary); }
+.routine-glance strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.routine-glance .routine-due-count { color: var(--accent-ink); }
+.routine-failed { padding: 2px 10px; border: 1px solid color-mix(in oklab, var(--clay) 50%, var(--line)); border-radius: var(--radius-pill); font-size: var(--text-xs); font-weight: 600; color: var(--clay-ink); }
+.routine-failed:hover { background: color-mix(in oklab, var(--clay) 12%, var(--panel)); }
+.routine-spend { font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.routine-missed { font-size: var(--text-xs); font-weight: 600; color: var(--clay-ink); }
+.routine-week { margin-bottom: 16px; padding: 12px 16px 10px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); }
+.routine-week-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.routine-week-head strong { font: 600 var(--text-md)/1.3 var(--font-title); }
+.routine-week-head small { font-size: var(--text-xs); color: var(--muted); }
+/* The line is soil: each run's face grows on a stem from a seed at its time, day names sit under it, weekends recessed,
+   and now is a small sun on a stalk. A stack sways from its seed under the pointer. */
+.routine-week-track { position: relative; height: 64px; container: routine-week / inline-size; }
+.routine-week-days { position: absolute; inset: 40px 0 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none;
+  border-top: 1px solid var(--line-strong); }
+.routine-week-days > li { padding: 6px 0 0 6px; border-left: 1px solid var(--line); font-size: var(--text-xs); color: var(--muted); white-space: nowrap; overflow: hidden; }
+.routine-week-days > li:first-child { border-left: 0; padding-left: 0; color: var(--ink); font-weight: 600; }
+.routine-week-days > li[data-weekend] { background: var(--recessed); }
+/* "Wed 28" needs 42px a day, 21em of the strip's text. A narrower strip (a small phone's) shows only the dates, every
+   day alike, and leaves the weekdays to screen readers; in em, so larger text drops them sooner. */
+@container routine-week (max-width: 21.2em) {
+  .routine-week-weekday { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+.routine-week-now { position: absolute; top: 4px; width: 2px; height: 36px; margin-left: -1px; border-radius: var(--radius-hair); background: color-mix(in oklab, var(--sun) 70%, var(--line)); }
+.routine-week-now::before { content: ""; position: absolute; top: -2px; left: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--sun);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--sun) 25%, transparent); }
+.routine-week-stack { position: absolute; top: 2px; display: flex; align-items: center; gap: 2px; margin-left: -14px; padding: 2px;
+  border: 1px solid transparent; border-radius: var(--radius-md); transform-origin: 14px calc(100% + 10px);
+  transition: background var(--motion-quick), border-color var(--motion-quick), rotate var(--motion-settle) var(--ease-settle); }
+.routine-week-stack::before { content: ""; position: absolute; top: 100%; left: 13px; width: 1.5px; height: 10px; background: color-mix(in oklab, var(--sage) 60%, var(--line-strong)); }
+.routine-week-stack::after { content: ""; position: absolute; top: calc(100% + 7px); left: 11px; width: 6px; height: 6px; border-radius: 50%; background: var(--sage); }
+.routine-week-stack:hover { z-index: var(--layer-raised); background: var(--recessed); rotate: -5deg; }
+.routine-week-stack[aria-pressed="true"] { z-index: var(--layer-raised); border-color: var(--accent); background: var(--accent-soft); }
+.routine-week-faces { display: flex; }
+.routine-week-faces img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--panel); }
+.routine-week-faces img + img { margin-left: -10px; }
+.routine-week-stack > small { padding-right: 2px; font-size: var(--text-2xs); font-weight: 600; color: var(--muted); }
+.routine-week-empty { position: absolute; top: 12px; left: 16px; margin: 0; font-size: var(--text-xs); color: var(--muted); }
+.routine-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 12px; }
+.routine-who { display: flex; flex-wrap: wrap; gap: 2px; }
+.routine-who > button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid transparent; border-radius: var(--radius-md);
+  transition: opacity var(--motion-quick), border-color var(--motion-quick); }
+.routine-who > button:hover { border-color: var(--line-strong); }
+.routine-who > button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.routine-who > button[data-dim] { opacity: 0.5; }
+.routine-who img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.routine-filters .segmented-control small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.routine-sort { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: var(--text-xs); color: var(--muted); }
+.routine-resort { font-size: var(--text-xs); }
+.routine-resort:disabled { visibility: hidden; }
+.routine-filtered { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0 0 10px; font-size: var(--text-xs); color: var(--muted); }
+.routine-lines { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.routine-line { border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); transition: border-color var(--motion-quick), background var(--motion-quick); }
+.routine-line:hover { border-color: var(--line-strong); }
+/* The row the sheet shows takes a soft fill in its kind's colour. */
+.routine-line[data-open] { border-color: color-mix(in oklab, var(--kind) 55%, var(--line)); background: color-mix(in oklab, var(--kind) 8%, var(--panel)); }
+.routine-line[data-off] .routine-line-text, .routine-line[data-off] .routine-line-when, .routine-line[data-off] .routine-results { opacity: 0.62; }
+.routine-line-head { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; }
+.routine-line-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 2px 4px; border-radius: var(--radius-md); text-align: left; }
+.routine-line-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* The runner's face, with the kind's icon in its colour on a small round badge. Off, the face sleeps: muted, the badge
+   a moon; switching it off lets two z's drift up once, switching it on wakes the face with a small hop. */
+.routine-face { position: relative; flex: none; width: 36px; height: 36px; }
+.routine-face > img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; transition: filter var(--motion-settle), opacity var(--motion-settle); }
+.routine-face-kind { position: absolute; right: -4px; bottom: -3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+  color: var(--panel); background: var(--kind); box-shadow: 0 0 0 2px var(--panel); }
+:is(.routine-line, .routine-detail)[data-off] .routine-face > img { filter: grayscale(0.85); opacity: 0.6; }
+:is(.routine-line, .routine-detail)[data-off] .routine-face-kind { background: var(--muted); }
+.routine-zz { position: absolute; top: -6px; right: -8px; font: italic 600 var(--text-xs)/1 var(--font-title); color: var(--muted); opacity: 0; pointer-events: none; }
+.routine-zz > i { position: absolute; top: -8px; left: 7px; font-size: var(--text-2xs); font-style: inherit; }
+.routine-line[data-stir="sleep"] .routine-zz { animation: routine-doze 1.6s var(--ease-settle) both; }
+.routine-line[data-stir="wake"] .routine-face > img { animation: routine-wake var(--motion-enter) var(--ease-settle); }
+@keyframes routine-doze { 0% { opacity: 0; translate: -4px 6px; } 30% { opacity: 1; } 100% { opacity: 0; translate: 4px -10px; } }
+@keyframes routine-wake { 40% { translate: 0 -4px; } }
+.routine-line-text { display: flex; flex-direction: column; min-width: 0; }
+.routine-line-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.routine-line-title strong { font: 600 var(--text-lg)/1.3 var(--font-title); }
+:is(.routine-line-title, .routine-detail-title) em { padding: 1px 8px; border-radius: var(--radius-pill); background: var(--recessed); font: normal 600 var(--text-2xs)/1.6 var(--font-body); color: var(--secondary); white-space: nowrap; }
+:is(.routine-line-title, .routine-detail-title) em[data-tone="due"] { background: var(--accent-soft); color: var(--accent-ink); }
+:is(.routine-line-title, .routine-detail-title) em[data-tone="warn"] { background: color-mix(in oklab, var(--attention) 22%, var(--panel)); color: var(--ink); }
+:is(.routine-line-title, .routine-detail-title) em[data-tone="bad"] { background: color-mix(in oklab, var(--clay) 18%, var(--panel)); color: var(--clay-ink); }
+.routine-line-text small { overflow: hidden; font-size: var(--text-xs); color: var(--secondary); white-space: nowrap; text-overflow: ellipsis; }
+/* When, over how far from now. */
+.routine-line-when { display: flex; flex-direction: column; align-items: flex-end; flex: none; width: 150px; font-size: var(--text-sm); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.routine-line-when small { font-size: var(--text-xs); color: var(--muted); }
+.routine-line-when[data-due] small { color: var(--accent-ink); }
+/* The last five runs, oldest first: filled when it posted, a ring when it looked and found nothing, a dash when it
+   skipped, clay when it failed; an empty slot is a faint dot. A routine that never ran shows none. */
+.routine-results { display: flex; align-items: center; gap: 4px; height: 12px; flex: none; }
+.routine-results > i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.routine-results > i[data-outcome="posted"] { background: var(--kind); }
+.routine-results > i[data-outcome="quiet"] { background: none; box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--kind) 70%, var(--line)); }
+.routine-results > i[data-outcome="no-news"] { height: 2px; border-radius: var(--radius-hair); background: var(--line-strong); }
+.routine-results > i[data-outcome="failed"] { background: var(--clay); }
+/* Run now waits under the pointer or keyboard focus; the switch always shows. */
+.routine-line-actions { display: flex; gap: 2px; flex: none; opacity: 0; transition: opacity var(--motion-quick); }
+.routine-line:is(:hover, :focus-within, [data-open]) .routine-line-actions { opacity: 1; }
+.routine-remove { min-height: 29px; padding: 0 10px; border-radius: var(--radius-small); font-size: var(--text-xs); }
+.routine-runs-title { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font: 600 var(--text-md)/1.3 var(--font-title); }
+.routine-runs-title small { font: 400 var(--text-xs)/1.3 var(--font-body); color: var(--muted); }
+.routine-runs ol { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.routine-runs li { display: grid; grid-template-columns: 10px minmax(0, 1fr); align-items: start; gap: 2px 10px; }
+.routine-runs li > i { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--kind); }
+.routine-runs li[data-outcome="quiet"] > i { background: none; box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--kind) 70%, var(--line)); }
+.routine-runs li[data-outcome="no-news"] > i { height: 2px; margin-top: 10px; background: var(--line-strong); }
+.routine-runs li[data-outcome="failed"] > i { background: var(--clay); }
+.routine-runs li > span { display: flex; flex-direction: column; font-size: var(--text-sm); }
+.routine-runs li small { font-size: var(--text-xs); color: var(--secondary); }
+.routine-runs li > button { grid-column: 2; justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 2px 0; font-size: var(--text-xs); color: var(--accent-ink); }
+.routine-runs p { margin: 0; font-size: var(--text-sm); color: var(--muted); }
+.routine-none { display: flex; align-items: center; gap: 12px; padding: 24px 8px; color: var(--muted); font-size: var(--text-sm); }
+.routine-none p { margin: 0; }
+/* The sheet (D70): one routine beside the list, which stays usable; it slides in over the page's right side, the list
+   steps aside for it where there's room, and it's a bottom sheet on phones. Its bar, then the routine's detail. */
+.workspace-content:has(.routines-page) { container-type: inline-size; }
+.routine-sheet { position: fixed; top: 0; right: 0; bottom: 0; z-index: var(--layer-panel); width: min(460px, 92%); display: flex; flex-direction: column;
+  background: var(--panel); border-left: 1px solid var(--line); box-shadow: var(--shadow-sheet-side); animation: peek-in var(--motion-settle) var(--ease-settle); }
+@container (min-width: 1040px) { .routines-page[data-sheet] { margin-right: 460px; padding-right: 24px; } }
+.routine-sheet-bar { display: flex; align-items: center; gap: 2px; padding: 10px 12px 10px 20px; border-bottom: 1px solid var(--line); }
+.routine-sheet-bar > span { flex: 1; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.routine-sheet > .routine-detail { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.routine-sheet .routine-detail-body { flex: 1; min-height: 0; padding: 18px 20px 24px; overflow-y: auto; overscroll-behavior: contain; }
+/* Both on the left: the floating chat button sits over the bottom right corner. */
+.routine-sheet .routine-detail-foot { margin-top: 0; padding: 12px 20px; }
+/* A routine's detail (D70), in the sheet and in place of a dialog's list: head, the editor with its preview first, the
+   last runs, then Remove and Run now. */
+.routine-detail-body { display: flex; flex-direction: column; gap: 22px; }
+.routine-detail-head { display: flex; align-items: center; gap: 14px; }
+.routine-detail-head .routine-face, .routine-detail-head .routine-face > img { width: 52px; height: 52px; }
+.routine-detail-head .routine-face { rotate: -4deg; }
+.routine-detail-head .routine-face-kind { width: 22px; height: 22px; }
+.routine-detail-head > div { flex: 1; min-width: 0; }
+.routine-detail-title { display: flex; align-items: center; gap: 8px; margin: 0; font: 600 var(--text-2xl)/1.2 var(--font-title); }
+/* The title takes focus only so the keyboard starts in the detail; it isn't a control, so it draws no ring. */
+.routine-detail-title:focus-visible { outline: none; box-shadow: none; }
+.routine-detail-head p { margin: 2px 0 0; font-size: var(--text-sm); color: var(--secondary); }
+.routine-detail { --hue: var(--kind); }
+.routine-detail-switch { align-items: center; gap: 8px; font-size: var(--text-xs); color: var(--secondary); }
+.routine-detail .routine-preview { order: -1; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 14px 16px 16px; border-radius: var(--radius-card); background: var(--recessed); }
+.routine-detail .routine-preview .badge-speech { margin: 0; }
+.routine-detail .routine-kinds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.routine-detail-foot { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 0 0; border-top: 1px solid var(--line); }
+/* In a dialog the detail takes the list's place, under a way back to all of them. */
+.routine-drill { animation: routine-open var(--motion-settle) var(--ease-settle); }
+.routine-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); }
+/* Atlas's offer to run routines while you're away (agents-design D54): his face, one line, two answers; flat paper. */
+.routine-away { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); }
+.routine-away > img { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; object-fit: cover; }
+.routine-away > p { flex: 1; margin: 0; font-size: var(--text-sm); color: var(--secondary); }
+.routine-away > p strong { display: block; color: var(--ink); font-size: var(--text-md); }
+.routine-away > div { display: flex; gap: 6px; flex-shrink: 0; }
+@media (max-width: 760px) {
+  .routine-away { flex-wrap: wrap; }
+  .routine-away > p { flex-basis: calc(100% - 58px); }
+  .routine-sheet { top: auto; left: 0; width: auto; height: 86%; border-left: 0; border-top: 1px solid var(--line); border-radius: 20px 20px 0 0; box-shadow: var(--shadow-sheet-up); animation-name: sheet-in; }
+}
+@media (max-width: 720px) {
+  .routine-head { flex-wrap: wrap; }
+  .routine-next { order: 5; margin-left: 44px; }
+  .routine-kinds, .routine-detail .routine-kinds { grid-template-columns: minmax(0, 1fr); }
+  .routine-preview { grid-template-columns: minmax(0, 1fr); }
+  .routine-sort { margin-left: 0; }
+  .routine-line-head { flex-wrap: wrap; }
+  .routine-line-main { flex-basis: calc(100% - 60px); }
+  .routine-line-when { order: 5; flex-direction: row; align-items: baseline; gap: 6px; width: auto; margin-left: 52px; }
+  .routine-line-actions { order: 6; opacity: 1; margin-left: auto; }
+  .routine-week-days > li { padding-left: 2px; font-size: var(--text-2xs); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .routine-zz, .routine-line[data-stir] .routine-face > img { animation: none !important; }
+  .routine-week-stack:hover { rotate: none; }
+}

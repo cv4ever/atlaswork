@@ -1,0 +1,79 @@
+/* Today's first-run strips: the backup reminder and Atlas's first-morning letter with its starter picks. */
+/* Today's backup reminder: a quiet strip under the greeting, never a modal. */
+.backup-nudge {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: var(--radius-card);
+  border: 1px dashed color-mix(in oklab, var(--ochre) 55%, transparent);
+  background: color-mix(in oklab, var(--ochre) 10%, var(--panel));
+  color: var(--secondary);
+  font-size: var(--text-sm);
+}
+.backup-nudge > svg { flex-shrink: 0; color: var(--ochre); }
+.backup-nudge p { flex: 1 1 260px; line-height: 1.6; }
+.backup-nudge strong { color: var(--ink); font-weight: 600; }
+/* A letter from Atlas, not a form: a morning wash from the accent's corner to an ochre one, hills along the foot and a
+   sprig in the corner, both masked from SVG in the skin's own colours. */
+.first-morning {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  margin: 0 0 22px;
+  padding: 22px 22px 44px;
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--line));
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in oklab, var(--accent) 11%, var(--panel)), transparent 60%),
+    radial-gradient(90% 80% at 100% 100%, color-mix(in oklab, var(--ochre) 15%, var(--panel)), transparent 60%),
+    var(--panel);
+  box-shadow: var(--panel-shadow);
+  animation: bed-rise var(--motion-enter) var(--ease-settle) backwards;
+}
+.first-morning::before, .first-morning::after { content: ""; position: absolute; z-index: var(--layer-behind); pointer-events: none; }
+.first-morning::before { inset: auto 0 0; height: 56px; background: linear-gradient(color-mix(in oklab, var(--sage) 24%, transparent), color-mix(in oklab, var(--sage) 12%, transparent)); mask: var(--motif-hills) no-repeat bottom / 100% 100%; }
+.first-morning::after { top: 0; right: 0; width: 170px; height: 125px; background: var(--accent); opacity: 0.13; mask: var(--motif-sprig) no-repeat right top / contain; }
+.first-morning .guide-head { margin-bottom: 16px; }
+.first-morning .guide-bubble p { min-height: 1.5em; }
+.guide-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--accent); animation: caret-blink 700ms steps(1) infinite; }
+.guide-caret[hidden] { display: none; }
+@keyframes caret-blink { 50% { opacity: 0; } }
+.first-morning-picks .area-pick { animation: bed-rise var(--motion-pop) calc(var(--i) * 50ms) var(--ease-settle) backwards; }
+.first-morning .area-pick, .first-morning .starter-pick {
+  transform: perspective(600px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform var(--motion-quick) ease-out, translate var(--motion-settle) var(--ease-settle), border-color var(--motion-quick), background var(--motion-quick);
+}
+.first-morning .area-pick:hover, .first-morning .starter-pick:hover { translate: 0; box-shadow: var(--shadow-hover); }
+.starter-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.starter-pick {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 16px 16px 14px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-align: left;
+  animation: bed-rise var(--motion-pop) calc(var(--i) * 60ms) var(--ease-settle) backwards;
+}
+.starter-pick:hover { border-color: color-mix(in oklab, var(--hue) 50%, var(--line)); border-top-color: var(--hue); }
+.starter-pick strong { font: 600 var(--text-xl)/1.25 var(--font-title); letter-spacing: -0.2px; }
+.starter-pick small { font-size: var(--text-sm); color: var(--secondary); line-height: 1.45; }
+.starter-blocks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.starter-blocks em { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); background: color-mix(in oklab, var(--hue) 10%, var(--recessed)); color: color-mix(in oklab, var(--hue) 60%, var(--ink)); font: 500 var(--text-xs)/1.5 var(--font-body); font-style: normal; }
+/* After the ideas, a dashed card for a project of your own: it opens the project dialog in this domain. */
+.starter-pick-new { --hue: var(--accent); align-content: start; border-style: dashed; background: transparent; }
+.starter-pick-new:hover { border-style: solid; }
+.starter-pick-plus { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--recessed); color: var(--muted); transition: rotate var(--motion-settle) var(--ease-settle), color var(--motion-quick); }
+.starter-pick-new:hover .starter-pick-plus { rotate: 90deg; color: var(--accent-ink); }
+.first-morning-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 16px; }
+.first-morning-foot .text-button { display: inline-flex; align-items: center; gap: 6px; }
+.first-morning-later { margin-left: auto; color: var(--muted); }
+.first-morning-later-row img { width: 26px; height: 26px; border-radius: var(--radius-md); object-fit: cover; flex: none; }
+@media (prefers-reduced-motion: reduce) {
+  .first-morning, .first-morning-picks .area-pick, .starter-pick { animation: none; }
+  .guide-caret { display: none; }
+}

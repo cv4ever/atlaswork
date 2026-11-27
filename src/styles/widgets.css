@@ -1,0 +1,417 @@
+/* Pages (D32): the twelve-column grid, the card every block is, each data widget, and the page editor. */
+/* restyles: .stage-chip */
+/* Pages (D32): blocks on a twelve-column grid, each one a widget drawn its own way. */
+.page-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.page-block { grid-column: span 12; min-width: 0; }
+.page-block.width-wide { grid-column: span 8; }
+.page-block.width-half { grid-column: span 6; }
+.page-block.width-narrow { grid-column: span 4; }
+/* A half block that starts a row and whose next block can't fit beside it would leave half the row empty: it takes the row. */
+.page-block.width-half:is(:first-child, .width-full + *, .width-wide + *):is(:last-child, :has(+ .width-full), :has(+ .width-wide)) { grid-column: span 12; }
+.page-block > .widget, .page-block > section { margin-bottom: 0; }
+.data-widget, .projects-widget, .resources-widget.list-view, .today-side > .today-card, .today-closing > .today-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-card); padding: var(--card-padding); height: 100%;
+}
+.page-block:has(> .data-widget) { align-self: stretch; }
+.widget-caption { color: var(--muted); font-size: var(--text-sm); margin-top: 8px; }
+/* On a page, every block is a flat card with less air, drawn in its own colour (the page's, or the kind's):
+   `--hue-ink` for its words (AA on the panel and the band in every kind colour), `--hue-figure` for a figure 40px and
+   up (large text, 3:1), `--hue-wash` for its heading band, its empty tracks and its stepper. */
+.page-block > .data-widget, .page-block > .tasks-widget, .page-block > .projects-widget, .page-block > .resources-widget.list-view, .today-side > .today-card, .today-closing > .today-card {
+  --tile: var(--hue, var(--accent)); padding: 16px 18px 18px; border-radius: var(--radius-card); box-shadow: var(--panel-shadow);
+  --hue-ink: color-mix(in oklab, var(--tile) 52%, var(--ink)); --hue-figure: color-mix(in oklab, var(--tile) 72%, var(--ink));
+  --hue-wash: color-mix(in oklab, var(--tile) 12%, var(--panel));
+}
+/* Kinds with a colour of their own: the heading band, the icon and every fill inside follow it (docs/page-design.md). */
+.page-block .countdown-widget { --tile: var(--kind-countdown); --hue: var(--kind-countdown); overflow: clip; }
+.page-block .habit-widget { --tile: var(--kind-habit); --hue: var(--kind-habit); }
+.page-block .tracker-widget { --tile: var(--kind-tracker); --hue: var(--kind-tracker); }
+/* On a domain page whose hue is a kind's own, that kind steps aside, so a gold countdown never sits beside a gold goal. */
+.page-grid[data-hue="Marigold"] .countdown-widget { --tile: var(--kind-countdown-alt); --hue: var(--kind-countdown-alt); }
+.page-grid[data-hue="Lagoon"] .tracker-widget { --tile: var(--kind-tracker-alt); --hue: var(--kind-tracker-alt); }
+.page-grid[data-hue="Sage"] .habit-widget { --tile: var(--kind-habit-alt); --hue: var(--kind-habit-alt); }
+/* The heading sits on a flat band of the card's colour, edge to edge, as an agent card's portrait does (Carlos,
+   2026-11-22). Paper notes, Next up, a countdown still asking for its date and Today's own cards (each with its drawn
+   corner motif) keep their own surfaces. */
+.page-block > :is(.data-widget, .tasks-widget, .projects-widget, .resources-widget.list-view):not(.note-widget, .next-view, .today-card, :has(> .inline-date)) > .section-heading {
+  margin: -16px -18px 14px; padding: 12px 18px; background: var(--hue-wash);
+  border-radius: calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0 0;
+}
+.page-block > .data-widget > .section-heading .heading-actions > span:not(.count-chip, .stage-chip) { color: var(--hue-ink); }
+/* An empty widget is an invitation: a small line drawing of what will fill it sits beside its one line, masked from SVG
+   and drawn in the card's colour, as Today's motifs are, so themes and domains recolour it. Still at rest. */
+.page-block :is(.empty-inline, .domain-fallow, .widget-caption[data-empty]), .page-block .milestone-list li.empty-inline {
+  display: flex; align-items: center; gap: 14px; line-height: 1.6;
+}
+.page-block :is(.empty-inline, .domain-fallow, .widget-caption[data-empty])::before {
+  content: ""; flex: none; width: 64px; height: 48px; background: color-mix(in oklab, var(--tile, var(--accent)) 70%, var(--panel));
+  mask: var(--empty-art) no-repeat center / contain;
+}
+/* The spine's timeline line and the road's absolute stops also draw on these rows; an empty one is just its drawing. */
+.page-block .milestone-list li.empty-inline::before { position: static; inset: auto; width: 64px; }
+.page-block .milestone-road li.empty-inline { position: static; translate: none; width: auto; color: var(--muted); text-align: left; }
+.page-block .tasks-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='14' r='7'/><path d='M8.6 14l2.4 2.4 4.4-4.6'/><path d='M26 14h30'/><circle cx='12' cy='34' r='7' stroke-dasharray='3 4'/><path d='M26 34h18'/></svg>");
+}
+.page-block .projects-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M17 27h30l-4 18H21z'/><path d='M14 27h36'/><path d='M32 27v-8'/><path d='M32 19c0-6 4-10 10-11-1 6-4 10-10 11z' fill='black'/><path d='M32 21c0-5-3-8-8-9 1 5 3 8 8 9z' fill='black'/></svg>");
+}
+.page-block .resources-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><rect x='8' y='14' width='34' height='30' rx='4'/><path d='M16 14V9a3 3 0 0 1 3-3h34a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H42'/><path d='M15 24h20M15 32h13'/></svg>");
+}
+.page-block .tracker-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 4v38h54'/><path d='M13 34l11-9 9 4 13-13' stroke-dasharray='3 5'/><circle cx='50' cy='13' r='4' fill='black'/></svg>");
+}
+.page-block .checklist-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><rect x='14' y='7' width='36' height='38' rx='5'/><rect x='24' y='3' width='16' height='8' rx='3' fill='black'/><rect x='21' y='18' width='6' height='6' rx='1.5'/><path d='M32 21h11'/><rect x='21' y='31' width='6' height='6' rx='1.5'/><path d='M32 34h8'/></svg>");
+}
+.page-block .milestones-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 42c12-2 18-10 28-10s14-6 18-12' stroke-dasharray='2 6'/><circle cx='6' cy='42' r='3' fill='black'/><path d='M52 20V4'/><path d='M52 4h10l-3 4.5 3 4.5H52' fill='black'/></svg>");
+}
+.page-block .note-widget {
+  --empty-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 48' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><rect x='10' y='9' width='44' height='35' rx='4'/><rect x='23' y='3' width='18' height='8' rx='1.5' fill='black' transform='rotate(-5 32 7)'/><path d='M18 23h28M18 31h18'/></svg>");
+}
+/* Pinned note: paper, not a card. */
+.page-block > .note-widget { --tile: var(--ochre); background: color-mix(in oklab, var(--ochre) 11%, var(--panel)); border-color: transparent;
+  box-shadow: var(--shadow-raised); }
+/* Habit: today's button in the habit's ink once done. */
+.page-block .habit-today.is-done { color: var(--hue-ink); }
+/* Heading actions are icons with tooltips (progressive disclosure); the pace verdict speaks in clay. */
+.heading-add { width: 28px; height: 28px; }
+.stage-chip[data-behind] { background: color-mix(in oklab, var(--clay) 20%, var(--panel)); color: var(--clay-ink); }
+/* Finished tasks fold behind their count. */
+.task-fold { margin-top: 4px; }
+.task-fold > summary { display: flex; align-items: center; gap: 4px; min-height: 30px; padding: 0 4px; list-style: none; cursor: pointer; color: var(--muted); font-size: var(--text-xs); border-radius: var(--radius-small); }
+.task-fold > summary::-webkit-details-marker { display: none; }
+.task-fold > summary:hover { background: var(--recessed); color: var(--ink); }
+.task-fold > summary svg { transition: rotate var(--motion-quick); }
+.task-fold[open] > summary svg { rotate: 90deg; }
+.task-fold .task-row { opacity: 0.7; }
+/* Countdown without a date: the usual horizons one tap away, each with the day it lands on. */
+.date-picks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.date-pick { display: grid; gap: 1px; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); text-align: left; }
+.date-pick:hover { border-color: var(--ochre); }
+.date-pick strong { font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.date-pick small { font-size: var(--text-xs); color: var(--muted); }
+/* The day tiles (`DayTiles.tsx`), wherever a task gets a day: the week (weekday, the date in Fraunces, a bar for the
+ * hours already planned out of 07:00 to 22:00, weekends warmer), Someday where it's allowed; above it the week's dates,
+ * Earlier, a finish line, Pick a date and Next week. */
+.day-tiles-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 6px; font-size: var(--text-xs); color: var(--muted); }
+.day-tiles-nav > span:first-of-type { margin-right: auto; }
+.day-tiles-nav .text-button { gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); font-size: var(--text-xs); }
+.day-tiles-nav :is(.text-button[aria-pressed="true"], .capture-pick-day[data-picked]) { border-color: transparent; background: var(--accent-soft); color: var(--accent-ink); }
+.day-tiles-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.day-tiles-week[data-someday] { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.day-tile { display: grid; justify-items: center; gap: 2px; min-width: 0; padding: 6px 2px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); }
+.day-tile small { font-size: var(--text-2xs); color: var(--muted); }
+.day-tile strong { font: 600 var(--text-lg)/1.2 var(--font-title); }
+.day-tile[data-weekend] { background: color-mix(in oklab, var(--sun) 7%, var(--panel)); }
+.day-tile-load { display: block; width: 70%; height: 4px; border-radius: var(--radius-hair); background: var(--recessed); overflow: hidden; }
+.day-tile-load > span { display: block; height: 100%; background: color-mix(in oklab, var(--accent) 55%, transparent); }
+.day-tile-someday strong { display: grid; place-items: center; height: 1.2em; font-size: var(--text-lg); color: var(--muted); }
+.day-tile-someday[aria-checked="true"] strong { color: inherit; }
+.day-tile-someday .day-tile-load { background: none; }
+.day-tile[aria-checked="true"] { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+.day-tile[aria-checked="true"] small { color: inherit; }
+.day-tile[aria-checked="true"] .day-tile-load { background: color-mix(in oklab, var(--on-accent) 30%, transparent); }
+.day-tile[aria-checked="true"] .day-tile-load > span { background: var(--on-accent); }
+@media (hover: hover) { .day-tile:not([aria-checked="true"]):hover { border-color: var(--accent); } }
+.page-block .section-heading { margin-bottom: 10px; }
+.page-block .section-heading h2, .today-closing .section-heading h2 { font-size: var(--text-sm); font-weight: 600; gap: 8px; }
+.page-block .section-heading h2 svg, .page-block .data-widget .section-heading h2 svg, .today-closing .section-heading h2 svg {
+  color: color-mix(in oklab, var(--tile) 75%, var(--ink));
+}
+/* Next up is the one thing to do now: tinted in the page's colour and set large, it reads as the page's call to action. */
+.page-block > .next-view { background: color-mix(in oklab, var(--hue, var(--accent)) 8%, var(--panel)); border-color: color-mix(in oklab, var(--hue, var(--accent)) 32%, var(--line)); }
+.page-block > .next-view .task-list .task-row { font-size: var(--text-lg); }
+/* A countdown still waiting for its date is an invitation, not a card. */
+.page-block > .countdown-widget:has(> .inline-date) { border-style: dashed; background: transparent; box-shadow: none; }
+
+/* Projects as progress bars; resources as a compact list. */
+.project-progress { list-style: none; display: grid; gap: 4px; margin: 0; padding: 0; }
+.project-progress button { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(80px, 36%); align-items: center; gap: 12px; padding: 8px 6px; border-radius: var(--radius); text-align: left; }
+/* A project with nothing left to do: its next step is offered where the bar would be. */
+.project-progress li { position: relative; }
+.project-progress li[data-stalled] .progress-track { visibility: hidden; }
+.project-progress .project-next { position: absolute; top: 50%; right: 6px; translate: 0 -50%; display: inline-flex; align-items: center; gap: 4px; width: auto; min-height: 28px; padding: 4px 10px; font-size: var(--text-xs); }
+/* Each project as its stage's plant in a little pot of its colour. */
+.project-pot { display: grid; place-items: center; width: 32px; height: 30px; border-radius: 6px 6px 12px 12px; font-size: 20px;
+  background: color-mix(in oklab, var(--hue) 16%, var(--panel)); box-shadow: inset 0 -4px 0 color-mix(in oklab, var(--hue) 30%, var(--panel)); transition: rotate var(--motion-settle) var(--ease-settle); }
+.project-progress button:hover .project-pot { rotate: -6deg; }
+/* Resource rows: the picture when there is one, else the kind's icon on its tint, each tile tilted like a pinned print. */
+.resource-list .resource-thumb { flex: none; width: 30px; height: 30px; border: 0; border-radius: var(--radius-md); --kind: var(--ochre); color: var(--kind); background: color-mix(in oklab, var(--kind) 16%, var(--panel));
+  box-shadow: var(--shadow-raised); rotate: -3deg; }
+.resource-list li:nth-child(even) .resource-thumb { rotate: 2deg; }
+.resource-list .resource-thumb[data-kind="link"] { --kind: var(--sage); }
+.resource-list .resource-thumb:is([data-kind="image"], [data-kind="video"]) { --kind: var(--clay); }
+.resource-list .resource-thumb[data-kind="quote"] { --kind: var(--accent); }
+.project-progress button:hover { background: var(--recessed); }
+.project-progress strong { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-progress small { color: var(--muted); font-size: var(--text-xs); }
+.project-progress .progress-track { margin: 0; height: 6px; }
+.project-progress .progress-track > span { background: var(--hue, var(--sage)); }
+.resource-list { list-style: none; margin: 0; padding: 0; }
+.resource-list button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-bottom: 1px solid var(--line); text-align: left; color: var(--ink); }
+.resource-list li:last-child button { border-bottom: 0; }
+.resource-list button svg { color: var(--muted); flex-shrink: 0; }
+.resource-list span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resource-list small { color: var(--muted); font-size: var(--text-xs); }
+.resource-list button:hover span { color: var(--accent-ink); }
+
+/* Shared bits: totals beside a heading, the view menu, and a celebration burst that plays once per success. */
+.heading-actions { display: inline-flex; align-items: center; gap: 10px; }
+.heading-actions { min-width: 0; }
+/* A long title takes two lines and says the rest in its tooltip; the detail beside it, the card's one number, never gives way. */
+.data-widget .section-heading h2 { min-width: 0; }
+.heading-title { min-width: 0; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.data-widget .heading-actions { flex: none; max-width: 50%; }
+.heading-actions > span:not(.count-chip, .stage-chip) { display: inline-flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: var(--text-xs); white-space: nowrap; }
+.heading-actions > span:not(.count-chip, .stage-chip) > time { overflow: hidden; text-overflow: ellipsis; }
+.count-chip[data-late] { color: var(--clay-ink); font-weight: 600; }
+/* The view menu (D39): a hover- or focus-revealed icon in the heading opens a popover naming the kind's views. */
+.view-button { width: 28px; height: 28px; opacity: 0; transition: opacity var(--motion-quick), background var(--motion-quick); }
+:is(.widget, .today-card):is(:hover, :focus-within) .view-button, .view-button:focus-visible, .view-button[aria-expanded="true"] { opacity: 1; }
+@media (hover: none) { .view-button { opacity: 1; } }
+.view-menu { width: 240px; padding: 6px; border: 1px solid var(--line); border-radius: var(--radius-control); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+.view-menu[data-open] { animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.view-menu > strong, .view-menu [role="group"] > :first-child { display: block; padding: 4px 8px 6px; font-size: var(--text-xs); font-weight: 600; color: var(--muted); }
+.view-menu > button, .view-menu [role="menuitemradio"] { width: 100%; display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: center; text-align: left; padding: 8px 8px; border-radius: var(--radius-md); color: var(--ink); }
+.view-menu > button:hover, .view-menu [data-highlighted] { background: var(--recessed); }
+.view-menu :is(button, [role="menuitemradio"]) > svg { color: var(--hue, var(--accent)); visibility: hidden; }
+.view-menu [aria-checked="true"] > svg { visibility: visible; }
+.view-menu :is(button, [role="menuitemradio"]) strong { display: block; font-size: var(--text-sm); font-weight: 500; } .view-menu [aria-checked="true"] strong { font-weight: 600; }
+.view-menu :is(button, [role="menuitemradio"]) small { display: block; font-size: var(--text-xs); color: var(--muted); line-height: 1.35; }
+/* A project's linked folder (agents-design D47, D77): a native popover in the view menu's look, anchored in CSS, with a
+   line about the folder over its actions. A phone, which shows a computer's folder too, spans it under the icon. */
+.folder-menu { position: fixed; inset: auto; top: anchor(bottom); right: anchor(right); margin: 6px 0 0; width: 280px; }
+@media (max-width: 560px) { .folder-menu { left: 12px; right: 12px; width: auto; } }
+.folder-menu:popover-open { animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.folder-menu > strong { color: var(--ink); font-size: var(--text-sm); overflow-wrap: anywhere; }
+.folder-menu > .folder-line { margin: 0; padding: 0 8px 8px; font-size: var(--text-xs); color: var(--muted); line-height: 1.4; }
+.folder-menu > button > svg { visibility: visible; }
+.folder-button[data-closed] svg { color: var(--clay-ink); }
+/* A count is words beside the title, not a pill. */
+.count-chip { font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.data-widget { position: relative; display: flex; flex-direction: column; gap: 6px; transition: border-color var(--motion-quick), transform var(--motion-settle) var(--ease-settle); }
+.data-widget:hover { border-color: color-mix(in oklab, var(--hue, var(--accent)) 35%, var(--line)); }
+.data-widget .section-heading h2 svg { color: var(--hue, var(--muted)); }
+.data-widget .section-heading > span { display: inline-flex; align-items: center; gap: 4px; }
+.burst { position: absolute; inset: 50% auto auto 50%; width: 0; height: 0; pointer-events: none; }
+.burst i { position: absolute; width: 6px; height: 6px; border-radius: var(--radius-hair); background: var(--hue, var(--accent));
+  animation: burst-fly var(--motion-fill) var(--ease-settle) forwards; rotate: calc(var(--i) * 45deg); }
+.burst i:nth-child(odd) { background: var(--ochre); border-radius: 50%; }
+@keyframes burst-fly {
+  0% { transform: translateY(0) scale(0.4); opacity: 1; }
+  100% { transform: translateY(-34px) scale(1); opacity: 0; }
+}
+
+/* Countdown: a big number in the place's colour, the wait so far as a filling track. */
+.countdown-figure { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: var(--text-lg); color: var(--secondary); margin-top: 4px; }
+.countdown-figure strong { font-family: var(--font-title); font-weight: 500; color: var(--ink); font-size: var(--text-4xl); font-variant-numeric: tabular-nums; }
+.countdown-figure.big strong { font-size: 56px; line-height: 1; color: var(--hue-figure, var(--accent-ink)); letter-spacing: -0.02em; }
+/* Near the day the figure beats once, and on the day the popper wiggles once, when the card first comes into view (`data-seen`). */
+.countdown-widget[data-soon][data-seen] .countdown-figure.big strong { animation: soon-beat 2.4s var(--ease-settle); transform-origin: left bottom; }
+@keyframes soon-beat { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.06); } }
+.countdown-party { color: var(--hue, var(--accent)); align-self: center; }
+.countdown-widget[data-seen] .countdown-party { animation: party 1.2s var(--ease-spring) 2 alternate; }
+@keyframes party { from { transform: rotate(-12deg); } to { transform: rotate(12deg) translateY(-3px); } }
+.wait-track { height: 6px; border-radius: var(--radius-small); background: var(--hue-wash, var(--recessed)); overflow: hidden; margin-top: auto; }
+.wait-track > span { display: block; height: 100%; background: var(--hue, var(--accent)); transform-origin: left; border-radius: var(--radius-small); transition: transform var(--motion-settle) var(--ease-settle); }
+
+/* Tracker: bars that hit the target in full colour, misses faded; the newest one rises in. */
+.tracker-chart { width: 100%; height: 130px; display: block; margin-top: 4px; overflow: visible; }
+.tracker-line { fill: none; stroke: var(--hue, var(--accent)); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.tracker-area { fill: color-mix(in oklab, var(--hue, var(--accent)) 16%, transparent); }
+.tracker-bar { fill: var(--hue, var(--accent)); transform-box: fill-box; transform-origin: bottom; }
+/* A miss is clay, the colour of lateness, so hits and misses differ by colour and not only by strength. */
+.tracker-bar[data-miss] { fill: var(--tracker-miss); }
+.tracker-bar[data-latest] { animation: bar-rise var(--motion-flourish) var(--ease-spring); }
+@keyframes bar-rise { from { transform: scaleY(0.2); } }
+.tracker-target { stroke: color-mix(in oklab, var(--ink) 55%, transparent); stroke-width: 1.5; stroke-dasharray: 4 5; vector-effect: non-scaling-stroke; }
+.tracker-hit { fill: transparent; }
+.tracker-hit:hover { fill: color-mix(in oklab, var(--ink) 6%, transparent); }
+.tracker-delta { font-size: var(--text-sm); margin-top: 2px; }
+.tracker-delta svg, .widget-caption svg { vertical-align: -2px; }
+.tracker-delta.good { color: var(--hue-ink, var(--accent-ink)); }
+.tracker-delta.bad { color: var(--clay-ink); }
+.tracker-latest .tracker-chart { height: 54px; }
+/* The first and last day the chart covers, under its ends. */
+.chart-dates { display: flex; justify-content: space-between; margin-top: 2px; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.widget-caption strong { color: var(--ink); font-weight: 600; }
+.widget-log { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: auto; border-top: 1px solid var(--line); padding-top: 12px; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line-field); border-radius: var(--radius); background: var(--hue-wash, var(--canvas)); padding: 2px; }
+.stepper .icon-button { width: 30px; height: 30px; }
+.stepper input { width: 64px; height: 30px; border: 0; background: transparent; text-align: center; color: var(--ink); font-size: var(--text-md); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.stepper-unit { color: var(--muted); font-size: var(--text-sm); padding-right: 4px; }
+.log-button { position: relative; margin-left: auto; }
+/* A card's main action speaks in the card's colour until it is done. */
+.page-block :is(.log-button:not(:disabled), .habit-today:not(.is-done)) { color: var(--hue-ink); border-color: color-mix(in oklab, var(--tile) 45%, var(--line-strong)); }
+.log-button:disabled { opacity: 0.75; cursor: default; color: var(--hue-ink, var(--accent-ink)); }
+
+/* Habit: days as tiles you tick, a big button for today, and the streak with a flame. */
+.habit-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.habit-days[data-month] { grid-template-columns: repeat(7, minmax(0, 30px)); gap: 6px; }
+.habit-label { text-align: center; color: var(--muted); font-size: var(--text-xs); }
+.habit-day { border-radius: var(--radius); background: var(--hue-wash, var(--recessed)); display: grid; place-items: center; align-content: center; gap: 2px; color: var(--muted); font-size: var(--text-xs);
+  border: 1px solid transparent; height: 46px; transition: transform var(--motion-settle) var(--ease-settle), background var(--motion-quick); }
+.habit-days[data-month] .habit-day { height: auto; aspect-ratio: 1; border-radius: var(--radius-small); }
+/* A ticked day holds its weekday's name, so its fill is the colour mixed toward ink until light text reaches AA. */
+.habit-day[aria-pressed="true"] { background: color-mix(in oklab, var(--hue, var(--accent)) 62%, var(--ink)); color: var(--on-accent); }
+.habit-day[aria-pressed="true"] svg { animation: tick-pop var(--motion-pop) var(--ease-spring); }
+.habit-day[data-today] { border-color: var(--hue, var(--accent)); box-shadow: none; }
+.habit-day:disabled { opacity: 0.35; }
+.habit-day:not(:disabled):hover { transform: translateY(-2px); }
+.habit-day:not(:disabled):active { transform: scale(0.92); }
+@keyframes tick-pop { from { transform: scale(0.2) rotate(-25deg); } }
+.habit-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+.habit-foot .widget-caption { margin: 0; }
+.habit-today { position: relative; }
+.habit-today.is-done { background: color-mix(in oklab, var(--hue, var(--accent)) 16%, var(--panel)); border-color: transparent; color: var(--hue-ink, var(--accent-ink)); }
+.streak { display: inline-flex; align-items: center; gap: 4px; color: var(--ink); font-weight: 500; }
+.streak svg { color: var(--clay); fill: color-mix(in oklab, var(--clay) 35%, transparent); }
+/* Never miss twice: a missed yesterday leaves the flame hollow and muted until today is ticked. */
+.streak[data-at-risk] svg { color: var(--muted); fill: none; }
+
+/* Goal: a ring or bar that sweeps to where you are, milestones at each quarter, a slider to move it. */
+.goal-ring-wrap { position: relative; width: 120px; height: 120px; margin: 2px auto 0; }
+.goal-ring { width: 100%; height: 100%; display: block; transform: rotate(-90deg); }
+.goal-track, .goal-fill { fill: none; stroke-width: 10; }
+.goal-track { stroke: var(--hue-wash, var(--recessed)); }
+.goal-fill { stroke: var(--hue, var(--accent)); stroke-linecap: round; transition: stroke-dasharray var(--motion-fill) var(--ease-settle); }
+.goal-center { position: absolute; inset: 0; display: grid; place-items: center; font: 500 var(--text-2xl) var(--font-title); color: var(--hue-ink, var(--ink)); }
+.goal-bar { position: relative; height: 14px; border-radius: var(--radius-small); background: var(--hue-wash, var(--recessed)); margin: 10px 0 4px; }
+.goal-bar > span { display: block; height: 100%; width: calc(var(--share) * 100%); background: var(--hue, var(--accent)); border-radius: var(--radius-small); transition: width var(--motion-fill) var(--ease-settle); }
+.goal-bar > i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--panel); border-radius: var(--radius-hair); }
+.goal-bar > i[data-passed]::after { content: ""; position: absolute; top: -7px; left: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--ochre); }
+.goal-numbers { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; color: var(--secondary); justify-content: center; }
+.goal-widget.view-bar .goal-numbers { justify-content: flex-start; }
+.goal-numbers > strong { font: 500 var(--text-2xl) var(--font-title); color: var(--hue-ink, var(--ink)); font-variant-numeric: tabular-nums; }
+.goal-numbers small strong { color: var(--ink); font-weight: 600; }
+.goal-numbers small { width: 100%; text-align: inherit; color: var(--muted); font-size: var(--text-sm); }
+.goal-widget.view-ring .goal-numbers small { text-align: center; }
+.goal-widget[data-reached] .goal-numbers small { color: var(--accent-ink); font-weight: 500; }
+.goal-path { display: flex; flex-wrap: wrap; gap: 4px 10px; list-style: none; padding: 0; margin: 0; font-size: var(--text-xs); color: var(--secondary); }
+.goal-path li { display: inline-flex; gap: 4px; align-items: baseline; }
+.goal-path span { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.goal-path small { color: var(--muted); }
+/* The correction slider is a secondary action: it shows on hover or focus, always on touch screens. */
+.goal-slider { width: 100%; min-width: 0; margin: 2px 0 0; accent-color: var(--hue, var(--accent)); opacity: 0; transition: opacity var(--motion-quick); }
+.goal-widget:is(:hover, :focus-within) .goal-slider { opacity: 0.55; }
+.goal-widget .goal-slider:is(:hover, :focus-visible) { opacity: 1; }
+@media (hover: none) { .goal-slider { opacity: 0.55; } }
+.countdown-widget .widget-caption[data-behind], .countdown-widget .widget-caption[data-behind] strong { color: var(--clay-ink); }
+/* Countdown without a date yet: the date field sits where the figure would. */
+.inline-date { display: grid; gap: 6px; font-size: var(--text-sm); color: var(--secondary); }
+.inline-date input { padding: 8px 10px; border-radius: var(--radius); border: 1px solid var(--line-field); background: var(--canvas); color: var(--ink); font: inherit; }
+/* Checklist: named things to tick off, edited in place. */
+.checklist-items { list-style: none; padding: 0; margin: 0; display: grid; }
+.checklist-items li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: var(--text-sm); }
+.checklist-items li:last-child { border-bottom: 0; }
+.checklist-items li > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.checklist-items li[data-done] > span { color: var(--muted); text-decoration: line-through; }
+.checklist-items .task-check { width: 20px; height: 20px; border: 1.5px solid currentColor; border-radius: var(--radius-small); align-items: center; justify-content: center; }
+.checklist-items .task-check[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.checklist-remove { width: 24px; height: 24px; opacity: 0; color: var(--muted); }
+.checklist-items li:hover .checklist-remove, .checklist-items li:focus-within .checklist-remove, .milestone-list li:hover .checklist-remove, .milestone-list li:focus-within .checklist-remove { opacity: 1; }
+@media (hover: none) { .checklist-remove { opacity: 1; } }
+.checklist-widget.view-compact .checklist-items { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0 14px; }
+.checklist-widget.view-compact .checklist-items li { padding: 4px 0; border: 0; }
+.checklist-widget[data-complete] .progress-track > span { background: var(--sage); }
+.checklist-add, .milestone-add { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
+.checklist-add input, .milestone-add input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: var(--radius); border: 1px solid var(--line-field); background: var(--canvas); color: var(--ink); font: inherit; font-size: var(--text-sm); }
+.milestone-add input[type="date"] { flex: 0 1 150px; }
+.checklist-add .text-button, .milestone-add .text-button { display: inline-flex; align-items: center; gap: 4px; }
+/* Milestones: a spine of dated steps with today marked between them. */
+.milestone-list { list-style: none; padding: 0; margin: 0; position: relative; }
+.milestone-list li { position: relative; display: grid; grid-template-columns: 52px 20px 1fr auto; align-items: center; gap: 0 10px; padding: 6px 0; font-size: var(--text-sm); }
+.milestone-list time { font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.milestone-list li > span { min-width: 0; }
+.milestone-list li.empty-inline { display: block; }
+.milestone-list li > span strong { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.milestone-list li > span small { color: var(--muted); font-size: var(--text-xs); }
+.milestone-list li[data-done] > span strong { color: var(--muted); text-decoration: line-through; }
+.milestone-list li[data-late] > span small { color: var(--clay-ink); }
+.milestone-list li[data-next] > span strong { color: var(--ink); font-weight: 600; }
+.milestone-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line-strong); background: var(--panel); display: grid; place-items: center; color: var(--on-accent); }
+.milestone-list li[data-done] .milestone-dot { background: var(--hue, var(--accent)); border-color: var(--hue, var(--accent)); }
+.milestone-list li[data-next] .milestone-dot { border-color: var(--hue, var(--accent)); box-shadow: none; }
+.milestone-list[data-timeline] li::before { content: ""; position: absolute; left: 71px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.milestone-list[data-timeline] li:first-child::before { top: 50%; }
+.milestone-list[data-timeline] li:last-child::before { bottom: 50%; }
+.milestone-today { color: var(--accent-ink); }
+.milestone-today i { justify-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: none; }
+.milestone-today span { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.milestone-today time { color: var(--accent-ink); }
+/* Tasks, Next up: one task, large. */
+.next-view .task-list .task-row, .next-view .task-list > div { font-size: var(--text-md); }
+.next-view .task-list { padding: 4px 0; }
+.next-clear { font-size: var(--text-sm); color: var(--secondary); padding: 10px 0; }
+
+/* Pinned note */
+.pinned-body { white-space: pre-wrap; line-height: 1.6; color: var(--secondary); font-size: var(--text-md); }
+.note-widget.view-paper .pinned-body { color: var(--ink); }
+.note-widget .widget-caption { margin-top: auto; }
+
+/* Page editor: each block's look and width as choices you can see; widgets to add as tiles. */
+.page-editor { list-style: none; padding: 0 24px; display: grid; gap: 8px; max-height: 50vh; overflow: auto; }
+.page-editor > li { border: 1px solid var(--line); border-radius: var(--radius-control); padding: 10px 12px; display: grid; gap: 10px; animation: bed-rise var(--motion-settle) var(--ease-settle); }
+.block-row { display: flex; align-items: center; gap: 8px; }
+.block-kind { display: flex; align-items: center; gap: 8px; font-weight: 500; flex: 1; min-width: 0; }
+.block-kind small { color: var(--muted); font-weight: 400; font-size: var(--text-xs); }
+.block-kind svg { color: var(--muted); flex-shrink: 0; }
+.block-tools { display: flex; align-items: center; }
+.block-confirm { color: var(--error); font-size: var(--text-xs); white-space: nowrap; }
+.removed-blocks { padding: 12px 24px 0; }
+.removed-blocks h3 { font-size: var(--text-xs); font-weight: 600; color: var(--secondary); display: flex; gap: 6px; margin-bottom: 6px; }
+.removed-blocks h3 small { color: var(--muted); font-weight: 400; }
+.removed-blocks ul { list-style: none; display: grid; gap: 4px; }
+.removed-blocks li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: var(--radius); background: var(--recessed); animation: bed-rise var(--motion-settle) var(--ease-settle); }
+.removed-blocks .block-kind { opacity: 0.85; }
+.block-choices { display: flex; gap: 8px; flex-wrap: wrap; }
+.block-choice { flex-wrap: wrap; flex-shrink: 1; }
+.width-glyph { display: inline-block; width: 16px; height: 8px; border-radius: var(--radius-hair); background: var(--recessed); border: 1px solid var(--line-strong); position: relative; overflow: hidden; }
+.width-glyph::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--share); background: currentColor; opacity: 0.7; }
+.block-settings { display: flex; flex-wrap: wrap; gap: 10px; }
+.block-settings label, .block-setting { display: grid; gap: 4px; font-size: var(--text-xs); color: var(--muted); flex: 1 1 120px; align-content: start; }
+.block-settings label small { color: var(--secondary); }
+.block-settings input, .block-settings select {
+  height: 30px; border: 1px solid var(--line-field); border-radius: var(--radius-md); padding: 0 8px; background: var(--canvas); color: var(--ink); font-size: var(--text-sm);
+}
+.block-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 12px 24px 4px; }
+.block-picker button { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 8px; row-gap: 2px; padding: 10px 12px; border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-control); text-align: left; transition: transform var(--motion-settle) var(--ease-settle), border-color var(--motion-quick), background var(--motion-quick); }
+.block-picker button svg { color: var(--accent); grid-row: span 2; }
+.block-picker button strong { font-weight: 500; font-size: var(--text-sm); }
+.block-picker button small { color: var(--muted); font-size: var(--text-xs); line-height: 1.3; }
+.block-picker button:hover { border-style: solid; border-color: var(--accent); background: var(--accent-soft); transform: translateY(-2px) rotate(-0.5deg); }
+.block-picker button:nth-child(even):hover { transform: translateY(-2px) rotate(0.5deg); }
+.block-picker button:hover svg { animation: tick-pop var(--motion-pop) var(--ease-spring); }
+.block-picker button:active { transform: scale(0.97); }
+
+@media (max-width: 760px) {
+  .page-block.width-wide, .page-block.width-half, .page-block.width-narrow { grid-column: span 12; }
+  .page-editor { padding: 0 16px; }
+  .block-picker { padding: 12px 16px 4px; }
+  /* A masthead on a phone: tile, title and actions; the intention or outcome under them; then the domain's tabs on
+     the band's edge sharing its width without icons, or the project's stage strip. */
+  .page-masthead { padding: 16px var(--page-padding) 12px; column-gap: 10px; grid-template-areas: "tile title actions" "intent intent intent" "foot foot foot"; }
+  .masthead-plant { align-self: center; width: 40px; height: 40px; margin: 0; font-size: var(--text-2xl); border-radius: var(--radius-control); }
+  .page-masthead .page-heading p { margin-top: 8px; }
+  .page-masthead:has(> .masthead-tabs) { padding-bottom: 0; }
+  .page-masthead .masthead-tabs { justify-self: stretch; width: 100%; gap: 0; margin-top: 8px; }
+  .page-masthead .masthead-tabs > button { flex: 1 1 0; min-width: 0; }
+  .page-masthead .masthead-tabs > button > svg { display: none; }
+  .page-masthead[data-plain] { grid-template-areas: "title actions" "intent intent" "foot foot"; }
+  /* A project has more actions than a phone's title row can hold beside its name: they join the stage strip's row. */
+  .project-masthead { grid-template-areas: "tile title title" "intent intent intent" "foot foot actions"; }
+  .masthead-stage { justify-self: start; margin-top: 10px; }
+  .project-masthead .masthead-actions { margin-top: 10px; }
+  .project-brief { gap: 10px; align-items: flex-start; }
+  .project-brief .guide-face { width: 36px; height: 36px; }
+  .project-brief .guide-face img { border-radius: var(--radius-control); }
+  .project-brief.is-welcome .guide-face { width: 40px; height: 40px; }
+  .project-brief.is-welcome .guide-face img { border-radius: var(--radius-control); }
+  .project-brief .guide-bubble { flex-wrap: wrap; gap: 10px; }
+  .project-brief .guide-bubble > div { flex-basis: 100%; }
+}

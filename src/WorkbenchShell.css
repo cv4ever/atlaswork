@@ -1,0 +1,2111 @@
+/* The shell (WorkbenchShell.tsx). It loads after src/styles.css, so where it sizes a part another sheet draws, it says so. */
+/* restyles: .task-row .workspace-content .agent-panel .agent-transcript .chat-message .workspace-page-panel */
+/* Workbench chrome. Skin values stay in WarmEditorial.module.css. */
+/* Sidebar and workbench grid. */
+.workbench {
+  --actual-sidebar: var(--sidebar-width);
+  --shell-inset: 16px;
+  --shell-gap: 12px;
+  --shell-radius: var(--radius-shell);
+  display: grid;
+  grid-template-columns: var(--actual-sidebar) minmax(0, 1fr) var(--agent-width);
+  grid-template-rows: minmax(0, 1fr) 36px;
+  width: 100%;
+  height: 100dvh;
+  position: relative;
+  isolation: isolate;
+  padding: var(--shell-inset);
+  gap: var(--shell-gap);
+  background: var(--canvas);
+  transition:
+    grid-template-columns var(--motion-settle) var(--ease-settle),
+    grid-template-rows var(--motion-settle) var(--ease-settle),
+    padding var(--motion-settle) var(--ease-settle);
+}
+/* Dragging a resize handle must track the pointer, not ease after it. */
+.resizing .workbench { transition: none; }
+@media (min-width: 761px) {
+  .workbench[data-status="false"] {
+    grid-template-rows: minmax(0, 1fr) 0px;
+    padding-bottom: calc(var(--shell-inset) - var(--shell-gap));
+  }
+}
+/* Canvas: drifting colour blooms under a pattern tinted by the theme's wash (WarmEditorial.module.css, --theme-wash-*).
+   html[data-canvas] picks the pattern; a small composited glow follows the pointer. The patterns are black-on-clear
+   SVG masks, set on the pseudo-elements that draw them (the canvas, and Settings' tiles and theme swatches through
+   [data-pattern]) rather than on the root, so no element inherits kilobytes of mask it never paints. */
+.workbench::before,
+.workbench::after {
+  content: "";
+  position: fixed;
+  z-index: var(--layer-behind);
+  pointer-events: none;
+}
+.workbench::before {
+  inset: -15%;
+  background:
+    radial-gradient(26% 32% at 14% 22%, var(--bloom-1), transparent 70%),
+    radial-gradient(30% 34% at 86% 80%, var(--bloom-2), transparent 70%),
+    radial-gradient(22% 26% at 64% 12%, var(--bloom-3), transparent 70%),
+    radial-gradient(20% 24% at 30% 88%, var(--bloom-3), transparent 70%);
+  will-change: transform;
+  animation: canvas-drift 40s ease-in-out infinite alternate;
+}
+.workbench::after {
+  inset: 0;
+  background: linear-gradient(125deg, var(--wash-1, var(--sage)), var(--wash-2, var(--clay)) 45%, var(--wash-3, var(--ochre)) 75%, var(--wash-1, var(--sage)));
+  opacity: 0.7;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23000' stroke-width='1.6'%3E%3Cpath d='M0 -16.1 L8 -14.3 L16 -12.1 L24 -9.5 L32 -6.8 L40 -4.3 L48 -2.3 L56 -0.9 L64 -0.2 L72 -0.2 L80 -0.7 L88 -1.7 L96 -2.8 L104 -3.9 L112 -4.9 L120 -5.7 L128 -6.1 L136 -6.4 L144 -6.5 L152 -6.8 L160 -7.2 L168 -8.0 L176 -9.1 L184 -10.6 L192 -12.3 L200 -14.0 L208 -15.6 L216 -16.7 L224 -17.3 L232 -17.0 L240 -16.1 M0 8.0 L8 10.7 L16 13.1 L24 15.0 L32 16.2 L40 16.7 L48 16.4 L56 15.6 L64 14.3 L72 12.9 L80 11.5 L88 10.2 L96 9.3 L104 8.6 L112 8.2 L120 8.0 L128 7.8 L136 7.4 L144 6.7 L152 5.8 L160 4.5 L168 3.1 L176 1.7 L184 0.4 L192 -0.4 L200 -0.7 L208 -0.2 L216 1.0 L224 2.9 L232 5.3 L240 8.0 M0 32.1 L8 33.0 L16 33.3 L24 32.7 L32 31.6 L40 30.0 L48 28.3 L56 26.6 L64 25.1 L72 24.0 L80 23.2 L88 22.8 L96 22.5 L104 22.4 L112 22.1 L120 21.7 L128 20.9 L136 19.9 L144 18.8 L152 17.7 L160 16.7 L168 16.2 L176 16.2 L184 16.9 L192 18.3 L200 20.3 L208 22.8 L216 25.5 L224 28.1 L232 30.3 L240 32.1 M0 48.7 L8 47.3 L16 45.4 L24 43.4 L32 41.5 L40 39.9 L48 38.6 L56 37.8 L64 37.3 L72 37.2 L80 37.1 L88 37.0 L96 36.8 L104 36.3 L112 35.6 L120 34.8 L128 34.0 L136 33.3 L144 33.0 L152 33.3 L160 34.2 L168 35.7 L176 37.8 L184 40.2 L192 42.8 L200 45.3 L208 47.4 L216 48.9 L224 49.6 L232 49.6 L240 48.7 M0 58.4 L8 56.2 L16 54.5 L24 53.1 L32 52.3 L40 51.9 L48 51.9 L56 52.0 L64 52.2 L72 52.2 L80 52.0 L88 51.6 L96 51.1 L104 50.6 L112 50.2 L120 50.1 L128 50.6 L136 51.6 L144 53.1 L152 55.2 L160 57.6 L168 60.1 L176 62.4 L184 64.3 L192 65.5 L200 65.9 L208 65.6 L216 64.4 L224 62.7 L232 60.6 L240 58.4 M0 67.7 L8 66.9 L16 66.7 L24 66.8 L32 67.2 L40 67.6 L48 67.9 L56 68.0 L64 67.9 L72 67.7 L80 67.4 L88 67.3 L96 67.4 L104 67.9 L112 69.0 L120 70.6 L128 72.6 L136 74.9 L144 77.2 L152 79.3 L160 80.9 L168 81.8 L176 81.9 L184 81.3 L192 79.8 L200 77.8 L208 75.5 L216 73.1 L224 70.9 L232 69.0 L240 67.7 M0 81.9 L8 82.6 L16 83.3 L24 83.9 L32 84.3 L40 84.5 L48 84.6 L56 84.5 L64 84.5 L72 84.8 L80 85.4 L88 86.5 L96 88.0 L104 89.9 L112 92.0 L120 94.1 L128 95.9 L136 97.2 L144 97.8 L152 97.6 L160 96.7 L168 95.0 L176 92.7 L184 90.2 L192 87.7 L200 85.4 L208 83.6 L216 82.3 L224 81.7 L232 81.6 L240 81.9 M0 100.2 L8 100.9 L16 101.4 L24 101.6 L32 101.8 L40 101.9 L48 102.2 L56 102.9 L64 103.9 L72 105.3 L80 107.0 L88 108.8 L96 110.7 L104 112.2 L112 113.2 L120 113.5 L128 113.0 L136 111.8 L144 109.9 L152 107.5 L160 104.8 L168 102.2 L176 99.9 L184 98.2 L192 97.0 L200 96.6 L208 96.7 L216 97.3 L224 98.3 L232 99.3 L240 100.2 M0 118.9 L8 119.2 L16 119.4 L24 119.7 L32 120.2 L40 121.1 L48 122.3 L56 123.8 L64 125.4 L72 127.0 L80 128.2 L88 128.9 L96 128.9 L104 128.2 L112 126.7 L120 124.6 L128 122.1 L136 119.4 L144 116.8 L152 114.6 L160 112.9 L168 111.9 L176 111.7 L184 112.1 L192 113.0 L200 114.3 L208 115.6 L216 116.8 L224 117.8 L232 118.5 L240 118.9 M0 137.1 L8 137.5 L16 138.2 L24 139.2 L32 140.4 L40 141.7 L48 143.0 L56 143.9 L64 144.3 L72 144.1 L80 143.1 L88 141.4 L96 139.2 L104 136.6 L112 133.9 L120 131.4 L128 129.3 L136 127.8 L144 127.1 L152 127.1 L160 127.8 L168 129.0 L176 130.6 L184 132.2 L192 133.7 L200 134.9 L208 135.8 L216 136.3 L224 136.6 L232 136.8 L240 137.1 M0 155.8 L8 156.7 L16 157.7 L24 158.7 L32 159.3 L40 159.4 L48 159.0 L56 157.8 L64 156.1 L72 153.8 L80 151.2 L88 148.5 L96 146.1 L104 144.2 L112 143.0 L120 142.5 L128 142.8 L136 143.8 L144 145.3 L152 147.2 L160 149.0 L168 150.7 L176 152.1 L184 153.1 L192 153.8 L200 154.1 L208 154.2 L216 154.4 L224 154.6 L232 155.1 L240 155.8 M0 174.1 L8 174.4 L16 174.3 L24 173.7 L32 172.4 L40 170.6 L48 168.3 L56 165.8 L64 163.3 L72 161.0 L80 159.3 L88 158.4 L96 158.2 L104 158.8 L112 160.1 L120 161.9 L128 164.0 L136 166.1 L144 168.0 L152 169.5 L160 170.6 L168 171.2 L176 171.5 L184 171.5 L192 171.4 L200 171.5 L208 171.7 L216 172.1 L224 172.7 L232 173.4 L240 174.1 M0 188.3 L8 187.0 L16 185.1 L24 182.9 L32 180.5 L40 178.2 L48 176.2 L56 174.7 L64 174.1 L72 174.2 L80 175.1 L88 176.7 L96 178.8 L104 181.1 L112 183.4 L120 185.4 L128 187.0 L136 188.1 L144 188.6 L152 188.7 L160 188.6 L168 188.3 L176 188.1 L184 188.0 L192 188.1 L200 188.4 L208 188.8 L216 189.2 L224 189.3 L232 189.1 L240 188.3 M0 197.6 L8 195.4 L16 193.3 L24 191.6 L32 190.4 L40 190.1 L48 190.5 L56 191.7 L64 193.6 L72 195.9 L80 198.4 L88 200.8 L96 202.9 L104 204.4 L112 205.4 L120 205.9 L128 205.8 L136 205.4 L144 204.9 L152 204.4 L160 204.0 L168 203.8 L176 203.8 L184 204.0 L192 204.1 L200 204.1 L208 203.7 L216 202.9 L224 201.5 L232 199.8 L240 197.6 M0 207.3 L8 206.4 L16 206.4 L24 207.1 L32 208.6 L40 210.7 L48 213.2 L56 215.8 L64 218.2 L72 220.3 L80 221.8 L88 222.7 L96 223.0 L104 222.7 L112 222.0 L120 221.2 L128 220.4 L136 219.7 L144 219.2 L152 219.0 L160 218.9 L168 218.8 L176 218.7 L184 218.2 L192 217.4 L200 216.1 L208 214.5 L216 212.6 L224 210.6 L232 208.7 L240 207.3 M0 223.9 L8 225.7 L16 227.9 L24 230.5 L32 233.2 L40 235.7 L48 237.7 L56 239.1 L64 239.8 L72 239.8 L80 239.3 L88 238.3 L96 237.2 L104 236.1 L112 235.1 L120 234.3 L128 233.9 L136 233.6 L144 233.5 L152 233.2 L160 232.8 L168 232.0 L176 230.9 L184 229.4 L192 227.7 L200 226.0 L208 224.4 L216 223.3 L224 222.7 L232 223.0 L240 223.9 M0 248.0 L8 250.7 L16 253.1 L24 255.0 L32 256.2 L40 256.7 L48 256.4 L56 255.6 L64 254.3 L72 252.9 L80 251.5 L88 250.2 L96 249.3 L104 248.6 L112 248.2 L120 248.0 L128 247.8 L136 247.4 L144 246.7 L152 245.8 L160 244.5 L168 243.1 L176 241.7 L184 240.4 L192 239.6 L200 239.3 L208 239.8 L216 241.0 L224 242.9 L232 245.3 L240 248.0'/%3E%3C/svg%3E");
+  --pattern-size: 240px 240px;
+  -webkit-mask: var(--pattern) 0 0 / var(--pattern-size);
+  mask: var(--pattern) 0 0 / var(--pattern-size);
+}
+[data-pattern="contours"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='%23000' stroke-width='1.6'%3E%3Cpath d='M0 -16.1 L8 -14.3 L16 -12.1 L24 -9.5 L32 -6.8 L40 -4.3 L48 -2.3 L56 -0.9 L64 -0.2 L72 -0.2 L80 -0.7 L88 -1.7 L96 -2.8 L104 -3.9 L112 -4.9 L120 -5.7 L128 -6.1 L136 -6.4 L144 -6.5 L152 -6.8 L160 -7.2 L168 -8.0 L176 -9.1 L184 -10.6 L192 -12.3 L200 -14.0 L208 -15.6 L216 -16.7 L224 -17.3 L232 -17.0 L240 -16.1 M0 8.0 L8 10.7 L16 13.1 L24 15.0 L32 16.2 L40 16.7 L48 16.4 L56 15.6 L64 14.3 L72 12.9 L80 11.5 L88 10.2 L96 9.3 L104 8.6 L112 8.2 L120 8.0 L128 7.8 L136 7.4 L144 6.7 L152 5.8 L160 4.5 L168 3.1 L176 1.7 L184 0.4 L192 -0.4 L200 -0.7 L208 -0.2 L216 1.0 L224 2.9 L232 5.3 L240 8.0 M0 32.1 L8 33.0 L16 33.3 L24 32.7 L32 31.6 L40 30.0 L48 28.3 L56 26.6 L64 25.1 L72 24.0 L80 23.2 L88 22.8 L96 22.5 L104 22.4 L112 22.1 L120 21.7 L128 20.9 L136 19.9 L144 18.8 L152 17.7 L160 16.7 L168 16.2 L176 16.2 L184 16.9 L192 18.3 L200 20.3 L208 22.8 L216 25.5 L224 28.1 L232 30.3 L240 32.1 M0 48.7 L8 47.3 L16 45.4 L24 43.4 L32 41.5 L40 39.9 L48 38.6 L56 37.8 L64 37.3 L72 37.2 L80 37.1 L88 37.0 L96 36.8 L104 36.3 L112 35.6 L120 34.8 L128 34.0 L136 33.3 L144 33.0 L152 33.3 L160 34.2 L168 35.7 L176 37.8 L184 40.2 L192 42.8 L200 45.3 L208 47.4 L216 48.9 L224 49.6 L232 49.6 L240 48.7 M0 58.4 L8 56.2 L16 54.5 L24 53.1 L32 52.3 L40 51.9 L48 51.9 L56 52.0 L64 52.2 L72 52.2 L80 52.0 L88 51.6 L96 51.1 L104 50.6 L112 50.2 L120 50.1 L128 50.6 L136 51.6 L144 53.1 L152 55.2 L160 57.6 L168 60.1 L176 62.4 L184 64.3 L192 65.5 L200 65.9 L208 65.6 L216 64.4 L224 62.7 L232 60.6 L240 58.4 M0 67.7 L8 66.9 L16 66.7 L24 66.8 L32 67.2 L40 67.6 L48 67.9 L56 68.0 L64 67.9 L72 67.7 L80 67.4 L88 67.3 L96 67.4 L104 67.9 L112 69.0 L120 70.6 L128 72.6 L136 74.9 L144 77.2 L152 79.3 L160 80.9 L168 81.8 L176 81.9 L184 81.3 L192 79.8 L200 77.8 L208 75.5 L216 73.1 L224 70.9 L232 69.0 L240 67.7 M0 81.9 L8 82.6 L16 83.3 L24 83.9 L32 84.3 L40 84.5 L48 84.6 L56 84.5 L64 84.5 L72 84.8 L80 85.4 L88 86.5 L96 88.0 L104 89.9 L112 92.0 L120 94.1 L128 95.9 L136 97.2 L144 97.8 L152 97.6 L160 96.7 L168 95.0 L176 92.7 L184 90.2 L192 87.7 L200 85.4 L208 83.6 L216 82.3 L224 81.7 L232 81.6 L240 81.9 M0 100.2 L8 100.9 L16 101.4 L24 101.6 L32 101.8 L40 101.9 L48 102.2 L56 102.9 L64 103.9 L72 105.3 L80 107.0 L88 108.8 L96 110.7 L104 112.2 L112 113.2 L120 113.5 L128 113.0 L136 111.8 L144 109.9 L152 107.5 L160 104.8 L168 102.2 L176 99.9 L184 98.2 L192 97.0 L200 96.6 L208 96.7 L216 97.3 L224 98.3 L232 99.3 L240 100.2 M0 118.9 L8 119.2 L16 119.4 L24 119.7 L32 120.2 L40 121.1 L48 122.3 L56 123.8 L64 125.4 L72 127.0 L80 128.2 L88 128.9 L96 128.9 L104 128.2 L112 126.7 L120 124.6 L128 122.1 L136 119.4 L144 116.8 L152 114.6 L160 112.9 L168 111.9 L176 111.7 L184 112.1 L192 113.0 L200 114.3 L208 115.6 L216 116.8 L224 117.8 L232 118.5 L240 118.9 M0 137.1 L8 137.5 L16 138.2 L24 139.2 L32 140.4 L40 141.7 L48 143.0 L56 143.9 L64 144.3 L72 144.1 L80 143.1 L88 141.4 L96 139.2 L104 136.6 L112 133.9 L120 131.4 L128 129.3 L136 127.8 L144 127.1 L152 127.1 L160 127.8 L168 129.0 L176 130.6 L184 132.2 L192 133.7 L200 134.9 L208 135.8 L216 136.3 L224 136.6 L232 136.8 L240 137.1 M0 155.8 L8 156.7 L16 157.7 L24 158.7 L32 159.3 L40 159.4 L48 159.0 L56 157.8 L64 156.1 L72 153.8 L80 151.2 L88 148.5 L96 146.1 L104 144.2 L112 143.0 L120 142.5 L128 142.8 L136 143.8 L144 145.3 L152 147.2 L160 149.0 L168 150.7 L176 152.1 L184 153.1 L192 153.8 L200 154.1 L208 154.2 L216 154.4 L224 154.6 L232 155.1 L240 155.8 M0 174.1 L8 174.4 L16 174.3 L24 173.7 L32 172.4 L40 170.6 L48 168.3 L56 165.8 L64 163.3 L72 161.0 L80 159.3 L88 158.4 L96 158.2 L104 158.8 L112 160.1 L120 161.9 L128 164.0 L136 166.1 L144 168.0 L152 169.5 L160 170.6 L168 171.2 L176 171.5 L184 171.5 L192 171.4 L200 171.5 L208 171.7 L216 172.1 L224 172.7 L232 173.4 L240 174.1 M0 188.3 L8 187.0 L16 185.1 L24 182.9 L32 180.5 L40 178.2 L48 176.2 L56 174.7 L64 174.1 L72 174.2 L80 175.1 L88 176.7 L96 178.8 L104 181.1 L112 183.4 L120 185.4 L128 187.0 L136 188.1 L144 188.6 L152 188.7 L160 188.6 L168 188.3 L176 188.1 L184 188.0 L192 188.1 L200 188.4 L208 188.8 L216 189.2 L224 189.3 L232 189.1 L240 188.3 M0 197.6 L8 195.4 L16 193.3 L24 191.6 L32 190.4 L40 190.1 L48 190.5 L56 191.7 L64 193.6 L72 195.9 L80 198.4 L88 200.8 L96 202.9 L104 204.4 L112 205.4 L120 205.9 L128 205.8 L136 205.4 L144 204.9 L152 204.4 L160 204.0 L168 203.8 L176 203.8 L184 204.0 L192 204.1 L200 204.1 L208 203.7 L216 202.9 L224 201.5 L232 199.8 L240 197.6 M0 207.3 L8 206.4 L16 206.4 L24 207.1 L32 208.6 L40 210.7 L48 213.2 L56 215.8 L64 218.2 L72 220.3 L80 221.8 L88 222.7 L96 223.0 L104 222.7 L112 222.0 L120 221.2 L128 220.4 L136 219.7 L144 219.2 L152 219.0 L160 218.9 L168 218.8 L176 218.7 L184 218.2 L192 217.4 L200 216.1 L208 214.5 L216 212.6 L224 210.6 L232 208.7 L240 207.3 M0 223.9 L8 225.7 L16 227.9 L24 230.5 L32 233.2 L40 235.7 L48 237.7 L56 239.1 L64 239.8 L72 239.8 L80 239.3 L88 238.3 L96 237.2 L104 236.1 L112 235.1 L120 234.3 L128 233.9 L136 233.6 L144 233.5 L152 233.2 L160 232.8 L168 232.0 L176 230.9 L184 229.4 L192 227.7 L200 226.0 L208 224.4 L216 223.3 L224 222.7 L232 223.0 L240 223.9 M0 248.0 L8 250.7 L16 253.1 L24 255.0 L32 256.2 L40 256.7 L48 256.4 L56 255.6 L64 254.3 L72 252.9 L80 251.5 L88 250.2 L96 249.3 L104 248.6 L112 248.2 L120 248.0 L128 247.8 L136 247.4 L144 246.7 L152 245.8 L160 244.5 L168 243.1 L176 241.7 L184 240.4 L192 239.6 L200 239.3 L208 239.8 L216 241.0 L224 242.9 L232 245.3 L240 248.0'/%3E%3C/svg%3E");
+}
+[data-canvas="doodles"] .workbench::after,
+[data-pattern="doodles"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 24c4-7 12-8 16-3c-4 6-12 7-16 3zM15 24l14-3'/%3E%3Cpath d='M56 108c3-5 9-6 12-2c-3 4-9 5-12 2z'/%3E%3Ccircle cx='128' cy='30' r='3.5'/%3E%3Cpath d='M18 82q3-5 6 0t6 0 6 0'/%3E%3Cpath d='M132 116c1-9 0-15-4-20M129 104c4-2 7-1 8 2c-3 2-6 1-8-2z'/%3E%3Cpath d='M38 124a6 6 0 1 0 7 8a5 5 0 1 1-7-8z'/%3E%3Cg fill='%23000' stroke='none'%3E%3Cpath d='M70 8l1.3 4.2 4.2 1.3-4.2 1.3-1.3 4.2-1.3-4.2-4.2-1.3 4.2-1.3z'/%3E%3Cpath d='M148 60l.9 2.8 2.8.9-2.8.9-.9 2.8-.9-2.8-2.8-.9 2.8-.9z'/%3E%3Ccircle cx='80' cy='60' r='1.5'/%3E%3Ccircle cx='85' cy='63' r='1.2'/%3E%3Ccircle cx='81' cy='67' r='1.3'/%3E%3Ccircle cx='100' cy='136' r='1.3'/%3E%3Ccircle cx='103.8' cy='138.8' r='1.3'/%3E%3Ccircle cx='102.4' cy='143.2' r='1.3'/%3E%3Ccircle cx='97.6' cy='143.2' r='1.3'/%3E%3Ccircle cx='96.2' cy='138.8' r='1.3'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-canvas="doodles"] .workbench::after {
+  --pattern-size: 160px 160px;
+}
+[data-canvas="terrazzo"] .workbench::after,
+[data-pattern="terrazzo"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath fill='%23000' d='M70.2 37.2 L71.4 41.5 L69.3 42.5 L67.0 39.2ZM22.5 107.9 L25.1 106.8 L27.8 108.9 L26.5 113.0 L24.1 114.5 L21.2 111.3ZM110.6 123.9 L114.5 119.0 L117.9 124.9 L112.5 128.0ZM61.7 148.6 L67.4 148.1 L67.5 152.7 L63.9 154.4ZM42.8 99.7 L39.7 100.5 L38.0 99.8 L38.6 96.8 L39.4 95.9 L42.0 97.3ZM142.0 60.0 L145.7 67.5 L143.6 72.6 L138.7 73.3 L133.4 66.5 L134.4 61.8ZM157.7 23.8 L165.2 22.5 L169.3 25.7 L166.7 35.2 L162.0 32.7ZM56.7 58.4 L49.9 59.5 L48.9 54.3 L52.5 46.4 L58.7 48.8 L61.5 54.6ZM171.7 136.3 L172.0 127.6 L182.4 124.8 L185.9 128.6 L182.5 138.0ZM113.6 179.0 L101.1 185.9 L99.3 173.3 L107.7 169.3ZM184.6 101.1 L178.3 99.8 L179.9 93.6 L186.1 95.2ZM141.6 172.3 L137.0 177.3 L127.7 179.1 L124.5 166.6 L133.1 164.4ZM155.3 180.9 L156.6 184.8 L153.3 186.1 L150.6 182.6ZM157.4 139.4 L152.7 142.8 L148.4 137.3 L149.2 134.5 L156.2 134.7ZM22.2 178.9 L24.3 174.8 L29.5 169.0 L33.9 177.9 L29.5 184.7ZM107.4 14.4 L110.7 15.5 L110.5 18.1 L108.3 20.8 L106.1 19.4 L106.8 16.3Z'/%3E%3C/svg%3E");
+}
+[data-canvas="terrazzo"] .workbench::after {
+  --pattern-size: 200px 200px;
+  opacity: 0.85;
+}
+[data-canvas="linen"] .workbench::after,
+[data-pattern="linen"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144' fill='none' stroke='%23000' stroke-width='1'%3E%3Cpath d='M0 2h144' stroke-dasharray='9 8 9 9 20 5 15 4 5 9 5 3 15 7 7 9 5 0' stroke-opacity='0.6'/%3E%3Cpath d='M0 6h144' stroke-dasharray='13 9 6 10 12 8 17 7 14 10 14 6 9 4 5 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 10h144' stroke-dasharray='8 5 26 4 24 4 14 4 24 6 13 7 5 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 14h144' stroke-dasharray='8 3 7 8 10 3 14 3 12 2 19 4 11 7 20 5 8 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 18h144' stroke-dasharray='7 4 6 7 24 10 6 6 7 6 6 7 21 8 10 7 2 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 22h144' stroke-dasharray='5 7 24 2 16 10 11 10 10 4 26 4 7 8 1 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 26h144' stroke-dasharray='17 8 8 3 22 5 12 5 18 4 7 6 17 4 8 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 30h144' stroke-dasharray='11 7 13 7 9 4 10 4 24 3 18 5 10 4 24 7 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 34h144' stroke-dasharray='6 3 15 7 14 5 21 4 9 2 23 10 16 5 4 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 38h144' stroke-dasharray='12 9 8 7 6 2 21 10 20 3 14 2 9 4 11 9 1 0' stroke-opacity='0.6'/%3E%3Cpath d='M0 42h144' stroke-dasharray='4 3 25 7 13 3 16 7 13 7 13 8 23 7 1 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 46h144' stroke-dasharray='7 3 14 10 4 9 21 2 15 8 11 8 7 7 11 8 1 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 50h144' stroke-dasharray='10 6 9 4 12 3 25 9 24 6 10 3 10 5 8 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 54h144' stroke-dasharray='20 3 15 6 11 3 10 6 22 3 9 5 18 10 3 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 58h144' stroke-dasharray='7 8 15 6 24 6 24 5 12 6 16 9 6 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 62h144' stroke-dasharray='18 9 14 2 16 10 19 8 7 3 20 6 15 6 1 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 66h144' stroke-dasharray='6 6 11 8 15 2 6 4 10 3 16 5 7 9 15 6 15 9 1 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 70h144' stroke-dasharray='6 4 18 10 16 5 10 3 23 4 7 4 23 6 5 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 74h144' stroke-dasharray='11 8 24 5 7 3 18 5 21 8 22 6 6 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 78h144' stroke-dasharray='23 6 24 6 7 2 17 5 20 8 11 5 25 3 1 0' stroke-opacity='0.6'/%3E%3Cpath d='M0 82h144' stroke-dasharray='6 10 16 2 24 6 25 7 13 6 24 8 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 86h144' stroke-dasharray='18 10 22 8 6 10 25 10 13 6 13 10 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 90h144' stroke-dasharray='4 8 23 6 11 6 24 10 13 8 18 6 7 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 94h144' stroke-dasharray='16 5 9 2 9 8 18 4 13 4 23 3 16 7 7 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 98h144' stroke-dasharray='14 7 11 6 9 7 24 7 14 7 20 3 16 9 1 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 102h144' stroke-dasharray='5 5 7 3 23 7 16 3 18 6 21 7 15 5 3 0' stroke-opacity='0.6'/%3E%3Cpath d='M0 106h144' stroke-dasharray='6 4 6 6 22 3 8 9 14 7 26 8 22 4 1 0' stroke-opacity='0.8'/%3E%3Cpath d='M0 110h144' stroke-dasharray='17 6 15 10 4 7 14 4 9 7 25 5 13 8 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M0 114h144' stroke-dasharray='13 8 25 2 12 5 13 3 17 4 17 4 16 8 1 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 118h144' stroke-dasharray='7 7 10 8 4 6 9 6 26 3 17 6 12 8 24 3 1 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 122h144' stroke-dasharray='15 8 18 2 21 6 20 10 25 3 10 7 1 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 126h144' stroke-dasharray='11 10 23 4 19 7 18 5 14 10 19 7 1 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 130h144' stroke-dasharray='23 9 22 8 7 4 25 10 23 8 5 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 134h144' stroke-dasharray='16 4 5 7 21 5 11 5 12 7 12 7 20 7 5 0' stroke-opacity='0.5'/%3E%3Cpath d='M0 138h144' stroke-dasharray='23 8 6 9 16 6 24 2 13 7 19 3 8 0' stroke-opacity='0.7'/%3E%3Cpath d='M0 142h144' stroke-dasharray='12 9 7 8 18 9 6 7 6 10 11 5 19 7 6 9 1 0' stroke-opacity='0.7'/%3E%3Cpath d='M2 0v144' stroke-dasharray='5 10 16 10 14 9 21 6 20 7 21 3 2 0' stroke-opacity='0.3'/%3E%3Cpath d='M8 0v144' stroke-dasharray='9 6 4 4 12 3 12 7 23 3 23 8 24 6 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M14 0v144' stroke-dasharray='10 4 16 2 16 4 19 2 16 7 4 3 13 3 5 8 26 10 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M20 0v144' stroke-dasharray='10 3 11 5 25 10 11 8 17 5 22 9 8 0' stroke-opacity='0.3'/%3E%3Cpath d='M26 0v144' stroke-dasharray='7 6 16 7 8 9 7 8 14 7 19 6 26 10 1 0' stroke-opacity='0.3'/%3E%3Cpath d='M32 0v144' stroke-dasharray='8 4 6 3 21 4 23 7 7 2 16 5 16 9 7 6 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M38 0v144' stroke-dasharray='23 4 25 4 14 4 9 5 26 8 6 6 12 5 1 0' stroke-opacity='0.3'/%3E%3Cpath d='M44 0v144' stroke-dasharray='6 10 7 7 14 5 18 3 5 8 19 4 20 8 12 6 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M50 0v144' stroke-dasharray='11 8 10 6 14 8 5 6 17 3 12 9 16 7 21 3 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M56 0v144' stroke-dasharray='8 2 15 3 11 4 14 7 7 8 5 8 13 3 23 7 6 0' stroke-opacity='0.3'/%3E%3Cpath d='M62 0v144' stroke-dasharray='10 7 17 9 5 6 16 2 15 10 12 7 14 9 5 0' stroke-opacity='0.4'/%3E%3Cpath d='M68 0v144' stroke-dasharray='6 2 11 6 11 3 17 4 13 2 26 6 16 9 11 3 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M74 0v144' stroke-dasharray='8 8 20 7 14 10 21 7 10 2 18 8 10 4 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M80 0v144' stroke-dasharray='8 8 18 7 6 4 9 5 7 2 24 5 13 8 12 3 5 0' stroke-opacity='0.2'/%3E%3Cpath d='M86 0v144' stroke-dasharray='14 8 10 4 25 4 22 5 11 3 8 5 23 8 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M92 0v144' stroke-dasharray='17 7 13 7 24 4 17 8 5 6 24 3 5 7 1 0' stroke-opacity='0.4'/%3E%3Cpath d='M98 0v144' stroke-dasharray='18 8 23 3 5 6 22 3 5 9 4 8 19 7 4 0' stroke-opacity='0.2'/%3E%3Cpath d='M104 0v144' stroke-dasharray='7 8 24 4 24 6 24 7 16 9 7 3 5 0' stroke-opacity='0.4'/%3E%3Cpath d='M110 0v144' stroke-dasharray='25 10 20 3 12 9 16 5 10 5 25 9 1 0' stroke-opacity='0.3'/%3E%3Cpath d='M116 0v144' stroke-dasharray='26 8 18 9 24 7 8 7 17 8 18 4 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M122 0v144' stroke-dasharray='25 4 23 5 10 5 15 2 22 8 15 5 5 0' stroke-opacity='0.4'/%3E%3Cpath d='M128 0v144' stroke-dasharray='14 7 18 8 13 9 14 6 24 5 26 6 1 0' stroke-opacity='0.3'/%3E%3Cpath d='M134 0v144' stroke-dasharray='12 6 12 5 26 6 7 8 16 2 9 10 4 5 17 9 1 0' stroke-opacity='0.2'/%3E%3Cpath d='M140 0v144' stroke-dasharray='22 9 15 5 24 5 23 6 12 4 19 9 1 0' stroke-opacity='0.2'/%3E%3C/svg%3E");
+}
+[data-canvas="linen"] .workbench::after {
+  --pattern-size: 144px 144px;
+  opacity: 0.45;
+}
+[data-canvas="waves"] .workbench::after,
+[data-pattern="waves"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M-19 40a19 19 0 0 1 38 0'/%3E%3Cpath d='M-14 40a14 14 0 0 1 28 0'/%3E%3Cpath d='M-9 40a9 9 0 0 1 18 0'/%3E%3Cpath d='M21 40a19 19 0 0 1 38 0'/%3E%3Cpath d='M26 40a14 14 0 0 1 28 0'/%3E%3Cpath d='M31 40a9 9 0 0 1 18 0'/%3E%3Cpath d='M61 40a19 19 0 0 1 38 0'/%3E%3Cpath d='M66 40a14 14 0 0 1 28 0'/%3E%3Cpath d='M71 40a9 9 0 0 1 18 0'/%3E%3Cpath d='M-59 20a19 19 0 0 1 38 0'/%3E%3Cpath d='M-54 20a14 14 0 0 1 28 0'/%3E%3Cpath d='M-49 20a9 9 0 0 1 18 0'/%3E%3Cpath d='M1 20a19 19 0 0 1 38 0'/%3E%3Cpath d='M6 20a14 14 0 0 1 28 0'/%3E%3Cpath d='M11 20a9 9 0 0 1 18 0'/%3E%3Cpath d='M41 20a19 19 0 0 1 38 0'/%3E%3Cpath d='M46 20a14 14 0 0 1 28 0'/%3E%3Cpath d='M51 20a9 9 0 0 1 18 0'/%3E%3Cpath d='M81 20a19 19 0 0 1 38 0'/%3E%3Cpath d='M86 20a14 14 0 0 1 28 0'/%3E%3Cpath d='M91 20a9 9 0 0 1 18 0'/%3E%3Cpath d='M-19 0a19 19 0 0 1 38 0'/%3E%3Cpath d='M-14 0a14 14 0 0 1 28 0'/%3E%3Cpath d='M-9 0a9 9 0 0 1 18 0'/%3E%3Cpath d='M21 0a19 19 0 0 1 38 0'/%3E%3Cpath d='M26 0a14 14 0 0 1 28 0'/%3E%3Cpath d='M31 0a9 9 0 0 1 18 0'/%3E%3Cpath d='M61 0a19 19 0 0 1 38 0'/%3E%3Cpath d='M66 0a14 14 0 0 1 28 0'/%3E%3Cpath d='M71 0a9 9 0 0 1 18 0'/%3E%3C/svg%3E");
+}
+[data-canvas="waves"] .workbench::after {
+  --pattern-size: 80px 40px;
+}
+[data-canvas="tiles"] .workbench::after,
+[data-pattern="tiles"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' fill='none' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='M0 -30L7.1 -17.2L21.2 -21.2L17.2 -7.1L30 0L17.2 7.1L21.2 21.2L7.1 17.2L0 30L-7.1 17.2L-21.2 21.2L-17.2 7.1L-30 0L-17.2 -7.1L-21.2 -21.2L-7.1 -17.2Z'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Cpath d='M96 -30L103.1 -17.2L117.2 -21.2L113.2 -7.1L126 0L113.2 7.1L117.2 21.2L103.1 17.2L96 30L88.9 17.2L74.8 21.2L78.8 7.1L66 0L78.8 -7.1L74.8 -21.2L88.9 -17.2Z'/%3E%3Ccircle cx='96' cy='0' r='6'/%3E%3Cpath d='M0 66L7.1 78.8L21.2 74.8L17.2 88.9L30 96L17.2 103.1L21.2 117.2L7.1 113.2L0 126L-7.1 113.2L-21.2 117.2L-17.2 103.1L-30 96L-17.2 88.9L-21.2 74.8L-7.1 78.8Z'/%3E%3Ccircle cx='0' cy='96' r='6'/%3E%3Cpath d='M96 66L103.1 78.8L117.2 74.8L113.2 88.9L126 96L113.2 103.1L117.2 117.2L103.1 113.2L96 126L88.9 113.2L74.8 117.2L78.8 103.1L66 96L78.8 88.9L74.8 74.8L88.9 78.8Z'/%3E%3Ccircle cx='96' cy='96' r='6'/%3E%3Cpath d='M48 18L55.1 30.8L69.2 26.8L65.2 40.9L78 48L65.2 55.1L69.2 69.2L55.1 65.2L48 78L40.9 65.2L26.8 69.2L30.8 55.1L18 48L30.8 40.9L26.8 26.8L40.9 30.8Z'/%3E%3Ccircle cx='48' cy='48' r='6'/%3E%3Cpath d='M38 0L48 -10L58 0L48 10Z'/%3E%3Cpath d='M-10 48L0 38L10 48L0 58Z'/%3E%3Cpath d='M86 48L96 38L106 48L96 58Z'/%3E%3Cpath d='M38 96L48 86L58 96L48 106Z'/%3E%3C/svg%3E");
+}
+[data-canvas="tiles"] .workbench::after {
+  --pattern-size: 96px 96px;
+}
+[data-canvas="blossoms"] .workbench::after,
+[data-pattern="blossoms"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='none' stroke='%23000' stroke-width='1.3'%3E%3Cellipse cx='39.5' cy='62.1' rx='6.8' ry='4.6' transform='rotate(141.4 39.5 62.1)'/%3E%3Cellipse cx='39' cy='49.3' rx='6.8' ry='4.6' transform='rotate(213.4 39 49.3)'/%3E%3Cellipse cx='51' cy='44.7' rx='6.8' ry='4.6' transform='rotate(285.4 51 44.7)'/%3E%3Cellipse cx='59' cy='54.8' rx='6.8' ry='4.6' transform='rotate(357.4 59 54.8)'/%3E%3Cellipse cx='51.9' cy='65.5' rx='6.8' ry='4.6' transform='rotate(429.4 51.9 65.5)'/%3E%3Ccircle cx='48.1' cy='55.3' r='3.5' fill='%23000'/%3E%3Cellipse cx='149.7' cy='177.3' rx='6.4' ry='4.4' transform='rotate(50 149.7 177.3)'/%3E%3Cellipse cx='137.6' cy='178.1' rx='6.4' ry='4.4' transform='rotate(122 137.6 178.1)'/%3E%3Cellipse cx='133' cy='166.8' rx='6.4' ry='4.4' transform='rotate(194 133 166.8)'/%3E%3Cellipse cx='142.3' cy='159' rx='6.4' ry='4.4' transform='rotate(266 142.3 159)'/%3E%3Cellipse cx='152.6' cy='165.4' rx='6.4' ry='4.4' transform='rotate(338 152.6 165.4)'/%3E%3Ccircle cx='143' cy='169.3' r='3.3' fill='%23000'/%3E%3Cellipse cx='14.3' cy='133.1' rx='6.7' ry='4.5' transform='rotate(255.6 14.3 133.1)'/%3E%3Cellipse cx='26.1' cy='137.8' rx='6.7' ry='4.5' transform='rotate(327.6 26.1 137.8)'/%3E%3Cellipse cx='25.3' cy='150.4' rx='6.7' ry='4.5' transform='rotate(399.6 25.3 150.4)'/%3E%3Cellipse cx='13.1' cy='153.5' rx='6.7' ry='4.5' transform='rotate(471.6 13.1 153.5)'/%3E%3Cellipse cx='6.3' cy='142.9' rx='6.7' ry='4.5' transform='rotate(543.6 6.3 142.9)'/%3E%3Ccircle cx='17' cy='143.5' r='3.4' fill='%23000'/%3E%3Cellipse cx='214.3' cy='133.1' rx='6.7' ry='4.5' transform='rotate(255.6 214.3 133.1)'/%3E%3Cellipse cx='226.1' cy='137.8' rx='6.7' ry='4.5' transform='rotate(327.6 226.1 137.8)'/%3E%3Cellipse cx='225.3' cy='150.4' rx='6.7' ry='4.5' transform='rotate(399.6 225.3 150.4)'/%3E%3Cellipse cx='213.1' cy='153.5' rx='6.7' ry='4.5' transform='rotate(471.6 213.1 153.5)'/%3E%3Cellipse cx='206.3' cy='142.9' rx='6.7' ry='4.5' transform='rotate(543.6 206.3 142.9)'/%3E%3Ccircle cx='217' cy='143.5' r='3.4' fill='%23000'/%3E%3Cellipse cx='150.2' cy='48.4' rx='5.7' ry='3.9' transform='rotate(217.7 150.2 48.4)'/%3E%3Cellipse cx='160.7' cy='45.4' rx='5.7' ry='3.9' transform='rotate(289.7 160.7 45.4)'/%3E%3Cellipse cx='166.8' cy='54.4' rx='5.7' ry='3.9' transform='rotate(361.7 166.8 54.4)'/%3E%3Cellipse cx='160.1' cy='63' rx='5.7' ry='3.9' transform='rotate(433.7 160.1 63)'/%3E%3Cellipse cx='149.9' cy='59.3' rx='5.7' ry='3.9' transform='rotate(505.7 149.9 59.3)'/%3E%3Ccircle cx='157.5' cy='54.1' r='3' fill='%23000'/%3E%3Cellipse cx='94.5' cy='129' rx='5.7' ry='3.8' transform='rotate(175.9 94.5 129)'/%3E%3Cellipse cx='100.2' cy='119.9' rx='5.7' ry='3.8' transform='rotate(247.9 100.2 119.9)'/%3E%3Cellipse cx='110.7' cy='122.5' rx='5.7' ry='3.8' transform='rotate(319.9 110.7 122.5)'/%3E%3Cellipse cx='111.4' cy='133.2' rx='5.7' ry='3.8' transform='rotate(391.9 111.4 133.2)'/%3E%3Cellipse cx='101.5' cy='137.3' rx='5.7' ry='3.8' transform='rotate(463.9 101.5 137.3)'/%3E%3Ccircle cx='103.7' cy='128.4' r='2.9' fill='%23000'/%3E%3Cellipse cx='69.1' cy='-5.1' rx='6.6' ry='4.4' transform='rotate(107.6 69.1 -5.1)'/%3E%3Cellipse cx='61.7' cy='-15.1' rx='6.6' ry='4.4' transform='rotate(179.6 61.7 -15.1)'/%3E%3Cellipse cx='69' cy='-25.2' rx='6.6' ry='4.4' transform='rotate(251.6 69 -25.2)'/%3E%3Cellipse cx='80.8' cy='-21.5' rx='6.6' ry='4.4' transform='rotate(323.6 80.8 -21.5)'/%3E%3Cellipse cx='80.9' cy='-9' rx='6.6' ry='4.4' transform='rotate(395.6 80.9 -9)'/%3E%3Ccircle cx='72.3' cy='-15.2' r='3.4' fill='%23000'/%3E%3Cellipse cx='69.1' cy='194.9' rx='6.6' ry='4.4' transform='rotate(107.6 69.1 194.9)'/%3E%3Cellipse cx='61.7' cy='184.9' rx='6.6' ry='4.4' transform='rotate(179.6 61.7 184.9)'/%3E%3Cellipse cx='69' cy='174.8' rx='6.6' ry='4.4' transform='rotate(251.6 69 174.8)'/%3E%3Cellipse cx='80.8' cy='178.5' rx='6.6' ry='4.4' transform='rotate(323.6 80.8 178.5)'/%3E%3Cellipse cx='80.9' cy='191' rx='6.6' ry='4.4' transform='rotate(395.6 80.9 191)'/%3E%3Ccircle cx='72.3' cy='184.8' r='3.4' fill='%23000'/%3E%3Cellipse cx='-13.6' cy='3.8' rx='5.6' ry='3.8' transform='rotate(218.9 -13.6 3.8)'/%3E%3Cellipse cx='-3.3' cy='1' rx='5.6' ry='3.8' transform='rotate(290.9 -3.3 1)'/%3E%3Cellipse cx='2.5' cy='9.9' rx='5.6' ry='3.8' transform='rotate(362.9 2.5 9.9)'/%3E%3Cellipse cx='-4.2' cy='18.1' rx='5.6' ry='3.8' transform='rotate(434.9 -4.2 18.1)'/%3E%3Cellipse cx='-14.1' cy='14.4' rx='5.6' ry='3.8' transform='rotate(506.9 -14.1 14.4)'/%3E%3Ccircle cx='-6.5' cy='9.4' r='2.9' fill='%23000'/%3E%3Cellipse cx='-13.6' cy='203.8' rx='5.6' ry='3.8' transform='rotate(218.9 -13.6 203.8)'/%3E%3Cellipse cx='-3.3' cy='201' rx='5.6' ry='3.8' transform='rotate(290.9 -3.3 201)'/%3E%3Cellipse cx='2.5' cy='209.9' rx='5.6' ry='3.8' transform='rotate(362.9 2.5 209.9)'/%3E%3Cellipse cx='-4.2' cy='218.1' rx='5.6' ry='3.8' transform='rotate(434.9 -4.2 218.1)'/%3E%3Cellipse cx='-14.1' cy='214.4' rx='5.6' ry='3.8' transform='rotate(506.9 -14.1 214.4)'/%3E%3Ccircle cx='-6.5' cy='209.4' r='2.9' fill='%23000'/%3E%3Cellipse cx='186.4' cy='3.8' rx='5.6' ry='3.8' transform='rotate(218.9 186.4 3.8)'/%3E%3Cellipse cx='196.7' cy='1' rx='5.6' ry='3.8' transform='rotate(290.9 196.7 1)'/%3E%3Cellipse cx='202.5' cy='9.9' rx='5.6' ry='3.8' transform='rotate(362.9 202.5 9.9)'/%3E%3Cellipse cx='195.8' cy='18.1' rx='5.6' ry='3.8' transform='rotate(434.9 195.8 18.1)'/%3E%3Cellipse cx='185.9' cy='14.4' rx='5.6' ry='3.8' transform='rotate(506.9 185.9 14.4)'/%3E%3Ccircle cx='193.5' cy='9.4' r='2.9' fill='%23000'/%3E%3Cellipse cx='186.4' cy='203.8' rx='5.6' ry='3.8' transform='rotate(218.9 186.4 203.8)'/%3E%3Cellipse cx='196.7' cy='201' rx='5.6' ry='3.8' transform='rotate(290.9 196.7 201)'/%3E%3Cellipse cx='202.5' cy='209.9' rx='5.6' ry='3.8' transform='rotate(362.9 202.5 209.9)'/%3E%3Cellipse cx='195.8' cy='218.1' rx='5.6' ry='3.8' transform='rotate(434.9 195.8 218.1)'/%3E%3Cellipse cx='185.9' cy='214.4' rx='5.6' ry='3.8' transform='rotate(506.9 185.9 214.4)'/%3E%3Ccircle cx='193.5' cy='209.4' r='2.9' fill='%23000'/%3E%3Cellipse cx='118.8' cy='28.2' rx='5.3' ry='3.6' transform='rotate(344.4 118.8 28.2)'/%3E%3Cellipse cx='115.3' cy='37.5' rx='5.3' ry='3.6' transform='rotate(416.4 115.3 37.5)'/%3E%3Cellipse cx='105.3' cy='37.1' rx='5.3' ry='3.6' transform='rotate(488.4 105.3 37.1)'/%3E%3Cellipse cx='102.6' cy='27.5' rx='5.3' ry='3.6' transform='rotate(560.4 102.6 27.5)'/%3E%3Cellipse cx='111' cy='21.9' rx='5.3' ry='3.6' transform='rotate(632.4 111 21.9)'/%3E%3Ccircle cx='110.6' cy='30.4' r='2.7' fill='%23000'/%3E%3Cellipse cx='142.3' cy='110.3' rx='6.1' ry='4.2' transform='rotate(164.4 142.3 110.3)'/%3E%3Cellipse cx='146.4' cy='99.4' rx='6.1' ry='4.2' transform='rotate(236.4 146.4 99.4)'/%3E%3Cellipse cx='158' cy='99.9' rx='6.1' ry='4.2' transform='rotate(308.4 158 99.9)'/%3E%3Cellipse cx='161.1' cy='111.1' rx='6.1' ry='4.2' transform='rotate(380.4 161.1 111.1)'/%3E%3Cellipse cx='151.4' cy='117.6' rx='6.1' ry='4.2' transform='rotate(452.4 151.4 117.6)'/%3E%3Ccircle cx='151.9' cy='107.7' r='3.2' fill='%23000'/%3E%3Ccircle cx='48.1' cy='73.4' r='1.5' fill='%23000' stroke='none'/%3E%3Ccircle cx='7.2' cy='22.4' r='1.6' fill='%23000' stroke='none'/%3E%3Ccircle cx='76.3' cy='118.9' r='1.7' fill='%23000' stroke='none'/%3E%3Ccircle cx='103.2' cy='126.8' r='1' fill='%23000' stroke='none'/%3E%3Ccircle cx='122.5' cy='54.2' r='1.8' fill='%23000' stroke='none'/%3E%3Ccircle cx='48.3' cy='191.1' r='2.1' fill='%23000' stroke='none'/%3E%3Ccircle cx='67.2' cy='61.4' r='1.2' fill='%23000' stroke='none'/%3E%3Ccircle cx='149.3' cy='21.6' r='1.4' fill='%23000' stroke='none'/%3E%3Ccircle cx='109.1' cy='98.8' r='1' fill='%23000' stroke='none'/%3E%3Ccircle cx='193.4' cy='57.2' r='1.6' fill='%23000' stroke='none'/%3E%3Ccircle cx='163.6' cy='59.1' r='2.1' fill='%23000' stroke='none'/%3E%3Ccircle cx='88.6' cy='21.5' r='1.7' fill='%23000' stroke='none'/%3E%3Ccircle cx='35.1' cy='163.4' r='1.8' fill='%23000' stroke='none'/%3E%3Ccircle cx='34.3' cy='108.3' r='1.6' fill='%23000' stroke='none'/%3E%3Ccircle cx='78.9' cy='176.7' r='2.2' fill='%23000' stroke='none'/%3E%3Ccircle cx='186.1' cy='130.7' r='1' fill='%23000' stroke='none'/%3E%3Ccircle cx='151.9' cy='139.7' r='2.1' fill='%23000' stroke='none'/%3E%3Ccircle cx='177.7' cy='7.3' r='1.9' fill='%23000' stroke='none'/%3E%3Ccircle cx='3' cy='152.2' r='1.4' fill='%23000' stroke='none'/%3E%3Ccircle cx='62.1' cy='98.9' r='1.5' fill='%23000' stroke='none'/%3E%3Ccircle cx='65.9' cy='30.7' r='1.3' fill='%23000' stroke='none'/%3E%3Ccircle cx='173.7' cy='153.4' r='1.3' fill='%23000' stroke='none'/%3E%3C/svg%3E");
+}
+[data-canvas="blossoms"] .workbench::after {
+  --pattern-size: 200px 200px;
+}
+[data-canvas="grid"] .workbench::after,
+[data-pattern="grid"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23000'%3E%3Ccircle cx='12' cy='12' r='1.3'/%3E%3C/svg%3E");
+}
+[data-canvas="grid"] .workbench::after {
+  --pattern-size: 24px 24px;
+}
+[data-canvas="daisies"] .workbench::after,
+[data-pattern="daisies"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'%3E%3Cellipse cx='60.9' cy='30.1' rx='7.2' ry='3.1' transform='rotate(304.9 60.9 30.1)'/%3E%3Cellipse cx='66' cy='38.1' rx='7.2' ry='3.1' transform='rotate(349.9 66 38.1)'/%3E%3Cellipse cx='63.9' cy='47.5' rx='7.2' ry='3.1' transform='rotate(394.9 63.9 47.5)'/%3E%3Cellipse cx='55.9' cy='52.6' rx='7.2' ry='3.1' transform='rotate(439.9 55.9 52.6)'/%3E%3Cellipse cx='46.6' cy='50.6' rx='7.2' ry='3.1' transform='rotate(484.9 46.6 50.6)'/%3E%3Cellipse cx='41.5' cy='42.5' rx='7.2' ry='3.1' transform='rotate(529.9 41.5 42.5)'/%3E%3Cellipse cx='43.5' cy='33.2' rx='7.2' ry='3.1' transform='rotate(574.9 43.5 33.2)'/%3E%3Cellipse cx='51.5' cy='28.1' rx='7.2' ry='3.1' transform='rotate(619.9 51.5 28.1)'/%3E%3Ccircle cx='53.7' cy='40.3' r='5' fill='%23000'/%3E%3Cellipse cx='94.9' cy='185.8' rx='6.4' ry='2.8' transform='rotate(315.8 94.9 185.8)'/%3E%3Cellipse cx='98' cy='193.6' rx='6.4' ry='2.8' transform='rotate(360.8 98 193.6)'/%3E%3Cellipse cx='94.7' cy='201.3' rx='6.4' ry='2.8' transform='rotate(405.8 94.7 201.3)'/%3E%3Cellipse cx='86.8' cy='204.4' rx='6.4' ry='2.8' transform='rotate(450.8 86.8 204.4)'/%3E%3Cellipse cx='79.1' cy='201.1' rx='6.4' ry='2.8' transform='rotate(495.8 79.1 201.1)'/%3E%3Cellipse cx='76' cy='193.3' rx='6.4' ry='2.8' transform='rotate(540.8 76 193.3)'/%3E%3Cellipse cx='79.3' cy='185.5' rx='6.4' ry='2.8' transform='rotate(585.8 79.3 185.5)'/%3E%3Cellipse cx='87.2' cy='182.4' rx='6.4' ry='2.8' transform='rotate(630.8 87.2 182.4)'/%3E%3Ccircle cx='87' cy='193.4' r='4.4' fill='%23000'/%3E%3Cellipse cx='173.7' cy='76.4' rx='5.9' ry='2.6' transform='rotate(105.1 173.7 76.4)'/%3E%3Cellipse cx='167.5' cy='71.7' rx='5.9' ry='2.6' transform='rotate(150.1 167.5 71.7)'/%3E%3Cellipse cx='166.5' cy='63.9' rx='5.9' ry='2.6' transform='rotate(195.1 166.5 63.9)'/%3E%3Cellipse cx='171.3' cy='57.8' rx='5.9' ry='2.6' transform='rotate(240.1 171.3 57.8)'/%3E%3Cellipse cx='179' cy='56.8' rx='5.9' ry='2.6' transform='rotate(285.1 179 56.8)'/%3E%3Cellipse cx='185.2' cy='61.5' rx='5.9' ry='2.6' transform='rotate(330.1 185.2 61.5)'/%3E%3Cellipse cx='186.2' cy='69.3' rx='5.9' ry='2.6' transform='rotate(375.1 186.2 69.3)'/%3E%3Cellipse cx='181.4' cy='75.4' rx='5.9' ry='2.6' transform='rotate(420.1 181.4 75.4)'/%3E%3Ccircle cx='176.4' cy='66.6' r='4.1' fill='%23000'/%3E%3Cellipse cx='-8.5' cy='142.1' rx='5.1' ry='2.2' transform='rotate(22.3 -8.5 142.1)'/%3E%3Cellipse cx='-13.3' cy='146.9' rx='5.1' ry='2.2' transform='rotate(67.3 -13.3 146.9)'/%3E%3Cellipse cx='-20.1' cy='147' rx='5.1' ry='2.2' transform='rotate(112.3 -20.1 147)'/%3E%3Cellipse cx='-24.9' cy='142.2' rx='5.1' ry='2.2' transform='rotate(157.3 -24.9 142.2)'/%3E%3Cellipse cx='-24.9' cy='135.4' rx='5.1' ry='2.2' transform='rotate(202.3 -24.9 135.4)'/%3E%3Cellipse cx='-20.1' cy='130.6' rx='5.1' ry='2.2' transform='rotate(247.3 -20.1 130.6)'/%3E%3Cellipse cx='-13.4' cy='130.6' rx='5.1' ry='2.2' transform='rotate(292.3 -13.4 130.6)'/%3E%3Cellipse cx='-8.6' cy='135.4' rx='5.1' ry='2.2' transform='rotate(337.3 -8.6 135.4)'/%3E%3Ccircle cx='-16.7' cy='138.8' r='3.5' fill='%23000'/%3E%3Cellipse cx='211.5' cy='142.1' rx='5.1' ry='2.2' transform='rotate(22.3 211.5 142.1)'/%3E%3Cellipse cx='206.7' cy='146.9' rx='5.1' ry='2.2' transform='rotate(67.3 206.7 146.9)'/%3E%3Cellipse cx='199.9' cy='147' rx='5.1' ry='2.2' transform='rotate(112.3 199.9 147)'/%3E%3Cellipse cx='195.1' cy='142.2' rx='5.1' ry='2.2' transform='rotate(157.3 195.1 142.2)'/%3E%3Cellipse cx='195.1' cy='135.4' rx='5.1' ry='2.2' transform='rotate(202.3 195.1 135.4)'/%3E%3Cellipse cx='199.9' cy='130.6' rx='5.1' ry='2.2' transform='rotate(247.3 199.9 130.6)'/%3E%3Cellipse cx='206.6' cy='130.6' rx='5.1' ry='2.2' transform='rotate(292.3 206.6 130.6)'/%3E%3Cellipse cx='211.4' cy='135.4' rx='5.1' ry='2.2' transform='rotate(337.3 211.4 135.4)'/%3E%3Ccircle cx='203.3' cy='138.8' r='3.5' fill='%23000'/%3E%3Cellipse cx='100.5' cy='129.4' rx='6.3' ry='2.7' transform='rotate(115.3 100.5 129.4)'/%3E%3Cellipse cx='94.9' cy='123.2' rx='6.3' ry='2.7' transform='rotate(160.3 94.9 123.2)'/%3E%3Cellipse cx='95.3' cy='114.9' rx='6.3' ry='2.7' transform='rotate(205.3 95.3 114.9)'/%3E%3Cellipse cx='101.4' cy='109.3' rx='6.3' ry='2.7' transform='rotate(250.3 101.4 109.3)'/%3E%3Cellipse cx='109.7' cy='109.7' rx='6.3' ry='2.7' transform='rotate(295.3 109.7 109.7)'/%3E%3Cellipse cx='115.3' cy='115.9' rx='6.3' ry='2.7' transform='rotate(340.3 115.3 115.9)'/%3E%3Cellipse cx='114.9' cy='124.2' rx='6.3' ry='2.7' transform='rotate(385.3 114.9 124.2)'/%3E%3Cellipse cx='108.8' cy='129.8' rx='6.3' ry='2.7' transform='rotate(430.3 108.8 129.8)'/%3E%3Ccircle cx='105.1' cy='119.6' r='4.3' fill='%23000'/%3E%3Cellipse cx='119.7' cy='56.7' rx='6.1' ry='2.7' transform='rotate(69.4 119.7 56.7)'/%3E%3Cellipse cx='111.7' cy='56.5' rx='6.1' ry='2.7' transform='rotate(114.4 111.7 56.5)'/%3E%3Cellipse cx='106.2' cy='50.6' rx='6.1' ry='2.7' transform='rotate(159.4 106.2 50.6)'/%3E%3Cellipse cx='106.5' cy='42.6' rx='6.1' ry='2.7' transform='rotate(204.4 106.5 42.6)'/%3E%3Cellipse cx='112.3' cy='37.1' rx='6.1' ry='2.7' transform='rotate(249.4 112.3 37.1)'/%3E%3Cellipse cx='120.4' cy='37.3' rx='6.1' ry='2.7' transform='rotate(294.4 120.4 37.3)'/%3E%3Cellipse cx='125.9' cy='43.2' rx='6.1' ry='2.7' transform='rotate(339.4 125.9 43.2)'/%3E%3Cellipse cx='125.6' cy='51.2' rx='6.1' ry='2.7' transform='rotate(384.4 125.6 51.2)'/%3E%3Ccircle cx='116' cy='46.9' r='4.2' fill='%23000'/%3E%3Cellipse cx='34.1' cy='193.6' rx='7' ry='3.1' transform='rotate(359.6 34.1 193.6)'/%3E%3Cellipse cx='30.6' cy='202.2' rx='7' ry='3.1' transform='rotate(404.6 30.6 202.2)'/%3E%3Cellipse cx='22.1' cy='205.8' rx='7' ry='3.1' transform='rotate(449.6 22.1 205.8)'/%3E%3Cellipse cx='13.5' cy='202.3' rx='7' ry='3.1' transform='rotate(494.6 13.5 202.3)'/%3E%3Cellipse cx='9.9' cy='193.8' rx='7' ry='3.1' transform='rotate(539.6 9.9 193.8)'/%3E%3Cellipse cx='13.4' cy='185.2' rx='7' ry='3.1' transform='rotate(584.6 13.4 185.2)'/%3E%3Cellipse cx='21.9' cy='181.6' rx='7' ry='3.1' transform='rotate(629.6 21.9 181.6)'/%3E%3Cellipse cx='30.5' cy='185.1' rx='7' ry='3.1' transform='rotate(674.6 30.5 185.1)'/%3E%3Ccircle cx='22' cy='193.7' r='4.8' fill='%23000'/%3E%3Cellipse cx='254.1' cy='193.6' rx='7' ry='3.1' transform='rotate(359.6 254.1 193.6)'/%3E%3Cellipse cx='250.6' cy='202.2' rx='7' ry='3.1' transform='rotate(404.6 250.6 202.2)'/%3E%3Cellipse cx='242.1' cy='205.8' rx='7' ry='3.1' transform='rotate(449.6 242.1 205.8)'/%3E%3Cellipse cx='233.5' cy='202.3' rx='7' ry='3.1' transform='rotate(494.6 233.5 202.3)'/%3E%3Cellipse cx='229.9' cy='193.8' rx='7' ry='3.1' transform='rotate(539.6 229.9 193.8)'/%3E%3Cellipse cx='233.4' cy='185.2' rx='7' ry='3.1' transform='rotate(584.6 233.4 185.2)'/%3E%3Cellipse cx='241.9' cy='181.6' rx='7' ry='3.1' transform='rotate(629.6 241.9 181.6)'/%3E%3Cellipse cx='250.5' cy='185.1' rx='7' ry='3.1' transform='rotate(674.6 250.5 185.1)'/%3E%3Ccircle cx='242' cy='193.7' r='4.8' fill='%23000'/%3E%3Cg transform='rotate(-20.4 40 120)'%3E%3Cpath d='M40 129V111'/%3E%3Cpath d='M40 122q-7-2-8-9q7 1 8 9zM40 117q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3Cg transform='rotate(-10.8 150 40)'%3E%3Cpath d='M150 49V31'/%3E%3Cpath d='M150 42q-7-2-8-9q7 1 8 9zM150 37q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3Cg transform='rotate(5.4 180 160)'%3E%3Cpath d='M180 169V151'/%3E%3Cpath d='M180 162q-7-2-8-9q7 1 8 9zM180 157q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3Cg transform='rotate(1.5 95 200)'%3E%3Cpath d='M95 209V191'/%3E%3Cpath d='M95 202q-7-2-8-9q7 1 8 9zM95 197q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3Cg transform='rotate(17 20 30)'%3E%3Cpath d='M20 39V21'/%3E%3Cpath d='M20 32q-7-2-8-9q7 1 8 9zM20 27q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3Cg transform='rotate(25.5 120 105)'%3E%3Cpath d='M120 114V96'/%3E%3Cpath d='M120 107q-7-2-8-9q7 1 8 9zM120 102q7-2 8-9q-7 1-8 9z'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-canvas="daisies"] .workbench::after {
+  --pattern-size: 220px 220px;
+}
+[data-canvas="stars"] .workbench::after,
+[data-pattern="stars"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' fill='%23000'%3E%3Cpath d='M60 70L57.9 56.1L47.7 66.8L37.5 77L53.8 61.4' fill='none' stroke='%23000' stroke-width='0.8' stroke-opacity='0.6'/%3E%3Ccircle cx='60' cy='70' r='2.2'/%3E%3Ccircle cx='57.9' cy='56.1' r='2.2'/%3E%3Ccircle cx='47.7' cy='66.8' r='2.2'/%3E%3Ccircle cx='37.5' cy='77' r='2.2'/%3E%3Ccircle cx='53.8' cy='61.4' r='2.2'/%3E%3Cpath d='M190 180L212.5 195.9L236.3 192.2L227.7 207.9L234 217.6' fill='none' stroke='%23000' stroke-width='0.8' stroke-opacity='0.6'/%3E%3Ccircle cx='190' cy='180' r='2.2'/%3E%3Ccircle cx='212.5' cy='195.9' r='2.2'/%3E%3Ccircle cx='236.3' cy='192.2' r='2.2'/%3E%3Ccircle cx='227.7' cy='207.9' r='2.2'/%3E%3Ccircle cx='234' cy='217.6' r='2.2'/%3E%3Cpath d='M64.6 38.8Q64.6 47.1 72.9 47.1Q64.6 47.1 64.6 55.4Q64.6 47.1 56.3 47.1Q64.6 47.1 64.6 38.8Z'/%3E%3Cpath d='M189.9 214.9Q189.9 221.6 196.5 221.6Q189.9 221.6 189.9 228.3Q189.9 221.6 183.2 221.6Q189.9 221.6 189.9 214.9Z'/%3E%3Cpath d='M184.9 133.7Q184.9 142.6 193.7 142.6Q184.9 142.6 184.9 151.5Q184.9 142.6 176 142.6Q184.9 142.6 184.9 133.7Z'/%3E%3Cpath d='M35.6 242.9Q35.6 248.8 41.5 248.8Q35.6 248.8 35.6 254.7Q35.6 248.8 29.7 248.8Q35.6 248.8 35.6 242.9Z'/%3E%3Cpath d='M82.1 162.4Q82.1 169.4 89.1 169.4Q82.1 169.4 82.1 176.4Q82.1 169.4 75.2 169.4Q82.1 169.4 82.1 162.4Z'/%3E%3Cpath d='M227.1 80.5Q227.1 89.3 235.8 89.3Q227.1 89.3 227.1 98Q227.1 89.3 218.3 89.3Q227.1 89.3 227.1 80.5Z'/%3E%3Cpath d='M95.8 222.6Q95.8 230.8 104 230.8Q95.8 230.8 95.8 239Q95.8 230.8 87.6 230.8Q95.8 230.8 95.8 222.6Z'/%3E%3Cpath d='M183.9 35.1Q183.9 39.8 188.6 39.8Q183.9 39.8 183.9 44.6Q183.9 39.8 179.1 39.8Q183.9 39.8 183.9 35.1Z'/%3E%3Cpath d='M34.8 105.6Q34.8 110.9 40.1 110.9Q34.8 110.9 34.8 116.2Q34.8 110.9 29.5 110.9Q34.8 110.9 34.8 105.6Z'/%3E%3Ccircle cx='64.7' cy='70.7' r='1.2'/%3E%3Ccircle cx='107.9' cy='231.2' r='0.9'/%3E%3Ccircle cx='98.1' cy='77' r='1.1'/%3E%3Ccircle cx='147.7' cy='227' r='1.6'/%3E%3Ccircle cx='76.8' cy='124.2' r='1.7'/%3E%3Ccircle cx='200.1' cy='87.5' r='1.7'/%3E%3Ccircle cx='221.1' cy='76.7' r='0.7'/%3E%3Ccircle cx='198.1' cy='211.5' r='1.7'/%3E%3Ccircle cx='61.7' cy='236.2' r='0.8'/%3E%3Ccircle cx='86' cy='29.9' r='1'/%3E%3Ccircle cx='134.7' cy='159.5' r='0.7'/%3E%3Ccircle cx='230.5' cy='219.8' r='0.9'/%3E%3Ccircle cx='198' cy='240.7' r='1'/%3E%3Ccircle cx='46.3' cy='131.3' r='1.7'/%3E%3Ccircle cx='190.8' cy='36.7' r='1'/%3E%3Ccircle cx='41.6' cy='100.8' r='1.7'/%3E%3Ccircle cx='27.2' cy='19.8' r='0.9'/%3E%3Ccircle cx='162.6' cy='104' r='1.7'/%3E%3Ccircle cx='103.4' cy='115.2' r='1.7'/%3E%3Ccircle cx='16' cy='47.4' r='1.5'/%3E%3Ccircle cx='126.1' cy='138.7' r='1.5'/%3E%3Ccircle cx='146.9' cy='63.2' r='0.8'/%3E%3Ccircle cx='51.8' cy='47.5' r='1.5'/%3E%3Ccircle cx='31.7' cy='201.8' r='1.2'/%3E%3Ccircle cx='34.7' cy='151.3' r='1.6'/%3E%3Ccircle cx='47.2' cy='-0.7' r='1.3'/%3E%3Ccircle cx='47.2' cy='259.3' r='1.3'/%3E%3Ccircle cx='69' cy='96' r='1.5'/%3E%3Ccircle cx='194.7' cy='70.1' r='1.1'/%3E%3Ccircle cx='12' cy='227.1' r='0.9'/%3E%3Ccircle cx='246.1' cy='66.5' r='1.5'/%3E%3Ccircle cx='56.7' cy='156.8' r='1'/%3E%3Ccircle cx='40.5' cy='63' r='1.6'/%3E%3Ccircle cx='6' cy='27.6' r='0.9'/%3E%3Ccircle cx='232.4' cy='177.4' r='1.6'/%3E%3Ccircle cx='23.2' cy='80' r='0.9'/%3E%3Ccircle cx='211' cy='135.3' r='0.8'/%3E%3Ccircle cx='103.2' cy='201.9' r='0.7'/%3E%3Ccircle cx='162.4' cy='15.1' r='1.6'/%3E%3Ccircle cx='102.3' cy='14.9' r='1.3'/%3E%3Ccircle cx='204.5' cy='14.4' r='1.8'/%3E%3C/svg%3E");
+}
+[data-canvas="stars"] .workbench::after {
+  --pattern-size: 260px 260px;
+}
+[data-canvas="beans"] .workbench::after,
+[data-pattern="beans"]::before {
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Cg transform='rotate(108.9 45.4 -0.5)'%3E%3Cellipse cx='45.4' cy='-0.5' rx='10' ry='7'/%3E%3Cpath d='M36.9 -0.5c5 -4.5 12 4.5 17 0'/%3E%3C/g%3E%3Cg transform='rotate(108.9 45.4 179.5)'%3E%3Cellipse cx='45.4' cy='179.5' rx='10' ry='7'/%3E%3Cpath d='M36.9 179.5c5 -4.5 12 4.5 17 0'/%3E%3C/g%3E%3Cg transform='rotate(88.6 160.7 33.4)'%3E%3Cellipse cx='160.7' cy='33.4' rx='8.5' ry='5.9'/%3E%3Cpath d='M153.5 33.4c4.2 -3.8 10.2 3.8 14.4 0'/%3E%3C/g%3E%3Cg transform='rotate(336.1 119.7 163.7)'%3E%3Cellipse cx='119.7' cy='163.7' rx='8.5' ry='6'/%3E%3Cpath d='M112.5 163.7c4.3 -3.8 10.2 3.8 14.5 0'/%3E%3C/g%3E%3Cg transform='rotate(359.4 66.3 112.4)'%3E%3Cellipse cx='66.3' cy='112.4' rx='9.3' ry='6.5'/%3E%3Cpath d='M58.4 112.4c4.6 -4.2 11.1 4.2 15.7 0'/%3E%3C/g%3E%3Cg transform='rotate(46.8 -2.3 -11.7)'%3E%3Cellipse cx='-2.3' cy='-11.7' rx='9.6' ry='6.8'/%3E%3Cpath d='M-10.5 -11.7c4.8 -4.3 11.6 4.3 16.4 0'/%3E%3C/g%3E%3Cg transform='rotate(46.8 -2.3 168.3)'%3E%3Cellipse cx='-2.3' cy='168.3' rx='9.6' ry='6.8'/%3E%3Cpath d='M-10.5 168.3c4.8 -4.3 11.6 4.3 16.4 0'/%3E%3C/g%3E%3Cg transform='rotate(46.8 177.7 -11.7)'%3E%3Cellipse cx='177.7' cy='-11.7' rx='9.6' ry='6.8'/%3E%3Cpath d='M169.5 -11.7c4.8 -4.3 11.6 4.3 16.4 0'/%3E%3C/g%3E%3Cg transform='rotate(46.8 177.7 168.3)'%3E%3Cellipse cx='177.7' cy='168.3' rx='9.6' ry='6.8'/%3E%3Cpath d='M169.5 168.3c4.8 -4.3 11.6 4.3 16.4 0'/%3E%3C/g%3E%3Cg transform='rotate(208.9 154.7 111.2)'%3E%3Cellipse cx='154.7' cy='111.2' rx='9' ry='6.3'/%3E%3Cpath d='M147.1 111.2c4.5 -4 10.8 4 15.2 0'/%3E%3C/g%3E%3Cg transform='rotate(268 118.3 79.8)'%3E%3Cellipse cx='118.3' cy='79.8' rx='10.6' ry='7.4'/%3E%3Cpath d='M109.2 79.8c5.3 -4.8 12.8 4.8 18.1 0'/%3E%3C/g%3E%3Cg transform='rotate(314.6 64.3 45)'%3E%3Cellipse cx='64.3' cy='45' rx='9.8' ry='6.9'/%3E%3Cpath d='M55.9 45c4.9 -4.4 11.8 4.4 16.7 0'/%3E%3C/g%3E%3Cg transform='rotate(170.9 15.9 79.6)'%3E%3Cellipse cx='15.9' cy='79.6' rx='10.2' ry='7.2'/%3E%3Cpath d='M7.2 79.6c5.1 -4.6 12.3 4.6 17.4 0'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-canvas="beans"] .workbench::after {
+  --pattern-size: 180px 180px;
+}
+/* Aurora: no pattern, big saturated blooms that drift faster. */
+[data-canvas="aurora"] .workbench::after,
+[data-canvas="plain"] .workbench::after,
+[data-canvas="plain"] .workbench::before {
+  display: none;
+}
+[data-canvas="aurora"] .workbench::before {
+  inset: -25%;
+  background:
+    radial-gradient(34% 40% at 12% 22%, var(--bloom-1), transparent 70%),
+    radial-gradient(38% 42% at 88% 80%, var(--bloom-2), transparent 70%),
+    radial-gradient(30% 34% at 62% 10%, var(--bloom-3), transparent 70%),
+    radial-gradient(28% 36% at 28% 92%, var(--accent), transparent 70%);
+  opacity: 0.55;
+  animation-duration: 14s;
+}
+[data-theme="dark"] .workbench::after {
+  opacity: 0.4;
+}
+@keyframes canvas-drift {
+  33% {
+    transform: translate(3%, -2%) rotate(2deg);
+  }
+  66% {
+    transform: translate(-2%, 3%) rotate(-1deg);
+  }
+  to {
+    transform: translate(2%, 2%) rotate(1deg) scale(1.04);
+  }
+}
+.workbench[data-sidebar-collapsed="true"] {
+  --actual-sidebar: 68px;
+}
+.workbench[data-agent-open="false"] {
+  grid-template-columns: var(--actual-sidebar) minmax(0, 1fr);
+}
+.sidebar {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--shell-radius);
+  box-shadow: var(--panel-shadow);
+  padding: 12px;
+  z-index: var(--layer-panel);
+}
+/* Sidebar surfaces, picked by html[data-sidebar]. Paper is the default panel. */
+[data-sidebar="sage"] .sidebar {
+  --recessed: color-mix(in srgb, var(--sage) 24%, var(--panel));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sage) 26%, var(--panel)),
+    color-mix(in srgb, var(--sage) 8%, var(--panel))
+  );
+}
+[data-sidebar="sunrise"] .sidebar {
+  background: linear-gradient(
+    172deg,
+    color-mix(in srgb, var(--ochre) 26%, var(--panel)),
+    var(--panel) 40% 65%,
+    color-mix(in srgb, var(--clay) 22%, var(--panel))
+  );
+}
+/* Glass lets the canvas pattern show through, blurred. */
+[data-sidebar="glass"] .sidebar {
+  background: color-mix(in srgb, var(--panel) 42%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+/* Ink: a deep green surface in both themes; local tokens flip the contrast. */
+[data-sidebar="ink"] .sidebar {
+  /* token-exempt: the ink look's own surface */
+  --panel: #26302a;
+  --ink: #f1efe4;
+  --secondary: #cdd2c2;
+  --muted: #a5ad9a;
+  --line: #ffffff1c;
+  --recessed: #ffffff14;
+  --sage: #a9bc93;
+  color: var(--ink);
+  border-color: transparent;
+  background:
+    radial-gradient(120% 50% at 0% 0%, #3d5243, transparent 70%),
+    var(--panel);
+}
+/* The masthead: the selected domain titles the sidebar on one line (the page's own band names it in full, 2026-11-20);
+   its emblem and name open the domain page. */
+.sidebar-masthead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 2px 10px;
+}
+.sidebar-domain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: var(--radius-card);
+  text-align: left;
+  transition: background var(--motion-quick);
+}
+.sidebar-domain:hover, .sidebar-domain[aria-current="page"] { background: color-mix(in oklab, var(--hue) 14%, transparent); }
+.sidebar-domain-emblem {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--hue) 16%, var(--panel));
+  font-size: var(--text-lg);
+  transition: transform var(--motion-settle) var(--ease-settle);
+}
+.sidebar-domain:hover .sidebar-domain-emblem { transform: rotate(-8deg) scale(1.06); }
+.sidebar-domain-text { min-width: 0; }
+.sidebar-domain-text > strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: color-mix(in oklab, var(--hue) 70%, var(--ink)); font: 600 var(--text-lg)/1.3 var(--font-title); }
+/* The late count is a clay badge on the emblem's top-right corner (the marigold teardrop is for "needs you"), its own
+   link to the domain's Tasks; the name keeps the whole line. */
+.sidebar-late {
+  position: absolute;
+  top: 0;
+  left: 27px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--clay-ink);
+  color: var(--on-accent);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--panel), var(--shadow-drop);
+  animation: badge-drop var(--motion-flourish) var(--ease-spring);
+  transition: scale var(--motion-quick);
+}
+.sidebar-late:hover { scale: 1.12; }
+/* The masthead remounts per domain: the new emblem drops in like a planted seed, its words slide after it. */
+.sidebar-domain-emblem { animation: domain-plant var(--motion-fill) var(--ease-spring); }
+.sidebar-domain-text { animation: domain-name-in var(--motion-pop) 80ms ease-out backwards; }
+/* The collapse button shows while the sidebar is pointed at or holds focus; the rail's expand button always shows. */
+@media (hover: hover) {
+  .workbench:not([data-sidebar-collapsed="true"]) .sidebar-collapse { opacity: 0; transition: opacity var(--motion-quick); }
+  .workbench:not([data-sidebar-collapsed="true"]) .sidebar:is(:hover, :focus-within) .sidebar-collapse { opacity: 1; }
+}
+.sidebar nav {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-top: 12px;
+}
+/* Separators are a hand-drawn wave that fades at both ends and flows a little while the sidebar is hovered. */
+.sidebar-masthead, .sidebar-me, .roster-row:first-child { position: relative; }
+.sidebar-masthead::after, .sidebar-me::before, .roster-row:first-child::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 8px;
+  pointer-events: none;
+  background: var(--line-strong);
+  mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 8'%3E%3Cpath d='M0 4Q11 2.6 22 4T44 4' fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"),
+    linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  mask-repeat: repeat-x, no-repeat;
+  mask-size: 44px 8px, 100% 100%;
+  mask-position: 0 50%, 0 0;
+  mask-composite: intersect;
+  transition: mask-position 1.4s var(--ease-settle);
+}
+.sidebar-masthead::after { bottom: -4px; }
+.sidebar-me::before { top: -4px; }
+.sidebar:hover .sidebar-masthead::after,
+.sidebar:hover .sidebar-me::before,
+.sidebar:hover .roster-row:first-child::after { mask-position: 44px 50%, 0 0; }
+/* Today's date marker, the top bar's link to Today: sized to the header's 44px row, tilted until pointed at or open. */
+.today-tile {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  flex-shrink: 0;
+  width: 40px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  text-align: center;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--line-strong), var(--shadow-drop);
+}
+.today-tile b { display: block; background: var(--accent); color: var(--on-accent); font-size: var(--text-2xs); line-height: 15px; font-weight: 600; }
+.today-tile span { display: grid; place-items: center; font: 600 var(--text-2xl)/1 var(--font-title); color: var(--ink); }
+.today-button { flex-shrink: 0; border-radius: var(--radius); }
+.today-button .today-tile {
+  rotate: -3deg;
+  transition: rotate var(--motion-settle) var(--ease-settle), translate var(--motion-settle) var(--ease-settle), box-shadow var(--motion-quick);
+}
+.today-button:is(:hover, :focus-visible) .today-tile {
+  rotate: 0deg;
+  translate: 0 -2px;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.today-button[aria-current="page"] .today-tile { rotate: 0deg; background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent); }
+.today-button[aria-current="page"] .today-tile span { color: var(--accent-ink); }
+@media (prefers-reduced-motion: reduce) {
+  .today-button .today-tile { transition: none; }
+  .today-button:is(:hover, :focus-visible) .today-tile { translate: none; }
+}
+.nav-projects > .nav-item { min-height: 36px; padding: 8px 12px; font-size: var(--text-sm); }
+.nav-projects > .nav-item > .project-dot { left: 24px; top: calc(50% + 4px); }
+/* A project with late steps says how many, in clay, at the row's end. */
+.nav-late { flex-shrink: 0; margin-left: auto; color: var(--clay-ink); font-size: var(--text-xs); font-weight: 600; }
+.nav-item.selected > .nav-late { color: inherit; }
+/* The open project's title wraps to a second line instead of cutting off. */
+.nav-projects > .nav-item.selected { white-space: normal; }
+.nav-projects > .nav-item.selected > span:not(.project-dot, .nav-late) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 1.3; }
+/* Next up: the domain's next three tasks above the foot, while the projects leave the room. */
+.sidebar-next { flex-shrink: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding-top: 10px; }
+.sidebar-next[data-room="false"] { position: absolute; visibility: hidden; pointer-events: none; }
+.sidebar-next-head { display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; color: var(--secondary); font-size: var(--text-xs); font-weight: 600; }
+.sidebar-next-count { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.sidebar-next-all { display: flex; align-items: center; gap: 2px; margin-left: auto; padding: 2px 4px; border-radius: var(--radius-md); color: var(--muted); font-weight: 500; }
+.sidebar-next-all:hover { color: var(--ink); }
+.sidebar-task { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 8px 0 6px; border-radius: var(--radius); color: var(--secondary); font-size: var(--text-sm); }
+.sidebar-task:hover { background: var(--recessed); color: var(--ink); }
+.sidebar-task-tick { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: var(--radius-pill); color: var(--line-field); }
+.sidebar-task-tick:hover { color: var(--accent); }
+.sidebar-task-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.sidebar-task-day { flex-shrink: 0; color: var(--muted); font-size: var(--text-xs); }
+.sidebar-task-day[data-late] { color: var(--clay-ink); font-weight: 600; }
+.sidebar-task-day[data-today] { color: var(--accent-ink); font-weight: 600; }
+.nav-item {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  margin-bottom: 4px;
+  color: var(--secondary);
+  font-size: var(--text-md);
+  white-space: nowrap;
+}
+.nav-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-item.selected {
+  background: var(--ink);
+  color: var(--panel);
+  font-weight: 500;
+}
+.nav-item:hover:not(.selected) {
+  background: var(--recessed);
+  color: var(--ink);
+}
+/* The foot: places outside the domain, side by side on one row, then you and Settings. */
+.sidebar-bottom {
+  padding-top: 12px;
+}
+.sidebar-places {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.sidebar-places > .nav-item { min-width: 0; margin-bottom: 0; padding-inline: 10px; gap: 8px; }
+/* Half a row has no room for "2 failing": a clay dot on the icon says it, the tooltip has the words. */
+.sidebar-places .nav-late {
+  position: absolute;
+  top: 8px;
+  left: 23px;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  border-radius: var(--radius-pill);
+  background: var(--clay-ink);
+  box-shadow: 0 0 0 2px var(--panel);
+  font-size: 0;
+}
+.sidebar-me {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 10px;
+}
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: var(--radius-control);
+  text-align: left;
+}
+.profile:hover, .profile.selected {
+  background: var(--recessed);
+}
+.profile img {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  object-fit: cover;
+  object-position: center 30%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--sage);
+}
+.profile > div {
+  min-width: 0;
+}
+.profile strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: var(--text-md);
+}
+.sidebar-settings.selected { background: var(--ink); color: var(--panel); }
+/* Header and resize controls. */
+.resize-handle {
+  position: absolute;
+  width: 6px;
+  top: var(--shell-inset);
+  bottom: calc(var(--shell-inset) + 36px + var(--shell-gap));
+  z-index: var(--layer-chrome);
+  cursor: col-resize;
+  touch-action: none;
+  outline-offset: -1px;
+}
+.resize-handle:hover:after,
+.resize-handle:focus-visible:after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+.sidebar-resize {
+  left: calc(var(--shell-inset) + var(--actual-sidebar) + var(--shell-gap) / 2 - 3px);
+}
+.agent-resize {
+  right: calc(var(--shell-inset) + var(--agent-width) + var(--shell-gap) / 2 - 3px);
+}
+.workspace-center {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  gap: var(--shell-gap);
+  position: relative;
+}
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  container-type: inline-size;
+}
+/* Narrow header: only the open domain keeps its name; the rest become emoji seeds. */
+@container (max-width: 960px) {
+  .domain-chip:not([data-active="true"]) > button:first-child { padding-right: 4px; }
+  .domain-chip:not([data-active="true"]) > button:first-child > span:last-child { display: none; }
+}
+.header-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 0 1 480px;
+  height: 48px;
+  padding: 0 10px 0 18px;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--panel-shadow);
+}
+.header-search:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.header-search kbd {
+  margin-left: auto;
+}
+.header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+/* Search is a round lens: it peeks around on hover and whispers its shortcut underneath. */
+.app-header .header-search {
+  position: relative;
+  flex: none;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--secondary);
+  transition: color var(--motion-quick), border-color var(--motion-quick), scale var(--motion-quick) var(--ease-settle);
+}
+.app-header .header-search:hover, .app-header .header-search:focus-visible {
+  color: var(--accent-ink);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+}
+.app-header .header-search:hover > svg { animation: search-peek var(--motion-linger) var(--ease-settle); }
+.app-header .header-search:active { scale: 0.9; }
+.app-header .header-search::after {
+  content: "Ctrl K";
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: var(--layer-float);
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--panel);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% -4px;
+  scale: 0.9;
+  transition: opacity var(--motion-quick), translate var(--motion-settle) var(--ease-settle), scale var(--motion-settle) var(--ease-settle);
+}
+.app-header .header-search:is(:hover, :focus-visible)::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 300ms; }
+@keyframes search-peek {
+  25% { translate: -2px -1px; rotate: -16deg; }
+  55% { translate: 2px -2px; rotate: 10deg; }
+  80% { translate: 0 1px; rotate: -3deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-header .header-search:hover > svg { animation: none; }
+}
+/* Every header control is 44px tall so the header-to-panel gap reads the same as every other shell gap. */
+.app-header .theme-toggle { width: 44px; height: 44px; }
+.app-header .theme-dial { left: -28px; top: -20px; }
+.app-header .theme-toggle::after { bottom: -12px; }
+
+/* The selected domain lends its hue to the accent tokens; the default domain keeps the skin accent. */
+:root[data-domain-hue][data-theme="light"] {
+  --accent: color-mix(in oklab, var(--domain-hue) 82%, #000);
+  --accent-ink: color-mix(in oklab, var(--domain-hue) 60%, var(--ink));
+  --accent-soft: color-mix(in oklab, var(--domain-hue) 14%, var(--panel));
+  --accent-hover: color-mix(in oklab, var(--domain-hue) 68%, #000);
+}
+/* A light hue (marigold, moss) mixed as above gives paper text on the accent, and accent words on the recessed tone,
+ * under 4.5:1; capping the lightness at 0.52 brings every domain hue to AA and leaves the darker ones untouched. */
+@supports (color: oklch(from red l c h)) {
+  :root[data-domain-hue][data-theme="light"] {
+    --accent: oklch(from color-mix(in oklab, var(--domain-hue) 82%, #000) min(l, 0.52) c h);
+    --accent-ink: oklch(from color-mix(in oklab, var(--domain-hue) 60%, var(--ink)) min(l, 0.52) c h);
+  }
+}
+:root[data-domain-hue][data-theme="dark"] {
+  --accent: color-mix(in oklab, var(--domain-hue) 65%, #fff);
+  --accent-ink: color-mix(in oklab, var(--domain-hue) 55%, #fff);
+  --accent-soft: color-mix(in oklab, var(--domain-hue) 22%, var(--panel));
+  --accent-hover: color-mix(in oklab, var(--domain-hue) 55%, #fff);
+}
+:root .nav-item.selected,
+:root .tab.active { background: var(--accent); }
+:root .nav-item.selected,
+:root .tab.active > button[role="tab"],
+:root .tab.active .tab-close { color: var(--on-accent); }
+
+/* Domain shelf: one seed-packet chip per PARA area, tinted by its own accent. */
+@property --hue { syntax: "<color>"; inherits: true; initial-value: #6c9a68; }
+/* Domain rail: overflow arrows + shelf, then All domains and Add on the right, kept together on the left of the header. */
+.domain-rail {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.domain-shelf {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: -8px 0;
+  padding: 8px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.domain-rail[data-more-right="true"] .domain-shelf { mask-image: linear-gradient(90deg, #000 calc(100% - 26px), transparent); }
+.domain-rail[data-more-left="true"] .domain-shelf { mask-image: linear-gradient(90deg, transparent, #000 26px); }
+.domain-rail[data-more-left="true"][data-more-right="true"] .domain-shelf {
+  mask-image: linear-gradient(90deg, transparent, #000 26px, #000 calc(100% - 26px), transparent);
+}
+.shelf-arrow {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--secondary);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--panel-shadow);
+  animation: shelf-arrow-in var(--motion-settle) var(--ease-spring);
+  transition: transform var(--motion-settle) var(--ease-settle), color var(--motion-quick);
+}
+.shelf-arrow[hidden] { display: none; }
+.shelf-arrow:hover:not(:disabled) { color: var(--accent-ink); transform: scale(1.1); }
+.shelf-arrow:active { transform: scale(0.94); }
+@keyframes shelf-arrow-in { from { opacity: 0; scale: 0.6; } }
+.domain-chip {
+  /* Words on the chip's 13% band: the hue mixed 52% into ink holds AA for every domain hue, as widget headings do. */
+  --hue-ink: color-mix(in oklab, var(--hue) 52%, var(--ink));
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  color: var(--hue-ink);
+  background: color-mix(in oklab, var(--hue) 13%, var(--panel));
+  border: 1px solid color-mix(in oklab, var(--hue) 26%, transparent);
+  transition: transform var(--motion-settle) var(--ease-settle), background var(--motion-quick), box-shadow var(--motion-quick), --hue var(--motion-settle);
+}
+.domain-chip:hover { transform: translateY(-1px) rotate(-0.6deg); box-shadow: none; }
+.domain-chip:nth-child(even):hover { transform: translateY(-1px) rotate(0.6deg); }
+.domain-chip > button:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 12px 0 4px;
+  border-radius: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.domain-chip-emoji {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--hue) 30%, transparent);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform var(--motion-settle) var(--ease-settle);
+}
+.domain-chip:hover .domain-chip-emoji { transform: rotate(-12deg) scale(1.08); }
+/* The edit pencil slides out of the chip on hover or keyboard focus, the open domain's too: its page's title carries
+   a pencil of its own (2026-11-20). */
+.domain-chip-settings {
+  display: grid;
+  place-items: center;
+  width: 0;
+  height: 26px;
+  margin-left: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0;
+  transition: width var(--motion-settle) var(--ease-settle), margin var(--motion-settle) var(--ease-settle), opacity var(--motion-quick);
+}
+.domain-chip:hover .domain-chip-settings,
+.domain-chip:focus-within .domain-chip-settings { width: 26px; margin: 0 8px 0 -6px; opacity: 1; }
+/* Keyboard focus on the domain's button rings the whole chip, pencil included: a ring round the button alone cut
+   across the chip where the pencil slides out. The pencil keeps its own ring. */
+.domain-chip:has(> button:first-child:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+.domain-chip > button:first-child:focus-visible { outline: none; }
+.domain-chip-settings:hover { background: color-mix(in oklab, var(--hue) 22%, transparent); }
+.domain-chip[data-active="true"] {
+  color: #fff;
+  /* Black or white, whichever passes AA on this hue: every domain hue and both skin accents clear 4.5:1 at L 0.565. */
+  color: oklch(from var(--hue) clamp(0, (0.565 - l) * 1000, 1) 0 0);
+  background: var(--hue);
+  border-color: transparent;
+}
+.domain-chip[data-active="true"] .domain-chip-emoji { box-shadow: none; animation: seed-bob 2.8s ease-in-out infinite; }
+.domain-chip[data-active="true"] .domain-chip-settings:hover { background: #ffffff30; }
+/* A domain with late tasks carries a clay dot on its pill's top-right, where the curve turns, like a notification
+   badge (Carlos's O4 of 2026-11-26, over a dot at a folded bar's end that read as a slider's handle); a ring of paper
+   cuts it out of the chip, as the sidebar masthead's late count is. The tooltip says how many. */
+.domain-chip-late {
+  position: absolute;
+  top: 2px;
+  left: calc(100% - 10px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--clay-ink);
+  box-shadow: 0 0 0 2px var(--panel);
+  pointer-events: none;
+}
+/* All domains: a quiet chevron that ends the shelf, "see them all" (and plant another there); it nudges right on hover. */
+.domain-all {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  transition: transform var(--motion-settle) var(--ease-settle), color var(--motion-quick), background var(--motion-quick);
+}
+.domain-all:hover { color: var(--accent-ink); background: var(--panel); transform: translateX(2px); }
+.domain-all[aria-current="page"] { color: var(--accent-ink); background: color-mix(in oklab, var(--accent) 18%, transparent); }
+@keyframes seed-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-2px) rotate(5deg); }
+}
+.app-header .primary-button {
+  height: 44px;
+  padding: 0 20px 0 16px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--panel);
+  font-size: var(--text-md);
+  font-weight: 600;
+  box-shadow: var(--panel-shadow);
+}
+.app-header .primary-button:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* The folded top bar (Carlos's pick of 2026-11-26, from O1 "ribbon" with round two's R1 row and R3 bars): one 24px row
+   6px under the window's edge, so the page starts at 36px instead of 72px. Today is a date pill, Search and Capture are
+   icons with their words in the tooltip, the theme dial leaves (the status bar keeps one), and the fold button ends
+   the row; unfolded, it shows only while the bar is pointed at or holds focus. */
+.header-fold { flex: none; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; color: var(--muted); }
+@media (hover: hover) {
+  .app-header:not([data-folded="true"]) .header-fold { opacity: 0; transition: opacity var(--motion-quick); }
+  .app-header:not([data-folded="true"]):is(:hover, :focus-within) .header-fold { opacity: 1; }
+}
+@media (min-width: 761px) {
+  .workbench[data-header-folded="true"] { padding-top: 6px; }
+  .workbench[data-header-folded="true"] .workspace-center { gap: 6px; }
+  .app-header[data-folded="true"] { position: relative; z-index: var(--layer-chrome); height: 24px; min-height: 0; gap: 8px; }
+  .app-header[data-folded="true"] .theme-toggle { display: none; }
+  .app-header[data-folded="true"] .today-button .today-tile {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: auto;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--radius-pill);
+    rotate: 0deg;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .app-header[data-folded="true"] .today-button:is(:hover, :focus-visible, [aria-current="page"]) .today-tile { box-shadow: 0 0 0 2px var(--accent); }
+  .app-header[data-folded="true"] .today-tile b { background: none; color: var(--secondary); font-size: var(--text-xs); line-height: 1; }
+  .app-header[data-folded="true"] .today-tile span { display: block; font: 600 var(--text-sm)/1 var(--font-body); }
+  .app-header[data-folded="true"] :is(.header-search, .create-button, .header-fold) { width: 24px; height: 24px; }
+  .app-header[data-folded="true"] :is(.header-search, .create-button) > svg { width: 16px; height: 16px; }
+  .app-header[data-folded="true"] .create-button { min-height: 0; padding: 0; justify-content: center; }
+  .app-header[data-folded="true"] .create-button > span { display: none; }
+  .app-header[data-folded="true"] .domain-all { height: 24px; }
+  .app-header[data-folded="true"] .shelf-arrow { width: 20px; height: 20px; }
+
+  /* Every chip folds flat into a 12px bar of its own width: the open domain's in its hue, the others see-through.
+     Pointing at the bars (or tabbing into them) stands them all back up as chips over the page's top edge, and they
+     fold again a moment after the pointer leaves. Keyboard focus holds them up, a click's focus doesn't: after a pick
+     the chips would otherwise stay standing over the page. */
+  .app-header[data-folded="true"] .domain-rail { align-self: flex-start; }
+  .app-header[data-folded="true"] .domain-shelf {
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-shell);
+    transition: padding var(--motion-settle) var(--ease-settle) var(--motion-settle), background var(--motion-quick) var(--motion-settle), box-shadow var(--motion-quick) var(--motion-settle);
+  }
+  .app-header[data-folded="true"] .domain-chip {
+    height: 12px;
+    overflow: clip;
+    overflow-clip-margin: 7px;
+    border-color: transparent;
+    background: color-mix(in oklab, var(--hue) 30%, transparent);
+    transition: height var(--motion-settle) var(--ease-settle) var(--motion-settle), background var(--motion-quick) var(--motion-settle), border-color var(--motion-quick) var(--motion-settle);
+  }
+  /* A bar is 12px tall but takes a tap 24px tall (DESIGN.md, "Target"): its button reaches 6px past it, into the row
+     (7px from the padding box, inside the chip's 1px border). Standing up, the chip is tall enough, and the reach
+     would cover its pencil. */
+  .app-header[data-folded="true"] .domain-shelf:not(:hover, :has(:focus-visible)) .domain-chip > button:first-child::before {
+    content: "";
+    position: absolute;
+    inset: -7px 0;
+  }
+  /* On the dark canvas the see-through bars keep more of their hue, or they sink into it. */
+  :root[data-theme="dark"] .app-header[data-folded="true"] .domain-shelf:not(:hover, :has(:focus-visible)) .domain-chip:not([data-active="true"]) {
+    background: color-mix(in oklab, var(--hue) 42%, transparent);
+  }
+  .app-header[data-folded="true"] .domain-chip[data-active="true"] { background: var(--hue); }
+  .app-header[data-folded="true"] .domain-chip > * { opacity: 0; transition: opacity var(--motion-quick); }
+  .app-header[data-folded="true"] .domain-chip-emoji { animation: none; }
+  /* Folded, the dot sits on the bar's top-right corner and stays shown; standing up, it settles onto the chip's curve,
+     a few pixels away, so it never travels across the chip. */
+  .app-header[data-folded="true"] .domain-chip > .domain-chip-late {
+    top: -4px;
+    left: calc(100% - 5px);
+    width: 6px;
+    height: 6px;
+    opacity: 1;
+    transition: top var(--motion-settle) var(--ease-settle) var(--motion-settle), left var(--motion-settle) var(--ease-settle) var(--motion-settle),
+      width var(--motion-settle) var(--ease-settle) var(--motion-settle), height var(--motion-settle) var(--ease-settle) var(--motion-settle);
+  }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) .domain-chip > .domain-chip-late { top: 2px; left: calc(100% - 10px); width: 8px; height: 8px; }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) {
+    padding: 6px 8px 8px;
+    background: var(--panel);
+    box-shadow: var(--shadow-float);
+    transition-delay: calc(var(--motion-quick) / 2);
+  }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) .domain-chip {
+    height: 40px;
+    border-color: color-mix(in oklab, var(--hue) 26%, transparent);
+    background: color-mix(in oklab, var(--hue) 13%, var(--panel));
+    transition-delay: calc(var(--motion-quick) / 2);
+  }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) .domain-chip[data-active="true"] { background: var(--hue); border-color: transparent; }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) .domain-chip > * { opacity: 1; transition-delay: var(--motion-quick); }
+  .app-header[data-folded="true"] .domain-shelf:is(:hover, :has(:focus-visible)) .domain-chip[data-active="true"] .domain-chip-emoji { animation: seed-bob 2.8s ease-in-out infinite; }
+}
+@media (min-width: 761px) and (prefers-reduced-motion: reduce) {
+  .app-header[data-folded="true"] :is(.domain-shelf, .domain-chip, .domain-chip > *) { transition-duration: 0s; }
+}
+/* While the look or the page switches (skin.ts `holdTransitions` sets data-switching for two frames), everything inside
+   changes at once: transitions would restyle and repaint hundreds of elements every frame. Only the theme dial turns. */
+[data-switching] :not(.theme-dial),
+[data-switching] ::before,
+[data-switching] ::after {
+  transition: none !important;
+}
+/* Theme dial: a sky disc turns on the hill's horizon, setting the sun and raising the moon. */
+.theme-toggle {
+  /* token-exempt: the dial's glass rim, a drawn object */
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px var(--panel), 0 0 0 5px var(--line), var(--panel-shadow);
+  transition: transform var(--motion-quick) ease-out;
+}
+/* Embossed glass: top highlight, bottom shade, inner rim. Sits above sky and hill. */
+.theme-toggle::before {
+  /* token-exempt: the dial's glass rim, a drawn object */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--layer-sticky);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(120% 60% at 50% -5%, #ffffff70, #ffffff10 55%, transparent 56%);
+  box-shadow: inset 0 2px 2px #ffffffa0, inset 0 -4px 6px #0000004d, inset 0 0 0 1px #0000001a;
+}
+.theme-toggle:active {
+  transform: translateY(1px) scale(0.97);
+}
+.theme-toggle:active::before {
+  /* token-exempt: the dial's glass rim, a drawn object */
+  box-shadow: inset 0 3px 6px #00000059, inset 0 -1px 1px #ffffff60, inset 0 0 0 1px #0000001a;
+}
+.theme-dial {
+  /* token-exempt: the drawn sky and moon of the theme dial */
+  position: absolute;
+  left: -26px;
+  top: -18px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 52% 32%, #ffe27a 0 6px, #ffe27a55 7px, transparent 12px),
+    radial-gradient(circle at 56% 60%, #fff 0 0.9px, transparent 1.4px),
+    radial-gradient(circle at 62% 70%, #fffb 0 0.8px, transparent 1.3px),
+    radial-gradient(circle at 38% 62%, #fff9 0 0.8px, transparent 1.3px),
+    radial-gradient(circle at 48% 68%, #f4f0dc 0 6px, transparent 6.5px),
+    linear-gradient(#a6d3ea, #f8dcb4 50%, #39405e 50%, #161b2c);
+  transition: transform var(--motion-flourish) var(--ease-settle);
+}
+/* Crescent shadow over the moon. */
+.theme-dial::after {
+  /* token-exempt: the drawn sky and moon of the theme dial */
+  content: "";
+  position: absolute;
+  left: 48%;
+  top: 68%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #2b3149;
+  transform: translate(-75%, -60%);
+}
+.theme-toggle::after {
+  content: "";
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  bottom: -14px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--sage);
+  transition: background-color var(--motion-settle) ease-out;
+}
+.theme-toggle[aria-checked="true"] .theme-dial {
+  transform: rotate(180deg);
+}
+.theme-toggle[aria-checked="true"]::after {
+  /* token-exempt: the dial's night hill */
+  background: #3f4c39;
+}
+.theme-toggle:hover .theme-dial {
+  transform: rotate(-14deg);
+}
+.theme-toggle[aria-checked="true"]:hover .theme-dial {
+  transform: rotate(166deg);
+}
+/* Chat bubble: the face(s) of whoever chat opens to, floating over the page's bottom-right corner.
+   The name slides out to the left on hover or focus, so the face never moves. */
+.atlas-dock {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: var(--layer-float);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+.atlas-dock > * { pointer-events: auto; }
+/* The side preview of a resource has its own Ask button; the bubble steps aside so it never covers the editor (Ctrl J still opens chat). */
+.workspace-center:has(.resource-peek) > .atlas-dock { display: none; }
+.atlas-button {
+  position: relative;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  box-shadow: var(--shadow-float);
+  font-size: var(--text-md);
+  font-weight: 600;
+  transition: translate var(--motion-settle) var(--ease-settle), box-shadow var(--motion-quick) ease-out;
+}
+.atlas-button:is(:hover, :focus-visible) { translate: 0 -2px; box-shadow: var(--shadow-float-hover); }
+/* Peek: a new agent message as a speech bubble whose tucked corner points down at the face. */
+.atlas-peek {
+  display: flex;
+  align-items: flex-start;
+  max-width: 300px;
+  margin-right: 14px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 16px 16px 4px 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow-float);
+  transform-origin: bottom right;
+  animation: peek-in var(--motion-settle) var(--ease-spring);
+}
+@keyframes peek-in {
+  from { opacity: 0; translate: 0 8px; scale: 0.94; }
+}
+.atlas-peek-open {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 4px 8px 8px;
+  border-radius: var(--radius-control);
+  text-align: left;
+}
+.atlas-peek-open:hover { background: var(--accent-soft); }
+.atlas-peek-open strong { display: block; font-size: var(--text-sm); font-weight: 600; }
+.atlas-peek-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+/* Dismiss appears only while you're on the peek. */
+.atlas-peek-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity var(--motion-quick) ease-out;
+}
+.atlas-peek:is(:hover, :focus-within) .atlas-peek-close { opacity: 1; }
+.atlas-peek-review {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+/* Replying: the typing dots in a small tag on the bubble's lower left, so you see a reply is on its way with the panel shut. */
+.atlas-typing {
+  position: absolute;
+  left: -6px;
+  bottom: -2px;
+  padding: 6px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--panel);
+  color: var(--accent-ink);
+  box-shadow: var(--shadow-drop);
+}
+.atlas-button[data-working] { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+/* Pages end with room for the bubble, so it never sits on their last line. */
+@media (min-width: 761px) {
+  .workspace-center:has(> .atlas-dock) .workspace-content::after { content: ""; display: block; height: 72px; }
+}
+.atlas-peek-close:hover { color: var(--ink); background: var(--recessed); }
+.atlas-button-label {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns var(--motion-settle) var(--ease-settle);
+}
+.atlas-button-label > span { overflow: hidden; white-space: nowrap; padding: 0; transition: padding var(--motion-settle) var(--ease-settle); }
+.atlas-button:is(:hover, :focus-visible) .atlas-button-label { grid-template-columns: 1fr; }
+.atlas-button:is(:hover, :focus-visible) .atlas-button-label > span { padding: 0 10px 0 12px; }
+/* The page already shows these agents' faces in a brief (D40), so the button shows a chat mark instead. */
+.atlas-button-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); }
+.atlas-button[data-pending="true"]::after,
+.phone-nav > button[data-pending="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--accent);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: atlas-pulse 1200ms ease-out 3;
+}
+/* Count badge: a marigold teardrop whose point leans toward the avatar. */
+.atlas-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px 999px 999px 2px;
+  background: var(--attention);
+  color: var(--on-attention);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px #fff, var(--shadow-drop);
+  animation: badge-drop var(--motion-flourish) var(--ease-spring);
+}
+@keyframes badge-drop {
+  from { scale: 0.3; rotate: -30deg; opacity: 0; }
+}
+@keyframes atlas-pulse {
+  0% { transform: scale(0.98); opacity: 0.65; }
+  100% { transform: scale(1.06); opacity: 0; }
+}
+.atlas-button:hover {
+  border-color: var(--line-strong);
+}
+/* The button and the chat panel share a view-transition name, so opening chat morphs one into the other. */
+.atlas-button,
+.agent-panel {
+  view-transition-name: atlas;
+}
+::view-transition-group(atlas) {
+  animation-duration: var(--motion-enter);
+  animation-timing-function: var(--ease-settle);
+  transform-origin: top left;
+}
+::view-transition-old(atlas),
+::view-transition-new(atlas) {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  object-position: left top;
+}
+::view-transition-old(atlas) {
+  animation-duration: var(--motion-quick);
+}
+/* Everything else snaps to its new layout, so only the Atlas morph moves. */
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+/* Tabs. */
+.workspace-topbar {
+  height: 54px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  min-width: 0;
+  background: var(--panel);
+}
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  flex: 1;
+  padding: 4px 0;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  flex-shrink: 0;
+  height: 36px;
+  max-width: 230px;
+  border-radius: var(--radius-control);
+}
+.tab:hover:not(.active) {
+  background: var(--recessed);
+}
+.tab > button[role="tab"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 12px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  max-width: 200px;
+  min-width: 60px;
+  border-radius: inherit;
+}
+.tab > button > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tab.active {
+  background: var(--ink);
+}
+.tab.active > button[role="tab"] > svg:first-child {
+  animation: tab-pop var(--motion-settle) var(--ease-spring);
+}
+.tab.active > button[role="tab"],
+.tab.active .tab-close {
+  color: var(--panel);
+  font-weight: 500;
+}
+.tab.tab-overview > button[role="tab"] { min-width: 0; padding: 0 10px; }
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  color: var(--muted);
+  opacity: 0;
+  flex-shrink: 0;
+  border-radius: 0 12px 12px 0;
+}
+.tab:hover .tab-close,
+.tab.active .tab-close,
+.tab:focus-within .tab-close {
+  opacity: 1;
+}
+.tab-close:hover {
+  color: var(--ink);
+}
+.tab.active .tab-close:hover {
+  color: var(--accent-soft);
+}
+.topbar-actions {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+.status-bar {
+  grid-row: 2;
+  grid-column: 1/-1;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  background: var(--panel);
+  box-shadow: var(--panel-shadow);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  z-index: var(--layer-chrome);
+}
+.status-bar > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.status-bar .status-middle {
+  font-size: var(--text-sm);
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* Plain text, not flex items, so a long last crumb ends in an ellipsis instead of being cut mid-word. */
+.status-crumbs {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.status-crumbs > span { margin: 0 8px; }
+.status-extra {
+  display: contents;
+}
+.status-middle span:not(.status-extra) {
+  color: var(--line-strong);
+}
+.status-bar button {
+  display: inline-flex;
+  padding: 4px;
+  align-items: center;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.status-bar button:hover {
+  color: var(--accent);
+}
+.status-bar .save-failed {
+  color: var(--error);
+}
+.status-bar .save-failed button {
+  text-decoration: underline;
+  color: var(--error);
+}
+/* Progress lane: a striped candy fill in the place's own colour, its emoji or plant riding the edge. Full turns it rainbow. */
+.status-bar .status-progress {
+  margin-left: auto;
+  flex-shrink: 0;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.progress-lane {
+  position: relative;
+  width: 132px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--hue) 16%, var(--recessed));
+  box-shadow: var(--shadow-well);
+}
+/* The stripes and the rainbow move by transform on their own layers, so the lane never repaints while it plays. */
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--share) * 100%);
+  border-radius: inherit;
+  overflow: hidden;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--hue) 75%, #fff), var(--hue), color-mix(in oklab, var(--hue) 60%, var(--clay)));
+  transition: width var(--motion-fill) var(--ease-settle);
+}
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 -11.3px;
+  background: repeating-linear-gradient(-45deg, #ffffff38 0 4px, transparent 4px 8px) 0 0 / 11.3px 100%;
+  animation: progress-stripes 1.2s linear infinite;
+}
+/* Four widths of one clay-to-clay gradient drawn twice: sliding half its width loops seamlessly. */
+.status-progress[data-complete="true"] .progress-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 400%;
+  background: linear-gradient(90deg, var(--clay), var(--ochre), var(--sage), var(--accent), var(--hue), var(--clay)) 0 0 / 50% 100%;
+  animation: progress-rainbow 4s linear infinite;
+}
+.progress-rider {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--share) * (100% - 16px));
+  width: 16px;
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+  translate: 0 -55%;
+  filter: drop-shadow(0 1px 1px #0000002e);
+  transition: left var(--motion-fill) var(--ease-settle);
+  animation: progress-hop 2.4s ease-in-out infinite;
+}
+.status-progress[data-complete="true"] .progress-rider { animation: progress-cheer var(--motion-linger) var(--ease-spring), progress-hop 2.4s var(--motion-linger) ease-in-out infinite; }
+.status-progress small { color: color-mix(in oklab, var(--hue) 52%, var(--ink)); font-size: var(--text-xs); }
+.progress-sparks { position: absolute; top: 50%; left: calc(var(--share) * (100% - 16px) + 8px); pointer-events: none; }
+.progress-sparks > i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: -2px;
+  border-radius: 50%;
+  background: var(--hue);
+  opacity: 0;
+  animation: progress-spark var(--motion-fill) ease-out;
+}
+.progress-sparks > i:nth-child(2) { background: var(--ochre); --dx: 10px; --dy: -14px; }
+.progress-sparks > i:nth-child(3) { background: var(--clay); --dx: -12px; --dy: -12px; }
+.progress-sparks > i:nth-child(4) { background: var(--sage); --dx: 14px; --dy: 8px; }
+.progress-sparks > i:nth-child(5) { background: var(--accent); --dx: -6px; --dy: 13px; }
+@keyframes progress-stripes { to { transform: translateX(11.3px); } }
+@keyframes progress-rainbow { from { transform: translateX(-50%); } to { transform: none; } }
+@keyframes progress-hop { 0%, 80%, 100% { translate: 0 -55%; } 88% { translate: 0 -85%; } }
+@keyframes progress-cheer { 0% { scale: 1; rotate: 0deg; } 40% { scale: 1.6; rotate: -14deg; } 70% { rotate: 10deg; } 100% { scale: 1; rotate: 0deg; } }
+@keyframes progress-spark {
+  0% { opacity: 1; transform: translate(0, 0) scale(1.2); }
+  100% { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, -16px)) scale(0.2); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill, .progress-fill::before, .progress-fill::after, .progress-rider { transition: none; animation: none !important; }
+  .progress-sparks { display: none; }
+}
+/* Content placement. */
+.workspace-page-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--shell-radius);
+  box-shadow: var(--panel-shadow);
+}
+.workspace-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.agent-panel {
+  grid-column: 3;
+  grid-row: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--shell-radius);
+  box-shadow: var(--panel-shadow);
+  overflow: hidden;
+}
+/* Mobile controls default visibility. */
+.mobile-header,
+.phone-nav {
+  display: none;
+}
+/* Active tab motion. */
+@keyframes tab-pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+/* Desktop rail. */
+@media (min-width: 1201px) {
+  .workbench[data-sidebar-collapsed="true"] .nav-item > span:not(.project-dot),
+  .workbench[data-sidebar-collapsed="true"] .sidebar-domain-text,
+  .workbench[data-sidebar-collapsed="true"] .sidebar-next,
+  .workbench[data-sidebar-collapsed="true"] .profile > div {
+    display: none;
+  }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-places {
+    grid-template-columns: 1fr;
+  }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-places > .nav-item {
+    padding-inline: 0;
+  }
+  /* In the rail the badges sit on the centred emblem's and icon's corners. */
+  .workbench[data-sidebar-collapsed="true"] .sidebar-late {
+    top: -2px;
+    left: calc(50% + 4px);
+  }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-places > .nav-item > .nav-late {
+    display: block;
+    left: calc(50% + 4px);
+  }
+  .workbench[data-sidebar-collapsed="true"] .sidebar {
+    padding: 12px 8px;
+  }
+  .workbench[data-sidebar-collapsed="true"] :is(.sidebar-masthead, .sidebar-me) {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-masthead {
+    padding: 0 0 12px;
+  }
+  .workbench[data-sidebar-collapsed="true"] :is(.nav-item, .profile, .sidebar-domain) {
+    justify-content: center;
+  }
+  .workbench[data-sidebar-collapsed="true"] :is(.profile, .sidebar-domain) {
+    flex: none;
+    padding: 4px;
+  }
+}
+/* Tablet icon rail. */
+@media (min-width: 761px) and (max-width: 1200px) {
+  .workbench {
+    --actual-sidebar: 68px;
+  }
+  .sidebar {
+    padding: 12px 8px;
+  }
+  .sidebar-masthead {
+    padding: 0 0 12px;
+  }
+  .sidebar-masthead, .sidebar-me {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .nav-item > span:not(.project-dot),
+  .sidebar-domain-text,
+  .sidebar-next,
+  .profile > div,
+  .sidebar-resize {
+    display: none;
+  }
+  .sidebar-places {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-places > .nav-item {
+    padding-inline: 0;
+  }
+  .sidebar > .sidebar-masthead > .sidebar-late {
+    top: -2px;
+    left: calc(50% + 4px);
+  }
+  .sidebar-places > .nav-item > .nav-late {
+    display: block;
+    left: calc(50% + 4px);
+  }
+  .nav-item, .profile, .sidebar-domain {
+    justify-content: center;
+  }
+  .profile, .sidebar-domain {
+    flex: none;
+    padding: 4px;
+  }
+}
+/* Narrow desktop chat placement. */
+@media (min-width: 761px) and (max-width: 1000px) {
+  .workbench[data-agent-open="true"] {
+    grid-template-columns: 68px minmax(0, 1fr) 300px;
+  }
+  .workbench[data-agent-open="true"] .agent-resize {
+    display: none;
+  }
+}
+/* Phone navigation and tabs. */
+@media (max-width: 760px) {
+  .workbench,
+  .workbench[data-agent-open="false"] {
+    --shell-inset: 8px;
+    --shell-gap: 8px;
+    --shell-radius: var(--radius-card);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    height: 100dvh;
+  }
+  .mobile-header {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--shell-radius);
+    background: var(--panel);
+    z-index: var(--layer-chrome);
+    transition: height var(--motion-settle) var(--ease-settle), margin var(--motion-settle) var(--ease-settle), opacity var(--motion-quick) ease-out;
+  }
+  /* Scrolling a page down folds the header away (its row and the gap under it), scrolling up brings it back. */
+  .workbench[data-header-away] .mobile-header { height: 0; margin-bottom: calc(-1 * var(--shell-gap)); border-width: 0; opacity: 0; overflow: hidden; pointer-events: none; }
+  .sidebar, .app-header { display: none; }
+  /* A domain page's heading takes sideways swipes (DomainPage), so the browser keeps only vertical panning there. */
+  [data-swipe] { touch-action: pan-y; }
+  .phone-nav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-row: 4;
+    grid-column: 1;
+    padding: 6px 4px calc(5px + env(safe-area-inset-bottom));
+    border: 1px solid var(--line);
+    border-radius: var(--radius-shell);
+    background: var(--panel);
+    gap: 2px;
+    position: relative;
+  }
+  /* The viewport shrinks for the keyboard (index.html), which would lift the bar onto it: it steps aside instead. */
+  .workbench[data-keyboard] .phone-nav { display: none; }
+  /* One ink pill under the selected place, sliding between slots on the settle curve; it fades out when no place is
+     selected (a More page) and slides back in from where it was. */
+  .phone-nav::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    width: calc((100% - 16px) / 5);
+    height: 52px;
+    border-radius: var(--radius-card);
+    background: var(--ink);
+    translate: calc(max(var(--nav-at), 0) * (100% + 2px)) 0;
+    transition: translate var(--motion-settle) var(--ease-settle), opacity var(--motion-quick) ease-out;
+  }
+  .phone-nav[data-at="-1"]::before { opacity: 0; }
+  .phone-nav > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 52px;
+    border-radius: var(--radius-card);
+    color: var(--secondary);
+    font-size: var(--text-xs);
+    position: relative;
+  }
+  .phone-nav > button[aria-current="page"] { color: var(--panel); transition: color var(--motion-quick) ease-out; }
+  /* Once the bar has been used, the place you pick hops in as the pill arrives; Chat's bubble chatters instead. */
+  .phone-nav[data-touched] > button[aria-current="page"] > svg { animation: tab-hop var(--motion-flourish) var(--ease-spring); }
+  .phone-nav[data-touched] > .phone-chat[aria-current="page"] > svg { animation: tab-chatter var(--motion-fill) var(--ease-spring); }
+  .phone-nav .atlas-count { position: absolute; top: 2px; right: 4px; min-width: 18px; height: 18px; }
+  /* Unread news with nobody waiting: a quiet accent dot where the count would sit. */
+  .phone-news { position: absolute; top: 8px; right: calc(50% - 16px); width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--panel); }
+  /* Capture: the centre of the bar, a 56px forest disc raised half out of it, ringed in the bar's own paper. Capture
+   * and Chat both do something else when held, so their press must not select anything or open the browser's callout. */
+  .phone-nav > .phone-hold { overflow: visible; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+  /* The grid icon tips onto its corner while its sheet is open, so the button reads as the sheet's handle. */
+  .phone-more > svg { transition: rotate var(--motion-settle) var(--ease-settle); }
+  .phone-more:has(+ .phone-pages:popover-open) > svg { rotate: 45deg; }
+  .phone-capture-mark { display: grid; place-items: center; width: 56px; height: 56px; margin-top: -28px; border: 4px solid var(--panel); border-radius: 50%; background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow); transition: background var(--motion-quick) ease-out, scale var(--motion-quick) var(--ease-settle); }
+  /* The one icon above 18px: a 56px disc needs a 24px glyph to read as the main action (DESIGN.md, Icons). */
+  .phone-capture-mark > svg { width: 24px; height: 24px; }
+  .phone-capture:hover .phone-capture-mark { background: var(--accent-hover); }
+  .phone-capture:active .phone-capture-mark { scale: 0.94; }
+  /* Pressed, the plus turns a quarter like a seed being twisted into the soil. */
+  .phone-capture-mark > svg { transition: rotate var(--motion-settle) var(--ease-settle); }
+  .phone-capture:active .phone-capture-mark > svg { rotate: 90deg; }
+  .toast, .storage-error { bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .workspace-center {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .workspace-topbar {
+    height: 46px;
+    padding-left: 6px;
+  }
+  .tab {
+    height: 32px;
+  }
+  .tab > button[role="tab"] {
+    font-size: var(--text-xs);
+    padding-left: 10px;
+    gap: 6px;
+  }
+  .tab-close {
+    opacity: 1;
+    min-width: 25px;
+  }
+  .topbar-actions {
+    padding: 0 6px;
+  }
+  /* Phones have no tab strip (agents-design D60): the page's own heading opens the open tabs (OpenTabs.tsx). The Chats
+     page's tabs are its own bar and stay. */
+  .workspace-page-panel > .workspace-topbar { display: none; }
+  .open-tab > .phone-hold { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+  .atlas-dock {
+    display: none;
+  }
+  .workspace-content {
+    scrollbar-gutter: auto;
+  }
+/* Chat placement. */
+  .agent-panel {
+    display: none;
+    grid-column: 1;
+    grid-row: 2;
+    border: 1px solid var(--line);
+    min-height: 0;
+  }
+  .workbench[data-mobile-agent="true"] .workspace-center {
+    display: none;
+  }
+  .workbench[data-mobile-agent="true"] .agent-panel {
+    display: flex;
+  }
+/* No status bar on phones: More has the theme, the phone bar the chat, and a failed save raises its own alert. */
+  .status-bar { display: none; }
+  .resize-handle {
+    display: none;
+  }
+}
+/* Header responsive rules. */
+@media (max-width: 1200px) {
+  .sidebar-collapse {
+    display: none;
+  }
+}
+.nav-item { position: relative; }
+.nav-item > .project-dot {
+  position: absolute;
+  left: 24px;
+  top: 25px;
+  box-shadow: 0 0 0 2px var(--panel);
+}
+/* Pointer movement changes only a small composited layer, never the full-screen mask. */
+.canvas-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 320px;
+  height: 320px;
+  z-index: var(--layer-behind);
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--bloom-3), transparent 70%);
+  transform: translate3d(-999px, -999px, 0);
+  will-change: transform;
+}
+.sidebar, .workspace-page-panel, .agent-panel { contain: layout paint; }
+.task-list:has(> :nth-child(21)), .resource-grid:has(> :nth-child(21)), .agent-transcript {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+.task-row:nth-child(n+21) { content-visibility: auto; contain-intrinsic-size: auto 48px; }
+.resource-grid > .resource-card:nth-child(n+21) { content-visibility: auto; contain-intrinsic-size: auto 220px; }
+.chat-message:nth-child(n+21) { content-visibility: auto; contain-intrinsic-size: auto 180px; }
+@media (prefers-reduced-motion: reduce) {
+  .canvas-glow { display: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+.workbench[data-agent-open="false"] .agent-panel { display: none; }
+
+/* Inside the scrolling sidebar an outward focus ring would be clipped; draw it inward. */
+.sidebar nav :focus-visible { outline-offset: -2px; }
+@keyframes domain-plant {
+  0% { translate: 0 -14px; rotate: -200deg; scale: 0.3; opacity: 0; }
+  60% { translate: 0 2px; rotate: 12deg; scale: 1.2; opacity: 1; }
+  80% { rotate: -6deg; scale: 0.95; }
+}
+@keyframes domain-name-in { from { opacity: 0; translate: -6px 0; filter: blur(2px); } }
+/* Icon rails keep the projects as folders: the colour dot moves with the centred icon. */
+@media (min-width: 1201px) {
+  .workbench[data-sidebar-collapsed="true"] .nav-projects > .nav-item > .project-dot { left: 28px; }
+}
+@media (min-width: 761px) and (max-width: 1200px) {
+  .nav-projects > .nav-item > .project-dot { left: 28px; }
+}
+.nav-add { color: var(--muted); }
+.nav-add > svg { transition: rotate var(--motion-settle) var(--ease-settle); }
+.nav-add:hover > svg { rotate: 90deg; }
+/* Compact density tightens the sidebar rhythm: shorter rows, smaller gaps, a smaller portrait. */
+[data-density="compact"] .sidebar { padding: 8px; }
+[data-density="compact"] .sidebar-masthead { padding: 2px 2px 8px; }
+[data-density="compact"] .sidebar-domain { gap: 8px; padding: 4px; }
+[data-density="compact"] .sidebar-domain-emblem { width: 28px; height: 28px; font-size: var(--text-md); }
+[data-density="compact"] .profile { gap: 8px; padding: 2px 4px; }
+[data-density="compact"] .profile img { width: 28px; height: 28px; }
+[data-density="compact"] .sidebar nav { padding-top: 8px; }
+[data-density="compact"] .nav-item { min-height: 34px; padding: 6px 10px; margin-bottom: 1px; gap: 8px; border-radius: var(--radius); }
+[data-density="compact"] .nav-item > .project-dot { left: 22px; top: 21px; }
+[data-density="compact"] .nav-projects > .nav-item { min-height: 30px; padding: 4px 10px; }
+[data-density="compact"] .nav-projects > .nav-item > .project-dot { left: 22px; top: calc(50% + 4px); }
+[data-density="compact"] .sidebar-late { left: 23px; }
+[data-density="compact"] .sidebar-bottom { padding-top: 6px; }
+[data-density="compact"] .sidebar-me { margin-top: 4px; padding-top: 8px; }
+.atlas-button .atlas-count { position: absolute; top: -3px; right: -3px; transform-origin: bottom left; }
+
+/* Status bar slides down and fades as its grid row closes. */
+.status-bar { transition: opacity var(--motion-quick) ease-out, translate var(--motion-settle) var(--ease-settle); }
+.workbench[data-status="false"] .status-bar { opacity: 0; translate: 0 14px; pointer-events: none; }
+.workbench[data-status="false"] .resize-handle { bottom: var(--shell-inset); }
+/* Phone header: your picture, a seed for each domain (the one you're in names itself), and Search. */
+@media (max-width: 760px) {
+  .mobile-header { gap: 6px; padding: 0 4px 0 4px; }
+  .phone-profile { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; }
+  .phone-profile img { width: 30px; height: 30px; object-fit: cover; object-position: center 30%; border-radius: 50%; box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--sage); transition: scale var(--motion-quick) var(--ease-settle); }
+  .phone-profile:active img { scale: 0.92; }
+  .phone-seeds { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 2px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .phone-seed { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 36px; min-width: 36px; padding: 0 8px; border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--panel); font-size: var(--text-lg); line-height: 1; transition: background var(--motion-quick) ease-out, border-color var(--motion-quick) ease-out; }
+  .phone-seed:hover { background: var(--recessed); }
+  .phone-seed[data-here="true"] { border-color: var(--hue, var(--accent)); box-shadow: inset 0 0 0 1px var(--hue, var(--accent)); }
+  .phone-seed[aria-current="page"] { background: var(--recessed); }
+  .phone-seed-name { font-size: var(--text-xs); font-weight: 600; color: var(--ink); white-space: nowrap; }
+  /* A picked seed hops and its name slides out, only after the row is first touched. */
+  .phone-seeds[data-touched] .phone-seed[data-here="true"] > .phone-seed-emoji { animation: tab-hop var(--motion-flourish) var(--ease-spring); }
+  .phone-seeds[data-touched] .phone-seed-name { animation: seed-name var(--motion-settle) var(--ease-settle); }
+  .phone-search { width: 40px; height: 40px; }
+}
+@keyframes seed-name { from { opacity: 0; max-width: 0; } to { opacity: 1; max-width: 160px; } }
+/* More: a sheet over the phone bar. Workspace and Crew each head a row of tiles like the bar's buttons; Settings and
+   the theme dial share its foot under a hairline. */
+.phone-pages { position: fixed; inset: auto var(--shell-inset) calc(var(--shell-inset) + 74px + env(safe-area-inset-bottom)); margin: 0; width: auto; padding: 12px 8px 8px; flex-direction: column; gap: 12px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+.phone-pages:popover-open { display: flex; animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.phone-pages h2 { padding: 0 8px 6px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.phone-pages section > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.phone-pages button:not(.theme-toggle) { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 64px; border-radius: var(--radius-control); color: var(--secondary); font-size: var(--text-xs); }
+.phone-pages-foot { display: flex; align-items: center; gap: 12px; padding: 8px 8px 0 0; border-top: 1px solid var(--line); }
+.phone-pages-foot > button:first-child { flex: 1; flex-direction: row; justify-content: flex-start; gap: 12px; min-height: 44px; padding: 0 12px; font-size: var(--text-sm); }
+.phone-pages-foot > .theme-toggle { width: 40px; height: 40px; }
+.phone-pages-foot .theme-dial { left: -30px; top: -22px; }
+.phone-pages button:not(.theme-toggle):hover { background: var(--recessed); color: var(--ink); }
+.phone-pages button[aria-current="page"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+/* Opening the sheet deals its tiles up like seed packets, each icon popping just behind its tile. */
+.phone-pages:popover-open button:not(.theme-toggle) { animation: pages-deal var(--motion-enter) var(--ease-spring) backwards; animation-delay: calc(var(--i) * 30ms); }
+.phone-pages:popover-open button:not(.theme-toggle) > svg { animation: roster-pop var(--motion-flourish) var(--ease-spring) backwards; animation-delay: calc(var(--i) * 30ms + 80ms); }
+@keyframes pages-deal { from { opacity: 0; translate: 0 8px; rotate: -3deg; scale: 0.92; } }
+/* Sidebar tabs: Workspace and Agents, a paper thumb sliding over a recessed track. */
+.sidebar-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.sidebar-modes {
+  position: relative;
+  container: sidebar-modes / inline-size;
+  display: grid;
+  /* Equal columns that may shrink below their content, so the thumb (half the track) always matches the selected tab. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 14px 2px 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--recessed);
+}
+.sidebar-modes::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-raised), 0 0 0 1px var(--line);
+  transition: translate var(--motion-settle) var(--ease-settle);
+}
+[data-sidebar="ink"] .sidebar-modes::before { background: #ffffff1f; }
+.sidebar-modes:has(> :last-child[aria-selected="true"])::before { translate: 100% 0; }
+.sidebar-modes > button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color var(--motion-quick);
+}
+.sidebar-modes > button:hover, .sidebar-modes > button[aria-selected="true"] { color: var(--ink); }
+.sidebar-modes > button > span:first-of-type { overflow: hidden; text-overflow: ellipsis; }
+/* A narrow sidebar drops the icons before the labels would truncate; the stacked rail (under 120px) keeps icons only. */
+@container sidebar-modes (120px < width < 236px) { .sidebar-modes > button > svg { display: none; } }
+.sidebar-modes > button:focus-visible { outline-offset: -2px; }
+.sidebar-mode-unread {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--attention);
+  color: var(--on-attention);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  line-height: 18px;
+}
+/* The roster reads like a chat app's contact list: face, name and time, then the latest line. */
+.sidebar-roster, .roster-group { display: flex; flex-direction: column; gap: 2px; }
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 8px;
+  border-radius: var(--radius-card);
+  text-align: left;
+  color: var(--secondary);
+  transition: background var(--motion-quick);
+}
+/* Atlas is pinned above the crew, under the same wave as the other sidebar sections. */
+.roster-row:first-child { margin-bottom: 10px; }
+.roster-row:first-child::after { bottom: -7px; }
+.roster-row:hover { background: var(--recessed); }
+.roster-row[aria-current] { background: color-mix(in oklab, var(--hue, var(--accent)) 16%, var(--panel)); }
+.roster-avatar { position: relative; display: grid; flex-shrink: 0; }
+.roster-avatar img { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--hue, transparent); transition: rotate var(--motion-settle) var(--ease-settle), scale var(--motion-settle) var(--ease-settle), translate var(--motion-settle) var(--ease-settle); }
+/* Faces perk up to say hello: a tilt and a hop. */
+.roster-row:hover .roster-avatar img { scale: 1.1; rotate: -8deg; translate: 0 -2px; }
+.roster-row:active .roster-avatar img { scale: 0.92; }
+/* Rows are dealt in like cards, each face popping in just behind its row. */
+.roster-row { animation: roster-deal var(--motion-enter) var(--ease-spring) backwards; animation-delay: calc(min(var(--i), 12) * 35ms); }
+.roster-avatar .avatar-stack { animation: roster-pop var(--motion-flourish) var(--ease-spring) backwards; animation-delay: calc(min(var(--i), 12) * 35ms + 90ms); }
+@keyframes roster-deal { from { opacity: 0; translate: -14px 4px; rotate: -2deg; } }
+@keyframes roster-pop { 0% { scale: 0.4; rotate: -25deg; } 60% { scale: 1.12; rotate: 6deg; } }
+/* Whoever waits on you gives a little "psst" wiggle once they've landed. */
+.roster-row[data-needs] .roster-avatar { animation: roster-psst var(--motion-fill) calc(min(var(--i), 12) * 35ms + var(--motion-flourish)) ease-in-out; }
+@keyframes roster-psst { 20%, 60% { rotate: -9deg; } 40%, 80% { rotate: 9deg; } }
+/* Atlas keeps a sparkle that twinkles as he arrives and whenever you hover him. */
+.roster-sparkle { position: absolute; top: -6px; left: -6px; color: var(--attention); animation: roster-twinkle var(--motion-linger) var(--motion-settle) var(--ease-spring) backwards; }
+.roster-row:hover .roster-sparkle { animation: roster-twinkle var(--motion-linger) var(--ease-spring); }
+@keyframes roster-twinkle { 0% { scale: 0; rotate: -90deg; opacity: 0; } 50% { scale: 1.4; rotate: 15deg; opacity: 1; } 75% { scale: 0.9; } }
+/* The tab icon hops when its tab is picked; Agents' bubble chatters. */
+.sidebar-modes > button[aria-selected="true"] > svg { animation: tab-hop var(--motion-flourish) var(--ease-spring); }
+#sidebar-tab-agents[aria-selected="true"] > svg { animation: tab-chatter var(--motion-fill) var(--ease-spring); }
+@keyframes tab-hop { 0% { scale: 0.6; rotate: -20deg; } 55% { scale: 1.2; rotate: 8deg; translate: 0 -2px; } }
+@keyframes tab-chatter { 0% { scale: 0.6; } 30% { scale: 1.2; rotate: -14deg; translate: 0 -2px; } 50% { rotate: 12deg; } 70% { rotate: -6deg; scale: 1; } }
+.roster-emoji {
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--line);
+  font-size: 11px;
+}
+.roster-avatar .strip-unread { top: -5px; right: -7px; }
+.roster-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.roster-line { display: flex; align-items: baseline; gap: 6px; }
+.roster-line strong {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+.roster-line time { flex-shrink: 0; color: var(--muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.roster-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--text-sm); }
+/* Unread rows speak up: a darker preview line and an accent timestamp. */
+.roster-row:has(.strip-unread) small { color: var(--secondary); font-weight: 500; }
+.roster-row:has(.strip-unread) time { color: var(--accent-ink); font-weight: 600; }
+.roster-add { margin-top: 6px; }
+.roster-add + .roster-add { margin-top: 0; }
+/* Section lines: the selected domain's name over its crew (Sort and display at its end, shown on hover or focus),
+ * then "Everyone else", which folds. Quiet labels, not a second set of tabs. */
+.roster-section { display: flex; align-items: center; gap: 4px; width: 100%; min-height: 30px; padding: 4px 2px 2px 8px; }
+.roster-section-name { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; color: var(--secondary); font-size: var(--text-xs); font-weight: 600; }
+.roster-section-name > span:not(.roster-count) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster-fold { margin-top: 6px; border-radius: var(--radius); text-align: left; }
+.roster-fold:hover .roster-section-name { color: var(--ink); }
+.roster-fold svg { transition: rotate var(--motion-quick) var(--ease-settle); }
+.roster-fold[aria-expanded="false"] svg { rotate: -90deg; }
+.roster-count { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.roster-options-button { width: 26px; height: 26px; flex-shrink: 0; anchor-name: --roster-options; }
+@media (hover: hover) {
+  .roster-options-button { opacity: 0; transition: opacity var(--motion-quick); }
+  .sidebar:is(:hover, :focus-within) .roster-options-button { opacity: 1; }
+}
+/* Agents you've never talked to, folded: their faces and how many. */
+.roster-more { min-height: 36px; font-size: var(--text-sm); }
+.roster-more .avatar-stack { flex-shrink: 0; }
+.roster-options {
+  position: fixed;
+  position-anchor: --roster-options;
+  inset: auto;
+  top: anchor(bottom);
+  left: anchor(left);
+  margin: 6px 0 0;
+  width: 284px;
+  overflow: auto;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.roster-options:popover-open { animation: dialog-in var(--motion-settle) var(--ease-settle); }
+/* Fieldsets default to min-content width, which let long examples push the panel sideways. */
+.roster-options fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.roster-options legend { display: flex; align-items: center; gap: 8px; width: 100%; padding: 14px 0 6px; color: var(--muted); font-size: var(--text-xs); font-weight: 600; }
+.roster-options legend > small { margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
+/* Visually hidden native inputs keep keyboard and screen-reader behaviour; the cards around them are the targets. */
+.roster-choice > input, .roster-size > input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.roster-options-head { display: flex; align-items: center; gap: 8px; min-height: 26px; }
+.roster-options-head > strong { font: 600 var(--text-lg)/1.2 var(--font-title); }
+.roster-reset { margin-left: auto; padding: 4px 8px; border-radius: var(--radius-pill); background: var(--recessed); color: var(--accent-ink); font-size: var(--text-xs); font-weight: 600; animation: badge-drop var(--motion-pop) var(--ease-spring); }
+.roster-reset:hover { background: color-mix(in oklab, var(--accent) 16%, var(--panel)); }
+/* The live preview sits on a little recessed tray, so it reads as a sample rather than a button. */
+.roster-preview { margin-top: 10px; padding: 4px; border-radius: var(--radius-card); background: var(--recessed); box-shadow: inset 0 0 0 1px var(--line); }
+.roster-preview .roster-row { margin: 0; background: var(--panel); box-shadow: var(--shadow-raised); animation: none; }
+.roster-preview .roster-row::after { display: none; }
+/* Order and row size are option cards: the chosen one is lifted on paper with an accent ring. */
+.roster-choices { display: grid; gap: 4px; }
+.roster-choice, .roster-size {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: border-color var(--motion-quick), background var(--motion-quick), translate var(--motion-settle) var(--ease-settle);
+}
+.roster-choice:hover, .roster-size:hover { background: var(--recessed); }
+.roster-choice:has(:checked), .roster-size:has(:checked) { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 8%, var(--panel)); box-shadow: 0 0 0 1px var(--accent); }
+.roster-choice:has(:focus-visible), .roster-size:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.roster-choice > span:nth-of-type(1) { flex: 1; min-width: 0; }
+.roster-choice strong, .roster-size strong { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); font-weight: 600; }
+/* The recommended option wears its tag on the card's top edge, like a ribbon, so the title keeps one line. */
+.roster-choice em { position: absolute; top: -8px; right: 10px; padding: 0 8px; border-radius: var(--radius-pill); background: color-mix(in oklab, var(--sage) 45%, var(--panel)); box-shadow: 0 0 0 2px var(--panel); color: var(--ink); font-size: var(--text-2xs); font-style: normal; font-weight: 600; line-height: 16px; }
+.roster-choices { padding-top: 4px; }
+.roster-choice small, .roster-size small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+.roster-choice:has(:checked) small, .roster-size:has(:checked) small { color: var(--secondary); }
+.roster-choice .avatar-stack { transition: translate var(--motion-settle) var(--ease-settle); }
+.roster-choice:hover .avatar-stack { translate: -3px 0; }
+.roster-sizes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.roster-sizes > legend { grid-column: 1 / -1; }
+.roster-size { flex-direction: column; align-items: flex-start; gap: 4px; }
+/* A sketch of the rows: lines of avatar dot and text bar, tall or short. */
+.roster-size-sketch { display: grid; gap: 4px; width: 100%; padding: 6px; border-radius: var(--radius-md); background: var(--recessed); }
+.roster-size-sketch i { display: block; height: 14px; border-radius: var(--radius-small); background:
+  radial-gradient(circle at 6px 50%, var(--line-strong) 5px, transparent 5.5px),
+  linear-gradient(var(--line-strong), var(--line-strong)) 16px 3px / 58% 3px no-repeat,
+  linear-gradient(var(--line), var(--line)) 16px 9px / 74% 3px no-repeat; }
+.roster-size-sketch[data-rows="compact"] { gap: 4px; }
+.roster-size-sketch[data-rows="compact"] i { height: 8px; background:
+  radial-gradient(circle at 4px 50%, var(--line-strong) 3.5px, transparent 4px),
+  linear-gradient(var(--line-strong), var(--line-strong)) 12px 50% / 52% 3px no-repeat; }
+.roster-size:has(:checked) .roster-size-sketch i { --line-strong: color-mix(in oklab, var(--accent) 55%, var(--panel)); }
+/* How much each row says, as a small meter beside the count. */
+.roster-meter { display: inline-flex; gap: 4px; }
+.roster-meter i { width: 12px; height: 4px; border-radius: var(--radius-hair); background: var(--line-strong); transition: background var(--motion-quick); }
+.roster-meter i[data-on] { background: var(--accent); }
+.roster-switch { margin-top: 0; padding: 8px 0; align-items: center; }
+.roster-switch + .roster-switch { border-top: 1px solid var(--line); }
+.roster-switch > span:last-child { flex: 1; min-width: 0; }
+.roster-switch small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster-switch:has(:disabled) { cursor: default; opacity: 0.55; }
+/* Presence: a dot on the face (amber waits on you, red is stuck, accent is working) and a coloured status line. */
+.roster-presence {
+  position: absolute;
+  left: -2px;
+  bottom: -2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--presence);
+  box-shadow: 0 0 0 2px var(--panel);
+}
+:is(.sidebar-roster, .roster-preview) [data-kind="working"] { --presence: var(--accent); }
+:is(.sidebar-roster, .roster-preview) :is([data-kind="approval"], [data-kind="question"]) { --presence: var(--attention); }
+:is(.sidebar-roster, .roster-preview) [data-kind="stuck"] { --presence: var(--stuck); }
+.roster-presence[data-kind="working"] { animation: presence-pulse 1.4s ease-in-out infinite; }
+@keyframes presence-pulse { 50% { box-shadow: 0 0 0 2px var(--panel), 0 0 0 5px color-mix(in srgb, var(--presence) 35%, transparent); } }
+.roster-status { display: flex; align-items: center; gap: 6px; min-width: 0; color: color-mix(in oklab, var(--presence) 65%, var(--ink)); }
+.roster-text small.roster-status { font-weight: 500; }
+.roster-status > svg { flex-shrink: 0; }
+.roster-status > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster-typing { display: inline-flex; gap: 4px; padding: 0 2px; }
+.roster-typing i { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: typing-dot 1s ease-in-out infinite; }
+.roster-typing i:nth-child(2) { animation-delay: 150ms; }
+.roster-typing i:nth-child(3) { animation-delay: 300ms; }
+.roster-empty { margin: -2px 8px 6px; color: var(--muted); font-size: var(--text-xs); animation: roster-deal var(--motion-enter) var(--motion-quick) var(--ease-spring) backwards; }
+.roster-wave { display: inline-block; transform-origin: 70% 80%; animation: roster-wave 1.4s var(--motion-flourish) ease-in-out 2; }
+@keyframes roster-wave { 15%, 45% { rotate: 16deg; } 30%, 60% { rotate: -8deg; } 75% { rotate: 0deg; } }
+.roster-empty > button { color: var(--accent-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+/* Compact rows: one line of face, name, status mark and time. */
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] { gap: 0; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-row { padding-block: 4px; gap: 8px; }
+.sidebar-roster[data-rows="compact"] .roster-row:first-child { margin-bottom: 8px; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-line { align-items: center; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-line strong { flex: 0 1 auto; font-size: var(--text-sm); }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-status { flex: 1; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-line time { margin-left: auto; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-emoji { /* token-exempt: an emoji glyph on a 15px tile, not text */ width: 15px; height: 15px; font-size: 9px; right: -4px; bottom: -3px; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .roster-presence { width: 9px; height: 9px; }
+:is(.sidebar-roster, .roster-preview)[data-rows="compact"] .strip-unread { top: -4px; right: -6px; min-width: 15px; height: 15px; line-height: 15px; }
+[data-density="compact"] .sidebar-modes { margin-top: 8px; }
+[data-density="compact"] .sidebar-modes > button { min-height: 28px; }
+[data-density="compact"] .roster-row { padding: 4px 6px; gap: 8px; border-radius: var(--radius); }
+/* Rails stack the two tabs as icons and show the roster as faces only. */
+@media (min-width: 1201px) {
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes { grid-template-columns: 1fr; margin-inline: 0; }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes::before { width: calc(100% - 6px); height: calc(50% - 3px); }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes:has(> :last-child[aria-selected="true"])::before { translate: 0 100%; }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes > button { min-height: 36px; padding: 0; }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes > button > span,
+  .workbench[data-sidebar-collapsed="true"] .roster-text,
+  .workbench[data-sidebar-collapsed="true"] .roster-section-name > :not(:first-child),
+  .workbench[data-sidebar-collapsed="true"] .roster-options-button,
+  .workbench[data-sidebar-collapsed="true"] .roster-empty,
+  .workbench[data-sidebar-collapsed="true"] :is(.roster-add, .roster-more) > span { display: none; }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-modes .sidebar-mode-unread { display: block; position: absolute; top: 2px; right: 2px; width: 8px; min-width: 0; height: 8px; padding: 0; font-size: 0; }
+  .workbench[data-sidebar-collapsed="true"] .roster-row,
+  .workbench[data-sidebar-collapsed="true"] :is(.roster-add, .roster-more, .roster-section, .roster-section-name) { justify-content: center; padding-inline: 0; }
+  .workbench[data-sidebar-collapsed="true"] .sidebar-roster .roster-row { padding-block: 6px; }
+}
+@media (min-width: 761px) and (max-width: 1200px) {
+  .sidebar-modes { grid-template-columns: 1fr; margin-inline: 0; }
+  .sidebar-modes::before { width: calc(100% - 6px); height: calc(50% - 3px); }
+  .sidebar-modes:has(> :last-child[aria-selected="true"])::before { translate: 0 100%; }
+  .sidebar-modes > button { min-height: 36px; padding: 0; }
+  .sidebar-modes > button > span, .roster-text, .roster-section-name > :not(:first-child), .roster-options-button, .roster-empty,
+  :is(.roster-add, .roster-more) > span { display: none; }
+  .sidebar-modes .sidebar-mode-unread { display: block; position: absolute; top: 2px; right: 2px; width: 8px; min-width: 0; height: 8px; padding: 0; font-size: 0; }
+  .roster-row, .roster-add, .roster-more, .roster-section, .roster-section-name { justify-content: center; padding-inline: 0; }
+  .sidebar-roster .roster-row { padding-block: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workbench, .status-bar, .sidebar-masthead::after, .sidebar-me::before, .roster-row:first-child::after, .sidebar-modes::before, .roster-avatar img,
+  .sidebar-domain, .sidebar-domain-emblem, .sidebar-collapse, .sidebar-late,
+  .roster-fold svg, .roster-options-button, .atlas-button, .atlas-button-label, .atlas-button-label > span { transition: none; }
+  .sidebar-domain-emblem, .sidebar-domain-text, .sidebar-late, .roster-presence, .roster-typing i, .roster-options,
+  .roster-row, .roster-row .roster-avatar, .roster-avatar .avatar-stack, .roster-sparkle, .roster-row:hover .roster-sparkle, .roster-empty, .roster-wave,
+  .sidebar-modes > button > svg, #sidebar-tab-agents[aria-selected="true"] > svg, .atlas-peek { animation: none; }
+  /* Phones: responsive.css already stops every transition and animation; a pressed plus and an open sheet's grid don't turn either. */
+  .phone-capture:active .phone-capture-mark > svg, .phone-more:has(+ .phone-pages:popover-open) > svg { rotate: none; }
+}
+
+/* The phone's open tabs: a stack with a count on the page's heading, and its sheet under the header; a row opens its
+   tab, holding it pins it, × closes it. */
+.open-tabs-button { position: relative; }
+@media (min-width: 761px) { .open-tabs-button { display: none; } }
+.open-tabs-count { position: absolute; top: 0; right: -2px; display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-pill); background: var(--recessed); color: var(--ink); font-size: var(--text-2xs); font-weight: 700; }
+.open-tabs { position: fixed; inset: calc(var(--shell-inset) + 56px) var(--shell-inset) auto; margin: 0; width: auto; padding: 12px 8px 8px; flex-direction: column; gap: 2px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+.open-tabs:popover-open { display: flex; animation: dialog-in var(--motion-quick) var(--ease-settle); }
+.open-tabs h2 { padding: 0 8px 6px; font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.open-tab { display: flex; align-items: center; gap: 4px; border-radius: var(--radius-control); }
+.open-tab[aria-current="page"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.open-tab > button:first-child { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; text-align: left; font-size: var(--text-sm); }
+.open-tab > button:first-child > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.open-tabs p { margin: 6px 12px 0; font-size: var(--text-xs); color: var(--muted); }

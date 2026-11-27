@@ -1,0 +1,402 @@
+{
+ "atlas | @Vital what should I bring to my check-up? | Bring up the knee, the headaches and your vitamin D. | What did Vital say about the knee?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | Add a list of the other Health projects to the Strength foundation page.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | Add the kitchen chair and hallway bulb fixes from my small fixes note.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | domain form | I've started learning piano and want to practise most days": {
+  "pass": 2,
+  "runs": 2
+ },
+ "atlas | domain form | something for my little side business selling art prints online": {
+  "pass": 2,
+  "runs": 2
+ },
+ "atlas | domain form for Health | make it about sleep and energy too, and give me a weekly report": {
+  "pass": 2,
+  "runs": 2
+ },
+ "atlas | I feel overwhelmed this week.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "atlas | I need a new agent.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | I'd like an agent to help me look after my beehives: hive checks, honey harvests, what each season needs.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | I'd like an agent to keep track of my family's birthdays and gift ideas.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | I'd like an agent to practise Spanish with me for ten minutes a day.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | Is there a task about the dentist?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | one of the workers of 'ceramicapreferivel' asked for a mobile app for android. he said: '[06:31, 11/20/2026] Paulo: Preciso de uma APP que faça as seguintes funções , basicamente um logbook de eventos na fábrica com separadores das diferentes secções onde eu registo (preferencialmente por voz depois transcrito e resumido por ia) as avarias e as soluções . [06:32, 11/20/2026] Paulo: Por explempo ; Secção produção Data xxx.  Evento xxxx Avaria xxx Solução xxxx'": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | one of the workers of 'ceramicapreferivel' asked for a mobile app for android. he said: '[06:31, 11/20/2026] Paulo: Preciso de uma APP que faça as seguintes funções , basicamente um logbook de eventos na fábrica com separadores das diferentes secções onde eu registo (preferencialmente por voz depois transcrito e resumido por ia) as avarias e as soluções . [06:32, 11/20/2026] Paulo: Por explempo ; Secção produção Data xxx.  Evento xxxx Avaria xxx Solução xxxx' | Before I set it up: are you taking this on as a paid job, and when does Paulo need it? | Paid job, working by the end of January. I take on client work like this regularly, so it deserves a domain of its own.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | one of the workers of 'ceramicapreferivel' asked for a mobile app for android. he said: '[06:31, 11/20/2026] Paulo: Preciso de uma APP que faça as seguintes funções , basicamente um logbook de eventos na fábrica com separadores das diferentes secções onde eu registo (preferencialmente por voz depois transcrito e resumido por ia) as avarias e as soluções . [06:32, 11/20/2026] Paulo: Por explempo ; Secção produção Data xxx.  Evento xxxx Avaria xxx Solução xxxx' | Before I set it up: are you taking this on as a paid job, and when does Paulo need it? | Paid job. He wants it working by the end of January.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | project form | uh so I need to like sort out the garage before my parents come at christmas, throw stuff out, maybe sell the old bike": {
+  "pass": 2,
+  "runs": 2
+ },
+ "atlas | Remind me to book a haircut.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | Sort this capture for me: what to do as tasks where they belong, with the days I named, and notes for what's worth keeping.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | Tick off 'Water the plants'.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "atlas | What's due today?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "check-in for demo-checkup": {
+  "pass": 0,
+  "runs": 1
+ },
+ "check-in for demo-family-visit": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Chef | Plan this week's dinners.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Coach | My shin hurts after yesterday's run. What should this week look like?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "compass | I just sent the offer to three people. Mark it.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "compass | I want to grow in my career.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "compass | Is my blood work booked yet?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "compass | Turn the portfolio outline into tasks.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "compass | Where should I start on the portfolio?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Counsel | My lease says either party may end it with 60 days' written notice. Can I move out at the end of January?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Creator | I want to make a video about the Alfama doors walk.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "forge | Plan the contact form for the launch page.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Gardener | Add a task to water the new monstera by the desk.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "Guide | I want to start meditating for an hour every day.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "hearth | Help me plan the first week of Home office corner.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "hearth | Move the overdue steps in Tax return 2025 to today.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "hearth | The bathroom tap drips and the bedroom window sticks.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Helm | Should I raise the price of the interface audit offer?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Iris | Critique my portfolio outline.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | Gift ideas for Rui?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | I called Sofia about Sunday dinner.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | I'm planning the summer family visit. | Good: the visit plan note has the dates and who's hosting. What do you want to sort first? | Add booking the train to it.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | Make tasks from my visit plan.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | project form | Quero organizar a festa de anos da Sofia no dia 12 de dezembro, com jantar em casa": {
+  "pass": 2,
+  "runs": 2
+ },
+ "kin | Remind me to call my brother Rui this weekend.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "kin | Remind me to call Sofia about Sunday dinner. | There's already an open task for that: Call Sofia about Sunday dinner, due today. | Oh right. I just called her, so tick it off.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Add a monthly transfer to the emergency fund.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Add a task to check when the news subscription renews, under Subscription cleanup.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Add a task to compare two energy suppliers. | I suggest a task “Compare two energy suppliers” in Finance. Want a due date on it? | Yes, make it next Friday.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Add a task to renew my passport.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Compare my emergency fund and this year's savings side by side.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | files | Summarise what's in my Tax papers folder.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | files | Turn the to-do list in my tax notes file into tasks.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | files | What does the photo of the pharmacy receipt say?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | files | When is my home insurance renewal due?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | files | Where do my tax notes say the receipts are kept?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | I cancelled the video service yesterday.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Remind me to cancel the video service. | I added 1 task: Cancel the video service, due in two days. Undo if it isn't right. | Thanks!": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | Turn my savings rhythm note into tasks.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "ledger | What do you know about my health?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | What's due in Finance this week?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "ledger | When is my dentist cleaning?": {
+  "pass": 0,
+  "runs": 1
+ },
+ "ledger | Which subscription costs the most?": {
+  "pass": 0,
+  "runs": 1
+ },
+ "Mentor | Should I take the full-time job offer or keep freelancing?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "muse | Rate my photo walk idea out of ten: shooting only doors in Alfama.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Planner | What matters most this week?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "quill | Tighten this line: 'I just wanted to quickly reach out to see if you might maybe be interested in having a call at some point.'": {
+  "pass": 1,
+  "runs": 1
+ },
+ "report for Finance": {
+  "pass": 1,
+  "runs": 1
+ },
+ "review for Career": {
+  "pass": 1,
+  "runs": 1
+ },
+ "review for Health": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Scholar | Break the Learning How to Learn course into study sessions.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "Scholar | help me create a new project. the goal of this project is to help my daughter Ines with her school assignment for the Poruguese class": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Scholar | help me create a new project. the goal of this project is to help my daughter Ines with her school assignment for the Poruguese class | Happy to. What is the assignment, and when is it due? | A two-page essay on a poem by Sophia de Mello Breyner, due next Friday.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "scout | Should the learning system live in Notion or Obsidian?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "spark | pages | Set up the First paid experiment page with widgets that fit its goal.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "spark | We're behind on Studio relaunch: 1 of 4 steps done with 80% of the time gone. Help me plan a catch-up.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "spark | Write a one-line pitch for the interface audit offer.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "Traveler | We're visiting family in Porto from 12 to 19 December. Add the bookings we need.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "vital | Actually, I run four times a week now.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | asked by Ledger | When is the dentist cleaning due?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | From now on I only run in the mornings, never after work.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | How is my sleep going?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | I want to start one new healthy habit. Help me pick it.": {
+  "pass": 0,
+  "runs": 1
+ },
+ "vital | Move Refill vitamin D into the Annual check-up project.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | My knee has ached after every run this week. What's wrong with it?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | pages | On the Health page, put the tasks board first and drop the projects.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | pages | Set up the Annual check-up page with widgets that fit its goal.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | pages | Show the First 10K tasks with the next step large instead of grouped by when.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | pages | Turn my training plan into tasks.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | project form | get fitter": {
+  "pass": 2,
+  "runs": 2
+ },
+ "vital | project form | I want to run my first 10k at the Lisbon race on the 15th of March": {
+  "pass": 2,
+  "runs": 2
+ },
+ "vital | project form for demo-10k | push it back two weeks and add a weekly long run": {
+  "pass": 2,
+  "runs": 2
+ },
+ "vital | Strength foundation has been quiet for 16 days. Help me pick one step for this week.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | Suggest the first three steps for Lights out by eleven.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | The blood work is booked, tick it off.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | Turn my training plan into tasks.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | Turn my training plan into tasks. | I suggest three tasks in Strength foundation: book a gym slot, learn the warm-up, log the first session. Nothing changes until you approve. | Too many. Just the first one.": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | What should I bring up at my check-up?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | What's overdue in Health?": {
+  "pass": 1,
+  "runs": 1
+ },
+ "vital | What's overdue in Health? | Book blood work is overdue; it was due two days ago. | I did that yesterday.": {
+  "pass": 1,
+  "runs": 1
+ }
+}

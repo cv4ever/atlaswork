@@ -1,0 +1,226 @@
+/* What every page shares: the dialog body, icon buttons, the page frame and heading, buttons, section headings, the tasks card and the progress track. */
+.dialog-body {
+  padding: 0 24px 8px;
+}
+.dialog-body .setting-row > input:not([type="checkbox"]),
+.dialog-body .setting-row > textarea {
+  width: min(100%, 300px);
+}
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  border-radius: var(--radius-small);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.icon-button:hover {
+  background: var(--recessed);
+  color: var(--ink);
+}
+.icon-button[aria-pressed="true"],
+.icon-button.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.overview-page,
+.collection-page {
+  padding: 28px var(--page-padding) 20px;
+  max-width: 1120px;
+  margin: auto;
+}
+/* Today stays mounted behind other pages. Hidden with content-visibility instead of display: none, the browser keeps its
+   laid-out boxes, so coming back to Today (or leaving it) restyles and lays out only what changed, not thousands of
+   elements (README, "Speed check"). Its contents stay out of focus, find and the accessibility tree, as display: none
+   kept them. It keeps its top padding, so the boxes it keeps sit inset as on show (a tool reading boxes, such as the
+   design check's detector, otherwise finds its heading flush at the panel's top edge), and a negative margin takes
+   that padding back, so it takes no space. */
+.overview-page[hidden] { display: block; content-visibility: hidden; height: 0; padding-bottom: 0; margin-bottom: -28px; }
+/* A page's heading lives in its band (`.page-masthead`, PageBand.tsx), where its box is `display: contents`. */
+.page-heading h1 {
+  font: 600 var(--text-display) / 1.2 var(--font-title);
+  letter-spacing: -1.25px;
+  position: relative;
+  display: inline-block;
+  text-wrap: balance;
+}
+.page-heading p {
+  color: var(--muted);
+  font-size: var(--text-md);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.widgets-button {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.quiet-button,
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--secondary);
+  font-size: var(--text-xs);
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: var(--radius-small);
+  white-space: nowrap;
+}
+.quiet-button:hover,
+.text-button:hover {
+  background: var(--recessed);
+  color: var(--accent-ink);
+}
+.text-button {
+  color: var(--accent-ink);
+  padding: 2px 0;
+  font-size: var(--text-xs);
+}
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-height);
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  font-weight: 500;
+  transition: transform var(--motion-settle) var(--ease-settle);
+}
+.primary-button:active,
+.secondary-button:active {
+  transform: translateY(1px) scale(0.97);
+}
+.primary-button {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.primary-button:hover {
+  background: var(--accent-hover);
+}
+.secondary-button {
+  border-color: var(--line-strong);
+  background: var(--panel);
+  color: var(--ink);
+}
+.secondary-button:hover {
+  border-color: var(--accent);
+}
+.widget {
+  margin-bottom: var(--section-gap);
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.section-heading h2 {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-heading h2 svg {
+  color: var(--muted);
+}
+.section-heading > span {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.tasks-widget {
+  background: var(--panel);
+  padding: var(--card-padding);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+.tasks-widget .section-heading {
+  margin-bottom: 14px;
+}
+.progress-track {
+  height: 3px;
+  background: var(--recessed);
+  border-radius: var(--radius-hair);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-track > span {
+  display: block;
+  width: 100%;
+  transform-origin: left;
+  height: 100%;
+  background: var(--sage);
+  border-radius: var(--radius-hair);
+  transition: transform var(--motion-settle) var(--ease-settle);
+}
+.task-row {
+  min-height: var(--row-height);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding: 8px 0;
+  min-width: 0;
+}
+.task-row:last-child {
+  border-bottom: 0;
+}
+/* Swiping a task on a touch screen: the row slides with the finger; ticked off on the left as it goes right, Star and
+   Tomorrow waiting on the right as it goes left. The list clips what's outside it, and mouse screens never show either. */
+.task-swipe-done, .task-swipe-actions { display: none; }
+@media (hover: none) {
+  .task-list { overflow-x: clip; }
+  .task-row { position: relative; translate: var(--swipe, 0) 0; transition: translate var(--motion-settle) var(--ease-settle); touch-action: pan-y; }
+  .task-row[data-swiping] { transition: none; }
+  .task-swipe-done { position: absolute; top: 0; right: 100%; bottom: 0; display: grid; place-items: center end; width: 120px; padding-right: 20px; background: var(--accent-soft); color: var(--accent-ink); }
+  .task-swipe-actions { position: absolute; top: 0; left: 100%; bottom: 0; display: flex; }
+  .task-swipe-actions > button { display: grid; place-content: center; justify-items: center; gap: 2px; width: 72px; background: var(--recessed); color: var(--secondary); font-size: var(--text-xs); }
+  .task-swipe-actions > .task-swipe-star { width: 56px; background: color-mix(in oklab, var(--ochre) 18%, var(--panel)); color: color-mix(in oklab, var(--ochre) 60%, var(--ink)); }
+  .task-swipe-star[data-on] svg { fill: currentColor; }
+}
+.task-check {
+  color: var(--line-strong);
+  display: flex;
+  flex-shrink: 0;
+  align-self: center;
+  position: relative;
+}
+/* The mark is 18 to 20px; its target reaches 4px past it on every side, so a tap has 24px or more (WCAG 2.5.8). */
+.task-check::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.task-check:hover {
+  color: var(--accent);
+}
+.task-check[aria-pressed="true"] {
+  color: var(--accent);
+}
+.today-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-sm);
+}
+.today-link:last-child { border-bottom: 0; }
+.today-link:hover { color: var(--accent-ink); }
+.today-link > span { flex: 1; min-width: 0; }
+.today-link small { display: block; color: var(--muted); font-size: var(--text-xs); }
+.today-link strong { display: block; font-weight: 500; overflow-wrap: anywhere; }
+/* The drawn plant (Plant.tsx) sits where a glyph would: sized by its place's font-size. */
+.plant { display: block; }

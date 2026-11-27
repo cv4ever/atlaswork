@@ -1,0 +1,842 @@
+/* The design system's tokens (DESIGN.md). Every stylesheet reads these; a value used with the same intent in three
+ * places belongs here, and scripts/check-tokens.mjs keeps raw radii, durations, weights and colours out of the rest. */
+.skin {
+  --font-body: "DM Sans", sans-serif;
+  --font-title: Fraunces, Georgia, serif;
+  /* One size ladder for both faces. Labels are 12px and captions 13px, so nothing a person reads in a sentence is
+   * 11px; that size (2xs) is for chips and badges only. xs to lg step down one pixel in compact density; 2xs and
+   * headings from xl up stay put. */
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 21px;
+  --text-3xl: 24px;
+  --text-4xl: 28px;
+  --text-5xl: 32px;
+  --text-display: clamp(28px, 2.6vw, 38px);
+  --canvas: #f7f5ef;
+  --sidebar: #f0eee6;
+  --panel: #fffdf8;
+  --recessed: #eeece3;
+  /* Three ink tiers, each a step down in contrast: about 12, 8 and 5.6 to 1 on the panel, in both themes. */
+  --ink: #34382f;
+  --secondary: #4f5348;
+  --muted: #62685c;
+  --line: #e2e2d7;
+  --line-strong: #c8ccbf;
+  /* The edge of a field: 3:1 or more against the panel and the canvas (WCAG 1.4.11), in both themes. */
+  --line-field: #898f82;
+  --skin-accent: #416b57;
+  --accent: var(--skin-accent);
+  --accent-ink: #355b48;
+  --accent-soft: #e7ece2;
+  --accent-hover: #345944;
+  --on-accent: #fffdf8;
+  --clay: #ad7761;
+  /* Clay for words: AA (4.5:1) on the panel and on clay-tinted chips; --clay stays for fills and marks. */
+  --clay-ink: #8f5640;
+  --ochre: #a08a4a;
+  --sage: #7e9473;
+  /* The data widgets' own colours, from the domain palette so they sit beside the agents: countdowns, trackers, habits. */
+  --kind-countdown: #d29a2b;
+  --kind-tracker: #2f8b9a;
+  --kind-habit: #6c9a68;
+  /* What a kind takes instead on a domain page whose hue is its own (Marigold, Lagoon, Sage), so the two never read as one. */
+  --kind-countdown-alt: #5482c9;
+  --kind-tracker-alt: #7c68c4;
+  --kind-habit-alt: #8d9a3e;
+  /* A tracker's missed day: clay, half strength on paper; stronger on the dark panel, where half reads as mud. */
+  --tracker-miss: color-mix(in oklab, var(--clay) 50%, var(--panel));
+  /* Today's sun: the one saturated gold, only in the hero's sky. */
+  --sun: #e2a12c;
+  --error: #a14232;
+  --error-soft: #f5e5de;
+  /* Model makers' marks in the message box (agents-design D82): each vendor's own colour, deepened to 3:1 on the panel. */
+  --vendor-claude: #c15f3c;
+  --vendor-openai: var(--ink);
+  --vendor-gemini: #4a6fd6;
+  --vendor-deepseek: #4d6bfe;
+  --vendor-mistral: #d9530e;
+  --vendor-meta: #0467df;
+  /* An agent's presence: waiting on you (amber, with its own text colour) or stuck (red). Same in both themes. */
+  --attention: #f2a531;
+  --on-attention: #2a2116;
+  --stuck: #d9534f;
+  --scrim: #1c251d80;
+  --shadow: 0 14px 50px #323c2920;
+  --panel-shadow: 0 1px 2px #323c290a;
+  /* Depth by job: something small that sits on its surface, a knob you drag, a well pressed in, a tile's drop, the
+   * floating chat bubble at rest and lifted, a card lifted under the pointer, a sheet sliding in from the side or from
+   * below. Shadows are never coloured: a place shows its colour in ink, not in a glow. */
+  --shadow-raised: 0 1px 3px #00000014;
+  --shadow-knob: 0 1px 3px #00000040;
+  --shadow-well: inset 0 1px 2px #0000001f;
+  --shadow-drop: 0 4px 10px -6px #00000040;
+  --shadow-hover: 0 12px 28px -16px #323c2952;
+  --shadow-float: 0 6px 18px -6px #0000003d, 0 2px 4px -2px #00000024;
+  --shadow-float-hover: 0 10px 24px -8px #00000047, 0 2px 4px -2px #00000024;
+  --shadow-sheet-side: -18px 0 40px -24px #0004;
+  --shadow-sheet-up: 0 -18px 40px -24px #0005;
+  --bloom-1: #7e947366;
+  --bloom-2: #ad776147;
+  --bloom-3: #d4ad3f4d;
+  /* The canvas wash's own colours (Garden's); each theme sets its three. */
+  --theme-wash-1: #94a58b;
+  --theme-wash-2: #a4ab9c;
+  --theme-wash-3: #c2bd9d;
+  /* Corners by what they round: a bar, a tag, a button, a tile, a field, a menu or tab, a card, a portrait, the shell. */
+  --radius-hair: 3px;
+  --radius-xs: 4px;
+  --radius-small: 6px;
+  --radius-md: 8px;
+  --radius: 10px;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-tile: 18px;
+  --radius-shell: 22px;
+  --radius-pill: 999px;
+  /* Stacking, bottom to top: a drawn backdrop, something lifted in its own card, a sticky bar inside a page, the
+   * sidebar and side panels, the shell's bars, the chat bubble and tooltips, toasts, and what must never be covered. */
+  --layer-behind: -1;
+  --layer-raised: 1;
+  --layer-sticky: 2;
+  --layer-panel: 5;
+  --layer-chrome: 10;
+  --layer-float: 20;
+  --layer-toast: 50;
+  --layer-top: 100;
+  --sidebar-width: 236px;
+  --agent-width: 360px;
+  --row-height: 45px;
+  --card-padding: 24px;
+  --page-padding: 40px;
+  --section-gap: 32px;
+  --control-height: 34px;
+  /* Durations by job: a hover, a layout change, a pick answering, something arriving, a celebration, a fill or
+   * line drawing, a long one-off flourish. Loops and per-item stagger delays stay with their animation. */
+  --motion-quick: 160ms;
+  --motion-settle: 280ms;
+  --motion-pop: 360ms;
+  --motion-enter: 440ms;
+  --motion-flourish: 520ms;
+  --motion-fill: 700ms;
+  --motion-linger: 900ms;
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1.18);
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: light;
+}
+.skin[data-theme="dark"] {
+  --canvas: #252720;
+  --sidebar: #22241e;
+  --panel: #2b2e25;
+  --recessed: #30342a;
+  --ink: #e8e8db;
+  --secondary: #bdc1b0;
+  --muted: #a3aa97;
+  --line: #3c4234;
+  --line-strong: #58614b;
+  --line-field: #777f6a;
+  --skin-accent: #b3c9a6;
+  --accent: var(--skin-accent);
+  --accent-ink: #c0d3b4;
+  --accent-soft: #374332;
+  --accent-hover: #c3d8b8;
+  --on-accent: #253021;
+  --clay: #d3a68e;
+  --clay-ink: var(--clay);
+  --ochre: #c2b273;
+  --sage: #a4b58d;
+  --kind-countdown: #e0b45a;
+  --kind-tracker: #6fb8c3;
+  --kind-habit: #9cc497;
+  --kind-countdown-alt: #8eaee0;
+  --kind-tracker-alt: #a99ae0;
+  --kind-habit-alt: #b5c070;
+  --tracker-miss: color-mix(in oklab, var(--clay) 80%, var(--panel));
+  --sun: #edc154;
+  --error: #efae9c;
+  --error-soft: #4c342c;
+  --vendor-claude: #e58a6b;
+  --vendor-gemini: #8ea7f0;
+  --vendor-deepseek: #8197ff;
+  --vendor-mistral: #f5813f;
+  --vendor-meta: #6aa6f5;
+  --shadow: 0 14px 50px #0005;
+  --panel-shadow: 0 1px 2px #0002;
+  --bloom-1: #7e947340;
+  --bloom-2: #d3a68e26;
+  --bloom-3: #c2b27326;
+  color-scheme: dark;
+}
+/* Themes (Settings → Appearance → Theme; `palette` in the Session, `data-palette` on the root): each recolours the
+ * surfaces, ink, accent and the clay, ochre and sage kind colours, sets the canvas wash, and may set a title face and
+ * a corner scale. Garden is the blocks above. Domain hues, widget kinds, attention, sun and errors stay the same in
+ * every theme, as they carry meaning. Light blocks are (0,2,0) and dark ones the same through :where(), so a domain's
+ * hue (WorkbenchShell.css, (0,3,0)) still replaces the accent inside a domain. */
+.skin[data-palette="linen"] {
+  --canvas: #f3f1ec;
+  --sidebar: #eceae4;
+  --panel: #fdfcf9;
+  --recessed: #ecebe6;
+  --ink: #1c1c1a;
+  --secondary: #3d3d39;
+  --muted: #5f5f59;
+  --line: #e3e1da;
+  --line-strong: #c6c3ba;
+  --line-field: #8a8780;
+  --skin-accent: #b8371f;
+  --accent-ink: #a3301b;
+  --accent-soft: #f7e4de;
+  --accent-hover: #9c2e1a;
+  --on-accent: #fffdf9;
+  --clay: #b06a4f;
+  --clay-ink: #8f4c33;
+  --ochre: #8f8152;
+  --sage: #7b8574;
+  --theme-wash-1: #c8c4b8;
+  --theme-wash-2: #d6cfc4;
+  --theme-wash-3: #c9c3b2;
+  --font-title: "Instrument Serif", Georgia, serif;
+  --radius-hair: 2px;
+  --radius-xs: 2px;
+  --radius-small: 3px;
+  --radius-md: 4px;
+  --radius: 6px;
+  --radius-control: 7px;
+  --radius-card: 9px;
+  --radius-tile: 10px;
+  --radius-shell: 12px;
+}
+.skin[data-palette="linen"]:where([data-theme="dark"]) {
+  --canvas: #1b1b1a;
+  --sidebar: #181817;
+  --panel: #232321;
+  --recessed: #2a2a28;
+  --ink: #ecebe6;
+  --secondary: #c4c3bc;
+  --muted: #a3a29b;
+  --line: #353532;
+  --line-strong: #4e4d49;
+  --line-field: #7a7974;
+  --skin-accent: #ef7a62;
+  --accent-ink: #f28c77;
+  --accent-soft: #43251f;
+  --accent-hover: #f3917c;
+  --on-accent: #1f0f0b;
+  --clay: #d99a82;
+  --clay-ink: #d99a82;
+  --ochre: #c4b47e;
+  --sage: #a8b19f;
+  --theme-wash-1: #5a5852;
+  --theme-wash-2: #6a5f58;
+  --theme-wash-3: #5d584c;
+}
+.skin[data-palette="tide"] {
+  --canvas: #edf2f2;
+  --sidebar: #e4ecec;
+  --panel: #fbfdfc;
+  --recessed: #e6eded;
+  --ink: #1f3036;
+  --secondary: #3d5058;
+  --muted: #566a71;
+  --line: #d9e3e3;
+  --line-strong: #bccbcc;
+  --line-field: #75898e;
+  --skin-accent: #1d6680;
+  --accent-ink: #185a71;
+  --accent-soft: #ddeef2;
+  --accent-hover: #175468;
+  --on-accent: #fbfdfc;
+  --clay: #cf735f;
+  --clay-ink: #a24c39;
+  --ochre: #b09a5c;
+  --sage: #6c9f98;
+  --theme-wash-1: #7fb1b0;
+  --theme-wash-2: #9dbfd0;
+  --theme-wash-3: #d5c9a4;
+}
+.skin[data-palette="tide"]:where([data-theme="dark"]) {
+  --canvas: #152126;
+  --sidebar: #121d22;
+  --panel: #1b2a30;
+  --recessed: #213238;
+  --ink: #e2eef0;
+  --secondary: #b8cacd;
+  --muted: #98adb1;
+  --line: #2b3d43;
+  --line-strong: #40575e;
+  --line-field: #6c858b;
+  --skin-accent: #7cc4d6;
+  --accent-ink: #93d0df;
+  --accent-soft: #20404a;
+  --accent-hover: #95d2e0;
+  --on-accent: #0d2229;
+  --clay: #eb9d8a;
+  --clay-ink: #eb9d8a;
+  --ochre: #d0bd85;
+  --sage: #8fc1b9;
+  --theme-wash-1: #2f6a6e;
+  --theme-wash-2: #3d5f7a;
+  --theme-wash-3: #6f6a50;
+}
+.skin[data-palette="terracotta"] {
+  --canvas: #f5eadf;
+  --sidebar: #efe0d0;
+  --panel: #fffaf4;
+  --recessed: #f0e3d5;
+  --ink: #3a2920;
+  --secondary: #5a4337;
+  --muted: #6f594c;
+  --line: #ead9c8;
+  --line-strong: #d5bfa9;
+  --line-field: #9a8371;
+  --skin-accent: #a94a22;
+  --accent-ink: #93401d;
+  --accent-soft: #f6e1d3;
+  --accent-hover: #923f1c;
+  --on-accent: #fffaf4;
+  --clay: #c0603c;
+  --clay-ink: #9a4527;
+  --ochre: #c4922f;
+  --sage: #858b4e;
+  --theme-wash-1: #d49a6a;
+  --theme-wash-2: #c7a57c;
+  --theme-wash-3: #a9a368;
+  --font-title: "Young Serif", Georgia, serif;
+}
+.skin[data-palette="terracotta"]:where([data-theme="dark"]) {
+  --canvas: #241a15;
+  --sidebar: #201712;
+  --panel: #2d211b;
+  --recessed: #352820;
+  --ink: #f3e5d9;
+  --secondary: #d4c0b0;
+  --muted: #b39d8c;
+  --line: #3e2f26;
+  --line-strong: #5a4537;
+  --line-field: #8a715f;
+  --skin-accent: #ee9a6f;
+  --accent-ink: #f2ab85;
+  --accent-soft: #4b2f20;
+  --accent-hover: #f3ad88;
+  --on-accent: #2a140a;
+  --clay: #eea184;
+  --clay-ink: #eea184;
+  --ochre: #dcb15e;
+  --sage: #b8bd85;
+  --theme-wash-1: #7a4a30;
+  --theme-wash-2: #6f5a3e;
+  --theme-wash-3: #5f6038;
+}
+.skin[data-palette="dusk"] {
+  --canvas: #f2eff6;
+  --sidebar: #ebe6f1;
+  --panel: #fdfcfe;
+  --recessed: #ece8f2;
+  --ink: #2d2737;
+  --secondary: #4a4256;
+  --muted: #635b70;
+  --line: #e3dde9;
+  --line-strong: #cbc3d6;
+  --line-field: #8d849b;
+  --skin-accent: #6a4c9c;
+  --accent-ink: #5d4289;
+  --accent-soft: #ebe4f5;
+  --accent-hover: #5a4186;
+  --on-accent: #fdfcfe;
+  --clay: #c26a80;
+  --clay-ink: #9c4a5f;
+  --ochre: #c9925e;
+  --sage: #8f86ad;
+  --theme-wash-1: #b49ad6;
+  --theme-wash-2: #e0a3b4;
+  --theme-wash-3: #e8c39d;
+  --font-title: Newsreader, Georgia, serif;
+  --radius-hair: 3px;
+  --radius-xs: 5px;
+  --radius-small: 7px;
+  --radius-md: 9px;
+  --radius: 12px;
+  --radius-control: 14px;
+  --radius-card: 18px;
+  --radius-tile: 21px;
+  --radius-shell: 25px;
+}
+.skin[data-palette="dusk"]:where([data-theme="dark"]) {
+  --canvas: #1d1a24;
+  --sidebar: #19161f;
+  --panel: #25212e;
+  --recessed: #2c2836;
+  --ink: #ece7f3;
+  --secondary: #c8c0d4;
+  --muted: #a9a0b7;
+  --line: #363042;
+  --line-strong: #4e465d;
+  --line-field: #7d7490;
+  --skin-accent: #bba4e8;
+  --accent-ink: #c7b4ee;
+  --accent-soft: #3a3050;
+  --accent-hover: #c9b6ef;
+  --on-accent: #1f1630;
+  --clay: #e7a0b2;
+  --clay-ink: #e7a0b2;
+  --ochre: #e2b78c;
+  --sage: #b3abd0;
+  --theme-wash-1: #5a4a8a;
+  --theme-wash-2: #7a4a64;
+  --theme-wash-3: #7a6248;
+}
+.skin[data-palette="frost"] {
+  --canvas: #eef0f3;
+  --sidebar: #e7eaee;
+  --panel: #fcfdfe;
+  --recessed: #f0f2f5;
+  --ink: #1b1f27;
+  --secondary: #3b4250;
+  --muted: #5b6371;
+  --line: #e1e4ea;
+  --line-strong: #c5cad3;
+  --line-field: #7d8490;
+  --skin-accent: #2d5bd0;
+  --accent-ink: #2650b8;
+  --accent-soft: #e3eafb;
+  --accent-hover: #244db5;
+  --on-accent: #fcfdfe;
+  --clay: #d06a4f;
+  --clay-ink: #a84a32;
+  --ochre: #b08f3c;
+  --sage: #6f8f86;
+  --theme-wash-1: #c9d2df;
+  --theme-wash-2: #d6dbe4;
+  --theme-wash-3: #cfd8e3;
+  --font-title: "Inter Tight", Georgia, serif;
+  --radius-hair: 2px;
+  --radius-xs: 2px;
+  --radius-small: 4px;
+  --radius-md: 5px;
+  --radius: 6px;
+  --radius-control: 7px;
+  --radius-card: 10px;
+  --radius-tile: 11px;
+  --radius-shell: 13px;
+}
+.skin[data-palette="frost"]:where([data-theme="dark"]) {
+  --canvas: #15171c;
+  --sidebar: #121418;
+  --panel: #1c1f26;
+  --recessed: #23262e;
+  --ink: #e8ebf1;
+  --secondary: #c0c6d1;
+  --muted: #9fa6b3;
+  --line: #2c3039;
+  --line-strong: #434956;
+  --line-field: #737b8a;
+  --skin-accent: #8eaaf5;
+  --accent-ink: #a2b9f7;
+  --accent-soft: #263255;
+  --accent-hover: #a5bcf8;
+  --on-accent: #0f1730;
+  --clay: #ec9d87;
+  --clay-ink: #ec9d87;
+  --ochre: #d6bb78;
+  --sage: #9fbcb3;
+  --theme-wash-1: #3a4252;
+  --theme-wash-2: #3f4757;
+  --theme-wash-3: #454b58;
+}
+.skin[data-palette="meadow"] {
+  --canvas: #fbf5df;
+  --sidebar: #f5edcf;
+  --panel: #fffdf3;
+  --recessed: #f4edd6;
+  --ink: #23301f;
+  --secondary: #3f4d38;
+  --muted: #59664f;
+  --line: #ece3c4;
+  --line-strong: #d8cca4;
+  --line-field: #8b8a6c;
+  --skin-accent: #2c7a3f;
+  --accent-ink: #256a36;
+  --accent-soft: #e2f0d9;
+  --accent-hover: #246735;
+  --on-accent: #fffdf3;
+  --clay: #e0603f;
+  --clay-ink: #b2432a;
+  --ochre: #e0a91f;
+  --sage: #5a9bc8;
+  --theme-wash-1: #8cc66d;
+  --theme-wash-2: #f2a07c;
+  --theme-wash-3: #f0cf55;
+  --font-title: "Bricolage Grotesque", Georgia, serif;
+  --radius-hair: 4px;
+  --radius-xs: 5px;
+  --radius-small: 8px;
+  --radius-md: 10px;
+  --radius: 13px;
+  --radius-control: 16px;
+  --radius-card: 21px;
+  --radius-tile: 23px;
+  --radius-shell: 29px;
+}
+.skin[data-palette="meadow"]:where([data-theme="dark"]) {
+  --canvas: #1c2116;
+  --sidebar: #191d13;
+  --panel: #242a1c;
+  --recessed: #2b3222;
+  --ink: #eef0dc;
+  --secondary: #cdd2b6;
+  --muted: #adb394;
+  --line: #353d29;
+  --line-strong: #4d573b;
+  --line-field: #7d8667;
+  --skin-accent: #8fd17a;
+  --accent-ink: #a2da8f;
+  --accent-soft: #2f4426;
+  --accent-hover: #a5dc93;
+  --on-accent: #14240c;
+  --clay: #f29a7c;
+  --clay-ink: #f29a7c;
+  --ochre: #f0c84e;
+  --sage: #8cc0e4;
+  --theme-wash-1: #4f7a3a;
+  --theme-wash-2: #8a5a3e;
+  --theme-wash-3: #8a7a2e;
+}
+.skin[data-palette="midnight"] {
+  --canvas: #eef1f7;
+  --sidebar: #e6eaf2;
+  --panel: #fbfcfe;
+  --recessed: #e9edf4;
+  --ink: #1b2233;
+  --secondary: #39425a;
+  --muted: #576079;
+  --line: #dde2ec;
+  --line-strong: #c1c8d7;
+  --line-field: #838ba0;
+  --skin-accent: #8f5b0c;
+  --accent-ink: #7d4f0a;
+  --accent-soft: #f6ead2;
+  --accent-hover: #7a4d09;
+  --on-accent: #fffdf7;
+  --clay: #c6705a;
+  --clay-ink: #a14d38;
+  --ochre: #a88a3e;
+  --sage: #6f8fb0;
+  --theme-wash-1: #9fb0d6;
+  --theme-wash-2: #b3a7d3;
+  --theme-wash-3: #a9c7cc;
+}
+.skin[data-palette="midnight"]:where([data-theme="dark"]) {
+  --canvas: #10141d;
+  --sidebar: #0d1119;
+  --panel: #181d29;
+  --recessed: #1f2534;
+  --ink: #e5e8f0;
+  --secondary: #bcc2d1;
+  --muted: #9aa1b3;
+  --line: #272e3e;
+  --line-strong: #3d4659;
+  --line-field: #6b7489;
+  --skin-accent: #f0b44c;
+  --accent-ink: #f4c36d;
+  --accent-soft: #3a3222;
+  --accent-hover: #f5c46a;
+  --on-accent: #1b1407;
+  --clay: #e6957c;
+  --clay-ink: #e6957c;
+  --ochre: #d6bb76;
+  --sage: #8fb2c9;
+  --theme-wash-1: #3b5a9a;
+  --theme-wash-2: #6b4f9e;
+  --theme-wash-3: #2f7f8a;
+}
+.skin[data-palette="espresso"] {
+  --canvas: #f4ece3;
+  --sidebar: #ede2d6;
+  --panel: #fffaf5;
+  --recessed: #efe5da;
+  --ink: #2f221b;
+  --secondary: #4f3e33;
+  --muted: #6b594c;
+  --line: #e6d9cb;
+  --line-strong: #cfbca9;
+  --line-field: #958271;
+  --skin-accent: #9b4c22;
+  --accent-ink: #873f1b;
+  --accent-soft: #f4e1d3;
+  --accent-hover: #863f1b;
+  --on-accent: #fffaf5;
+  --clay: #b86a4c;
+  --clay-ink: #93492f;
+  --ochre: #a8853e;
+  --sage: #7f8a62;
+  --theme-wash-1: #b58a6a;
+  --theme-wash-2: #a8917a;
+  --theme-wash-3: #bfa070;
+  --font-title: "Young Serif", Georgia, serif;
+}
+.skin[data-palette="espresso"]:where([data-theme="dark"]) {
+  --canvas: #1e1814;
+  --sidebar: #1a1511;
+  --panel: #28201b;
+  --recessed: #312821;
+  --ink: #f1e6d8;
+  --secondary: #d0c1af;
+  --muted: #ae9e8c;
+  --line: #3b3029;
+  --line-strong: #56473c;
+  --line-field: #85735f;
+  --skin-accent: #e2915f;
+  --accent-ink: #eaa57a;
+  --accent-soft: #4a3426;
+  --accent-hover: #eaa476;
+  --on-accent: #24160d;
+  --clay: #e39c80;
+  --clay-ink: #e39c80;
+  --ochre: #d2b06a;
+  --sage: #a7b48c;
+  --theme-wash-1: #7a5238;
+  --theme-wash-2: #5d4a3a;
+  --theme-wash-3: #8a6a3c;
+}
+/* The plain themes (Carlos, 2026-11-26, from a Linear/Notion palette): neutral greys, one main colour, violet words,
+ * and state colours for the kinds: sage green, ochre amber, clay red-orange. Their shadows and scrim drop Garden's
+ * green tint, which reads as dirt on grey. Graphite and Paper fill buttons in near-black and keep violet for words,
+ * links and selection; Violet makes violet the one accent. */
+.skin[data-palette="graphite"] {
+  --canvas: #f3f3f4;
+  --sidebar: #ececee;
+  --panel: #fdfdfd;
+  --recessed: #f3f3f5;
+  --ink: #18181b;
+  --secondary: #46464d;
+  --muted: #5f5f66;
+  --line: #e7e7ea;
+  --line-strong: #d1d1d6;
+  --line-field: #86868e;
+  --skin-accent: #18181b;
+  --accent-ink: #5b3fe0;
+  --accent-soft: #efebff;
+  --accent-hover: #3a3a41;
+  --on-accent: #fdfdfd;
+  --clay: #e2603f;
+  --clay-ink: #ad361a;
+  --ochre: #dfa020;
+  --sage: #1f9d55;
+  --theme-wash-1: #d4d4d8;
+  --theme-wash-2: #d3cfe8;
+  --theme-wash-3: #dcdce0;
+  --scrim: #18181b73;
+  --shadow: 0 14px 50px #18181b1c;
+  --panel-shadow: 0 1px 2px #18181b0d;
+  --shadow-hover: 0 12px 28px -16px #18181b47;
+  --font-title: "DM Sans", sans-serif;
+  --radius-hair: 2px;
+  --radius-xs: 3px;
+  --radius-small: 5px;
+  --radius-md: 6px;
+  --radius: 7px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+  --radius-tile: 11px;
+  --radius-shell: 14px;
+}
+.skin[data-palette="graphite"]:where([data-theme="dark"]) {
+  --canvas: #111113;
+  --sidebar: #0e0e10;
+  --panel: #19191c;
+  --recessed: #202024;
+  --ink: #ededf0;
+  --secondary: #c4c4cb;
+  --muted: #9e9ea7;
+  --line: #29292e;
+  --line-strong: #3f3f46;
+  --line-field: #74747d;
+  --skin-accent: #ededf0;
+  --accent-ink: #a99bff;
+  --accent-soft: #2a2547;
+  --accent-hover: #ffffff;
+  --on-accent: #18181b;
+  --clay: #f08a6e;
+  --clay-ink: #f08a6e;
+  --ochre: #f0be55;
+  --sage: #4cc382;
+  --theme-wash-1: #3a3a42;
+  --theme-wash-2: #3d3854;
+  --theme-wash-3: #34343a;
+  --scrim: #0009;
+  --shadow: 0 14px 50px #0008;
+  --panel-shadow: 0 1px 2px #0004;
+  --shadow-hover: 0 12px 28px -16px #000a;
+}
+.skin[data-palette="violet"] {
+  --canvas: #f4f4f6;
+  --sidebar: #ededf1;
+  --panel: #fdfdfe;
+  --recessed: #f2f2f6;
+  --ink: #1b1b22;
+  --secondary: #464652;
+  --muted: #666674;
+  --line: #e6e6ec;
+  --line-strong: #cfcfd9;
+  --line-field: #858594;
+  --skin-accent: #6a4cf0;
+  --accent-ink: #5a3ddb;
+  --accent-soft: #eeeafe;
+  --accent-hover: #5a3ddb;
+  --on-accent: #fdfdfe;
+  --clay: #e2603f;
+  --clay-ink: #ad361a;
+  --ochre: #dfa020;
+  --sage: #1f9d55;
+  --theme-wash-1: #c9c3ee;
+  --theme-wash-2: #d0d0dc;
+  --theme-wash-3: #d9d4f0;
+  --scrim: #18181b73;
+  --shadow: 0 14px 50px #18181b1c;
+  --panel-shadow: 0 1px 2px #18181b0d;
+  --shadow-hover: 0 12px 28px -16px #18181b47;
+  --font-title: "Inter Tight", sans-serif;
+  --radius-hair: 2px;
+  --radius-xs: 3px;
+  --radius-small: 5px;
+  --radius-md: 6px;
+  --radius: 7px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+  --radius-tile: 11px;
+  --radius-shell: 14px;
+}
+.skin[data-palette="violet"]:where([data-theme="dark"]) {
+  --canvas: #0f0f14;
+  --sidebar: #0c0c10;
+  --panel: #17171d;
+  --recessed: #1e1e26;
+  --ink: #ececf2;
+  --secondary: #c3c3cf;
+  --muted: #9d9dac;
+  --line: #272730;
+  --line-strong: #3d3d4a;
+  --line-field: #73738a;
+  --skin-accent: #9b8afb;
+  --accent-ink: #ac9dff;
+  --accent-soft: #2a2547;
+  --accent-hover: #b1a4ff;
+  --on-accent: #14102e;
+  --clay: #f08a6e;
+  --clay-ink: #f08a6e;
+  --ochre: #f0be55;
+  --sage: #4cc382;
+  --theme-wash-1: #3d3866;
+  --theme-wash-2: #30303c;
+  --theme-wash-3: #3a3552;
+  --scrim: #0009;
+  --shadow: 0 14px 50px #0008;
+  --panel-shadow: 0 1px 2px #0004;
+  --shadow-hover: 0 12px 28px -16px #000a;
+}
+.skin[data-palette="paper"] {
+  --canvas: #f5f4f1;
+  --sidebar: #eeece7;
+  --panel: #fefefd;
+  --recessed: #f3f2ee;
+  --ink: #2f2d29;
+  --secondary: #4d4a44;
+  --muted: #65625b;
+  --line: #e9e7e2;
+  --line-strong: #d6d3cc;
+  --line-field: #8a8780;
+  --skin-accent: #2f2d29;
+  --accent-ink: #5b3fe0;
+  --accent-soft: #efebff;
+  --accent-hover: #4a4741;
+  --on-accent: #fefefd;
+  --clay: #df5b3a;
+  --clay-ink: #ad361a;
+  --ochre: #d99a1f;
+  --sage: #2a9a5b;
+  --theme-wash-1: #dcd6c8;
+  --theme-wash-2: #d8d1e4;
+  --theme-wash-3: #e3dcc8;
+  --scrim: #2f2d2973;
+  --shadow: 0 14px 50px #2f2d291c;
+  --panel-shadow: 0 1px 2px #2f2d290d;
+  --shadow-hover: 0 12px 28px -16px #2f2d2947;
+  --radius-hair: 2px;
+  --radius-xs: 3px;
+  --radius-small: 5px;
+  --radius-md: 7px;
+  --radius: 8px;
+  --radius-control: 9px;
+  --radius-card: 12px;
+  --radius-tile: 13px;
+  --radius-shell: 16px;
+}
+.skin[data-palette="paper"]:where([data-theme="dark"]) {
+  --canvas: #1a1917;
+  --sidebar: #161513;
+  --panel: #21201d;
+  --recessed: #292824;
+  --ink: #edebe6;
+  --secondary: #c8c5be;
+  --muted: #a3a098;
+  --line: #302e2a;
+  --line-strong: #47443e;
+  --line-field: #7b786f;
+  --skin-accent: #edebe6;
+  --accent-ink: #a99bff;
+  --accent-soft: #2c2742;
+  --accent-hover: #ffffff;
+  --on-accent: #21201d;
+  --clay: #f08a6e;
+  --clay-ink: #f08a6e;
+  --ochre: #f0be55;
+  --sage: #4cc382;
+  --theme-wash-1: #3a3936;
+  --theme-wash-2: #3a3648;
+  --theme-wash-3: #3b3a34;
+  --scrim: #0009;
+  --shadow: 0 14px 50px #0008;
+  --panel-shadow: 0 1px 2px #0004;
+  --shadow-hover: 0 12px 28px -16px #000a;
+}
+.skin[data-density="compact"] {
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+  --row-height: 36px;
+  --card-padding: 18px;
+  --page-padding: 28px;
+  --section-gap: 24px;
+  --control-height: 30px;
+  font-size: var(--text-md);
+}
+/* The canvas wash: the theme's own three colours, shifted halfway toward the part of the day when Follow time of day
+ * is on (the day itself shows the theme's colours as they are). */
+.skin[data-daypart] {
+  --wash-1: color-mix(in oklab, var(--theme-wash-1) 50%, var(--daypart-1, var(--theme-wash-1)));
+  --wash-2: color-mix(in oklab, var(--theme-wash-2) 50%, var(--daypart-2, var(--theme-wash-2)));
+  --wash-3: color-mix(in oklab, var(--theme-wash-3) 50%, var(--daypart-3, var(--theme-wash-3)));
+  --bloom-1: color-mix(in srgb, var(--wash-1) 42%, transparent);
+  --bloom-2: color-mix(in srgb, var(--wash-2) 32%, transparent);
+  --bloom-3: color-mix(in srgb, var(--wash-3) 32%, transparent);
+}
+.skin[data-daypart="morning"] {
+  --daypart-1: #c6a057;
+  --daypart-2: #b89675;
+  --daypart-3: #d6bd79;
+}
+.skin[data-daypart="evening"] {
+  --daypart-1: #bd866f;
+  --daypart-2: #9b7897;
+  --daypart-3: #c89e81;
+}
+.skin[data-daypart="night"] {
+  --daypart-1: #758fae;
+  --daypart-2: #8380aa;
+  --daypart-3: #779d9f;
+}

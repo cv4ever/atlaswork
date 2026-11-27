@@ -1,0 +1,138 @@
+{
+  "note": "Each pack is gpt-image-2 sheets of 1536x1024 (3x2 cells of 512px, cut with a 6px inset to 256px WebP in public/agents/<style>/). Sheet 0 (atlas, hearth, vital, kin, ledger, compass) took the Storybook faces as Image 1 with `first_sheet` + 'STYLE: ' + `first_sheet_styles[pack]`; Manga's sheet 0 is text-only (`manga_sheet_0`), since with the reference it came out as a Western cartoon; Villains' sheet 0 took the Heroes sheet 0 as Image 2 (`villains_sheet_0`). Every later sheet (`groups` 1-8, the last a single 1024px portrait) used a prompt like `later_sheets[pack]` (sheet 1's; the per-cell animal, emblem and role notes change per sheet): Image 1 the six Storybook faces, Image 2 the pack's sheet 0 as the style.",
+  "groups": [
+    [
+      "atlas",
+      "hearth",
+      "vital",
+      "kin",
+      "ledger",
+      "compass"
+    ],
+    [
+      "spark",
+      "muse",
+      "scout",
+      "quill",
+      "forge",
+      "gardener"
+    ],
+    [
+      "coach",
+      "bookkeeper",
+      "scholar",
+      "chef",
+      "traveler",
+      "artist"
+    ],
+    [
+      "musician",
+      "mentor",
+      "guide",
+      "homekeeper",
+      "planner",
+      "helm"
+    ],
+    [
+      "counsel",
+      "mei",
+      "cedar",
+      "anika",
+      "sylvie",
+      "rami"
+    ],
+    [
+      "rowan",
+      "amara",
+      "hiro",
+      "finn",
+      "lina",
+      "noor"
+    ],
+    [
+      "mateo",
+      "imani",
+      "ellis",
+      "arjun",
+      "zuri",
+      "owen"
+    ],
+    [
+      "yuna",
+      "clara",
+      "malik",
+      "vera",
+      "minh",
+      "eden"
+    ],
+    [
+      "hugo"
+    ]
+  ],
+  "first_sheet": "Image 1 is a 3x2 sheet of six existing agent portraits. Redraw THE SAME six characters in the SAME positions (top row left to right 1, 2, 3; bottom row left to right 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, clothing colours, and the small emblem each wears (1 a compass badge, 2 a little house, 3 a heartbeat line, 4 two linked rings, 5 a coin, 6 a compass rose). Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Plain flat background per cell in the same hue as that cell in Image 1. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. ",
+  "first_sheet_styles": {
+    "heroes": "each character reimagined as an ORIGINAL friendly superhero (never any existing comic character, no existing logos or franchise costumes). Domino eye masks or simple cowls, capes or high collars, a bodysuit in that character's clothing colours, and their emblem enlarged as a bold chest symbol (1 compass badge, 2 house, 3 heartbeat line, 4 linked rings, 5 coin, 6 compass rose). Classic 1960s American comic book art: bold black inks, flat print colours, Ben-Day halftone dots, a radiating burst in the flat background. Heroic but kind, confident smiles.",
+    "pixel": "16-bit era role-playing game character portrait pixel art. Visible square pixels on a coarse grid of about 64 by 64 pixels per portrait, upscaled crisp with nearest-neighbour, no anti-aliasing, no blur, limited palette of about 16 colours per portrait, dithering in the shading, a dark 1-pixel outline around the figure, flat single-colour background.",
+    "animals": "each character reimagined as a friendly anthropomorphic animal in a warm hand-painted gouache storybook style with fine dark ink outlines and subtle paper grain, wearing that character's same clothes and emblem. 1 a red fox in the navy jacket and cream turtleneck, 2 a badger in the green work shirt, 3 a brown hare in the coral zip fleece, 4 a brown bear in the mustard cardigan and plum blouse, 5 a barn owl with round glasses in the black knit sweater, 6 a silver-grey wolf in the tan coat and light blue shirt. Animal faces, not humans in costumes.",
+    "ink": "minimal hand-drawn black ink line portraits like friendly productivity-app avatars: confident uniform black strokes, simple geometric shapes, solid black fills for hair, small dot eyes or simple curved eyes, almost no shading, no colour at all on the figure, pure black ink on a warm off-white paper background in EVERY cell (ignore Image 1's background colours for this style; all six backgrounds are the same off-white #f7f5ef). Charming, simple, a little whimsical.",
+    "clay": "stop-motion claymation figures photographed in a small studio: plasticine and modelling clay with visible fingerprints and tool marks, rounded chunky proportions, glossy bead eyes, soft warm key light with gentle shadows, shallow depth of field, a smooth painted card backdrop in the cell's colour. Handmade and charming, not plastic CGI.",
+    "fantasy": "high fantasy adventuring guild portraits in rich painterly digital illustration with soft rim light. Same faces, recast as a fantasy party: 1 a wayfinder mage in a navy hooded robe with a glowing compass amulet, 2 a hearth druid in a green cloak with a small house-shaped lantern brooch, 3 a nimble monk-ranger in coral leathers with a heartbeat rune, 4 a gentle bard-cleric in a mustard cloak with two linked silver rings on a chain, 5 a scholar-alchemist with round spectacles in a dark scribe's coat with a gold coin clasp, 6 a grey-haired ranger captain in a tan leather coat with a compass-rose shoulder brooch. Fantasy flavour, but approachable, no weapons shown."
+  },
+  "manga_sheet_0": "A sheet of six anime character portraits, exactly 3 columns by 2 rows, 1536x1024, every cell a complete 512x512 square with NO gutters, NO borders, NO labels, NO text. Top row left to right then bottom row: 1 a young man with tousled black hair, navy work jacket over a cream turtleneck, a small compass badge; 2 a young woman with wavy shoulder-length auburn hair and freckles, olive green work shirt, a small gold house pin; 3 a young person with short black curly hair and warm brown skin, coral zip-neck fleece, a heartbeat-line pin; 4 a woman in her forties with chin-length wavy brown hair, gold drop earrings, mustard cardigan over a plum blouse, a linked-rings pin; 5 a man in his thirties with neat side-parted dark hair and round gold glasses, black ribbed sweater over a grey collar, a gold coin pin; 6 a man in his fifties with swept silver-grey hair, tan coat over a light blue shirt, a compass-rose brooch. Each whole head and hair plus shoulders centred in its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell. Backgrounds per cell: 1 deep navy, 2 brick red, 3 sage green, 4 dusty rose, 5 teal, 6 cobalt blue, each flat with a faint manga screentone dot gradient. STYLE: contemporary Japanese TV anime character design sheet, clean thin digital lineart, big glossy anime eyes with layered irises and two catchlights, tiny nose, small mouth, slim anime jaw, hair in sharp clustered locks with glossy highlight bands, flat cel colours with one hard shadow tone, light blush. Friendly, calm, adult proportions, not chibi, not Western cartoon, no paper texture.",
+  "villains_sheet_0": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 shows the same six people as comic-book HEROES: match its comic art style, framing and crop exactly, and draw each person's VILLAIN counterpart in the same position. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Backgrounds: deep, dark, near-black versions of that cell's hue in Image 1, with a sinister acid-green or violet halftone burst; never bright. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: each person reimagined as an ORIGINAL comic-book supervillain, the dark mirror of the heroes. 1960s American comic book art: bold black inks, flat print colours, Ben-Day halftone dots, an ominous radiating burst behind. Villain costumes: high pointed collars, hoods or swept capes lined in acid green or crimson, gauntlets, a domino mask, monocle or visor; a palette of deep purple, black, acid green and blood red. Their chest emblem is a corrupted version of a hero emblem. Expressions: a sly knowing smirk, one raised eyebrow, scheming but playful and theatrical, never gory, never frightening, faces dramatically under-lit.  Never any existing comic villain's costume, colours or likeness. Corrupted emblems for these six: 1 a compass whose needle points the wrong way, 2 a cracked house, 3 a flatline heartbeat, 4 two broken rings, 5 a cracked coin, 6 a shattered compass rose. Make them unmistakably villains next to Image 2: darker palette, sharper collars, sly scheming smirks, but still the same recognisable people.",
+  "later_sheets": {
+    "manga": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: unmistakably Japanese anime and manga, contemporary TV anime character design: clean thin digital lineart, big glossy anime eyes with layered irises and two catchlights, tiny nose, small mouth, slim anime jaw, hair in sharp clustered locks with glossy highlight bands, flat cel colours with one hard shadow tone, light blush, a faint screentone dot gradient in the background. Adult proportions, not chibi, not Western cartoon, no paper texture.",
+    "heroes": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: each character reimagined as an ORIGINAL friendly superhero (never any existing comic character, no existing logos or franchise costumes). Domino eye masks or simple cowls, capes or high collars, a bodysuit in that character's clothing colours, and their emblem enlarged as a bold chest symbol. Classic 1960s American comic book art: bold black inks, flat print colours, Ben-Day halftone dots, a radiating burst in the flat background. Heroic but kind, confident smiles. Give each an original chest emblem (no letters) suited to them; role hints: 1 looks after new ventures and ideas; 2 looks after creative hobbies; 3 looks after discovery and research; 4 looks after writing; 5 looks after building and making; 6 looks after the garden.",
+    "villains": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: each person reimagined as an ORIGINAL comic-book supervillain, the dark mirror of the heroes. 1960s American comic book art: bold black inks, flat print colours, Ben-Day halftone dots, an ominous radiating burst behind. Villain costumes: high pointed collars, hoods or swept capes lined in acid green or crimson, gauntlets, a domino mask, monocle or visor; a palette of deep purple, black, acid green and blood red. Their chest emblem is a corrupted version of a hero emblem. Expressions: a sly knowing smirk, one raised eyebrow, scheming but playful and theatrical, never gory, never frightening, faces dramatically under-lit. Backgrounds: deep, dark, near-black versions of the cell's hue with a sinister acid-green or violet halftone burst, never bright, exactly as Image 2. Never any existing comic villain's costume, colours or likeness. Give each an original corrupted chest emblem (no letters); role hints: 1 looks after new ventures and ideas; 2 looks after creative hobbies; 3 looks after discovery and research; 4 looks after writing; 5 looks after building and making; 6 looks after the garden.",
+    "pixel": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: 16-bit era role-playing game character portrait pixel art. Visible square pixels on a coarse grid of about 64 by 64 pixels per portrait, upscaled crisp with nearest-neighbour, no anti-aliasing, no blur, limited palette of about 16 colours per portrait, dithering in the shading, a dark 1-pixel outline around the figure, flat single-colour background.",
+    "animals": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: each character reimagined as a friendly anthropomorphic animal in a warm hand-painted gouache storybook style with fine dark ink outlines and subtle paper grain, wearing that character's same clothes and emblem. Animals, one per cell, each an animal face not a human in costume, wearing that person's clothes, hair colour hints and accessories: 1 a red squirrel; 2 a tabby cat; 3 a meerkat; 4 a raven; 5 a beaver; 6 a hedgehog.",
+    "ink": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background in EVERY cell the same warm off-white #f7f5ef, exactly as Image 2. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: minimal hand-drawn black ink line portraits like friendly productivity-app avatars: confident uniform black strokes, simple geometric shapes, solid black fills for hair, small dot eyes or simple curved eyes, almost no shading, no colour at all on the figure, pure black ink on a warm off-white paper background in EVERY cell (ignore Image 1's background colours for this style; all six backgrounds are the same off-white #f7f5ef). Charming, simple, a little whimsical.",
+    "clay": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: stop-motion claymation figures photographed in a small studio: plasticine and modelling clay with visible fingerprints and tool marks, rounded chunky proportions, glossy bead eyes, soft warm key light with gentle shadows, shallow depth of field, a smooth painted card backdrop in the cell's colour. Handmade and charming, not plastic CGI.",
+    "fantasy": "Image 1 is a 3x2 sheet of six existing agent portraits: the people to redraw. Image 2 is a finished sheet in the target style: match its art style exactly (line work, shading, colour treatment, background treatment, framing and crop) but draw the six people from Image 1, never Image 2's people. Redraw the SAME six people in the SAME positions (top row left to right 1, 2, 3; bottom row 4, 5, 6), each still recognisable: hair style and colour, skin tone, face shape, age, glasses, jewellery and clothing colours. Output exactly 3 columns by 2 rows, 1536x1024 total, every cell a complete 512x512 square portrait with NO gutters, NO borders, NO frames, NO labels, NO text, NO names, NO signatures. Each whole head and hair plus shoulders sits centred inside its own cell with generous top margin, bust cropped at mid chest, eyes at the same height in every cell, nothing crossing cell boundaries. Background per cell in the hue of that cell in Image 1, treated exactly as Image 2 treats backgrounds. Warm, calm, trustworthy, friendly expressions; these are helpful assistants in a personal organiser app. STYLE: high fantasy adventuring guild portraits in rich painterly digital illustration with soft rim light. Each person recast as a distinct fantasy role suited to their look (mage, druid, bard, ranger, alchemist, cleric, artificer and so on), approachable, no weapons shown. Role hints for their fantasy role: 1 looks after new ventures and ideas; 2 looks after creative hobbies; 3 looks after discovery and research; 4 looks after writing; 5 looks after building and making; 6 looks after the garden."
+  },
+  "animals": {
+    "spark": "red squirrel",
+    "muse": "tabby cat",
+    "scout": "meerkat",
+    "quill": "raven",
+    "forge": "beaver",
+    "gardener": "hedgehog",
+    "coach": "cheetah",
+    "bookkeeper": "field mouse",
+    "scholar": "tortoise",
+    "chef": "raccoon",
+    "traveler": "red panda",
+    "artist": "peacock",
+    "musician": "cockatoo",
+    "mentor": "elephant",
+    "guide": "red deer stag",
+    "homekeeper": "dormouse",
+    "planner": "grey heron",
+    "helm": "lion",
+    "counsel": "giraffe",
+    "mei": "giant panda",
+    "cedar": "moose",
+    "anika": "lynx",
+    "sylvie": "snow leopard",
+    "rami": "camel",
+    "rowan": "otter",
+    "amara": "zebra",
+    "hiro": "shiba inu dog",
+    "finn": "golden retriever",
+    "lina": "koala",
+    "noor": "gazelle",
+    "mateo": "capybara",
+    "imani": "leopard",
+    "ellis": "old english sheepdog",
+    "arjun": "tiger",
+    "zuri": "toucan",
+    "owen": "ram",
+    "yuna": "harbour seal",
+    "clara": "mute swan",
+    "malik": "gorilla",
+    "vera": "kangaroo",
+    "minh": "ring-tailed lemur",
+    "eden": "alpaca",
+    "hugo": "walrus"
+  }
+}
