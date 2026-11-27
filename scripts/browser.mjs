@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import { Browser, computeExecutablePath, detectBrowserPlatform, install } from "@puppeteer/browsers";
 import puppeteer from "puppeteer-core";
 
-/** Raise it on purpose, then redraw the visual goldens with it (README, "Design showcase"). */
+/** Raise it on purpose, then redraw the visual goldens with it (DEVELOPMENT.md, "Design showcase"). */
 export const chromeBuild = "158.0.8127.36";
 const here = fileURLToPath(new URL("..", import.meta.url));
 /** The main checkout, whose Git folder every worktree shares; this checkout when Git can't say. */

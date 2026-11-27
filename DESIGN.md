@@ -255,7 +255,7 @@ components:
 
 This file is the visual language; `src/WarmEditorial.module.css` holds its tokens, except the ten domain hues, which a domain stores as a value and `domainHues` in `src/model.ts` holds. `scripts/check-tokens.mjs` (part of `pnpm run lint`) keeps the stylesheets on the tokens.
 Page and widget anatomy (masthead, twelve-column grid, the parts every widget is built from, tints by kind) lives in `docs/page-design.md`.
-The dev server's `/dev/design/` page draws all of it live, every widget in every view included (README, "Design showcase").
+The dev server's `/dev/design/` page draws all of it live, every widget in every view included (DEVELOPMENT.md, "Design showcase").
 The decisions behind both are D-codes in `docs/agents-design.md`, and Carlos's recorded taste overrides anything here.
 
 ## Overview
@@ -544,7 +544,7 @@ It stays in fixed colours (forest, cream, sun) whatever the theme, and is drawn 
 ### Do:
 - **Do** reuse the parts in `docs/page-design.md` before adding a new one.
 - **Do** take every size, corner, duration, shadow, layer and colour from a token, and every gap from the spacing grid; add a token when a value repeats with the same intent three times.
-- **Do** put a new rule in the sheet that owns its class (`src/styles/`, one sheet per part of the app; the shell, domain chips included, in `src/WorkbenchShell.css`; owners in README, "Where to change the UI"); a sheet that restyles another's class says so in a `restyles` comment.
+- **Do** put a new rule in the sheet that owns its class (`src/styles/`, one sheet per part of the app; the shell, domain chips included, in `src/WorkbenchShell.css`; owners in DEVELOPMENT.md, "Where to change the UI"); a sheet that restyles another's class says so in a `restyles` comment.
 - **Do** carry a domain's hue only in the places The Own Colour Rule names.
 - **Do** pick a motion duration by its job: `--motion-quick` (160ms) for hover and colour, `--motion-settle` (280ms) for layout and panels, `--motion-pop` (360ms) for a pick answering, `--motion-enter` (440ms) for something arriving, `--motion-flourish` (520ms) for a celebration, `--motion-fill` (700ms) for a bar filling or a line drawing, `--motion-linger` (900ms) for a rare long one-off.
 - **Do** move with the settle curve (`--ease-settle`) for every hover, press, panel and state change; keep the spring (`--ease-spring`) for keyframed moments when something grows or lands: a plant, a sticker, a tick, a badge. Turn both off under reduced motion.

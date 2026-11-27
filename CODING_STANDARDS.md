@@ -8,7 +8,7 @@ Read during review. `pnpm run check` already enforces types, the accessibility l
 
 ## Copy
 
-- **UI paths in copy match the current labels.** Messages, errors, docs and comments that name a place in the app ("Settings → Account") use the tab and section names the UI shows today. A diff that renames or moves a tab or section greps `src/`, `supabase/functions/`, `docs/` and `README.md` for the old path. Example: after the AI model moved to its own tab, the agent function still told signed-out users to connect a model in "Profile → Account".
+- **UI paths in copy match the current labels.** Messages, errors, docs and comments that name a place in the app ("Settings → Account") use the tab and section names the UI shows today. A diff that renames or moves a tab or section greps `src/`, `supabase/functions/`, `docs/`, `README.md` and `DEVELOPMENT.md` for the old path. Example: after the AI model moved to its own tab, the agent function still told signed-out users to connect a model in "Profile → Account".
 - **User-facing copy uses the app's own words.** Domain (never area, section or category; Everyday is the default domain), project, resource (a note, link, file, image, video or quote; "note" only for the note kind), Library and topic, agent and crew (Atlas is "your thinking partner", other agents are never bots or assistants), team, room, routine, proposal, and the write modes "Proactive" and "Asks first". A diff that adds copy with a synonym picks the term here; a new concept earns a line here first. Example: the onboarding shipped as "Your areas" and was renamed to "Your domains".
 
 ## Review switches
@@ -17,7 +17,7 @@ Read during review. `pnpm run check` already enforces types, the accessibility l
 
 ## Browser checks
 
-- **A diff that changes what a browser check drives runs that check.** `scripts/check-skin.mjs` drives the Settings appearance pages (themes, Canvas, Layout); `scripts/check-chats.mjs` drives the Chats page, the roster and the room "To" row; `scripts/check-pages.mjs` drives a project page (masthead, grid, countdown, pace verdict). When a diff changes those screens or the labels, classes or ids the scripts select, the review runs the check (`pnpm run check:browser -- --only skin`, README "Verification") and reports its result, fixing the script when the change is intended. Otherwise only a release runs them, all through `scripts/check-browser.mjs`. Example: Settings gained grouped tabs and captioned preset cards in `cf54c76`; the skin check stayed broken until a release check found it.
+- **A diff that changes what a browser check drives runs that check.** `scripts/check-skin.mjs` drives the Settings appearance pages (themes, Canvas, Layout); `scripts/check-chats.mjs` drives the Chats page, the roster and the room "To" row; `scripts/check-pages.mjs` drives a project page (masthead, grid, countdown, pace verdict). When a diff changes those screens or the labels, classes or ids the scripts select, the review runs the check (`pnpm run check:browser -- --only skin`, DEVELOPMENT.md "Verification") and reports its result, fixing the script when the change is intended. Otherwise only a release runs them, all through `scripts/check-browser.mjs`. Example: Settings gained grouped tabs and captioned preset cards in `cf54c76`; the skin check stayed broken until a release check found it.
 
 ## Data safety
 

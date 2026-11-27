@@ -1,4 +1,4 @@
-# Cloudflare Pages response headers for app.atlaswork.app (README, "Releasing"). Sign-in tokens live in localStorage,
+# Cloudflare Pages response headers for app.atlaswork.app (DEVELOPMENT.md, "Releasing"). Sign-in tokens live in localStorage,
 # so the Content-Security-Policy is the safety net against injected script: only this site's own scripts and
 # Turnstile's run. Connections stay open to any https host because a customer's own AI provider can be any
 # OpenAI-compatible address (Settings → AI model); images and media likewise, because notes link to any page.

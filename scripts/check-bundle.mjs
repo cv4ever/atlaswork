@@ -1,5 +1,5 @@
 // Fails when the production build carries a dev-only engine (dev/chatgpt/README.md, dev/echo), the admin page
-// (dev/admin, README "Admin page"), the Agents page's Briefings tab (dev/briefings) or the large seed
+// (dev/admin, DEVELOPMENT.md "Admin page"), the Agents page's Briefings tab (dev/briefings) or the large seed
 // (dev/large, speed builds only), or has lost the closed-beta gate (src/Gate.tsx, launch plan step 5): strangers at
 // app.atlaswork.app must see the waitlist. Run after `vite build`.
 import { readdirSync, readFileSync } from "node:fs";

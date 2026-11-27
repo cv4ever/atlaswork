@@ -190,5 +190,5 @@ function AgentDetail({ entry, draft, unreleased, onDraft, onSaved, children }: {
 
 function savedLine({ files, retired }: Saved) {
   if (!files.length) return "Nothing changed in the source.";
-  return `Saved to ${files.join(" and ")}.${retired ? " The shipped version is retired, so agents still holding it get this one." : ""} Run the model comparison before a release (README, "Live agents").`;
+  return `Saved to ${files.join(" and ")}.${retired ? " The shipped version is retired, so agents still holding it get this one." : ""} Run the model comparison before a release (DEVELOPMENT.md, "Live agents").`;
 }

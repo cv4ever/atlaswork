@@ -43,7 +43,7 @@ export default defineConfig(({ command, mode }) => {
     server: { allowedHosts: tailnetHost ? [tailnetHost] : [] },
     plugins: [
       // Dev-only ChatGPT plan bridge (dev/chatgpt/README.md): Settings → AI model → ChatGPT plan, and the admin page's
-      // routes (README, "Admin page"), same tailnet rule.
+      // routes (DEVELOPMENT.md, "Admin page"), same tailnet rule.
       ...command === "serve" ? [chatGptPlugin(logins, tailnetHost), adminPlugin(logins, tailnetHost), {
         // The dev server installs on a phone as its own app, "Atlaswork dev" with a clay icon (dev/app), so it never
         // reads as the real one; production builds keep vite-plugin-pwa's manifest.
@@ -102,7 +102,7 @@ export default defineConfig(({ command, mode }) => {
             options: { cacheName: "crew-styles", expiration: { maxEntries: 160 } } }],
           navigateFallback: "/index.html",
           // Google's Calendar consent returns to /connectors/callback, which Cloudflare forwards to the connectors
-          // function (README, "Accounts and server storage"); answering it with the app shell would drop the code.
+          // function (DEVELOPMENT.md, "Accounts and server storage"); answering it with the app shell would drop the code.
           navigateFallbackDenylist: [/^\/connectors\//],
           // Routine pushes (agents-design D55): the push and notification-click handlers live beside the generated worker.
           importScripts: ["/push-sw.js"],

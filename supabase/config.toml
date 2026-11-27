@@ -248,7 +248,7 @@ otp_expiry = 3600
 # sender_name = "Admin"
 
 # Sign-in emails carry the link and the same one-time code (Settings → Account takes either). Production uses these
-# files too: README, "Accounts and server storage", says how to push them.
+# files too: DEVELOPMENT.md, "Accounts and server storage", says how to push them.
 [auth.email.template.magic_link]
 subject = "Your sign-in link"
 content_path = "./supabase/templates/magic_link.html"

@@ -1,4 +1,4 @@
-// The admin page's model cases (/dev/admin/, README "Admin page"): runs the comparison's cases that cover one agent
+// The admin page's model cases (/dev/admin/, DEVELOPMENT.md "Admin page"): runs the comparison's cases that cover one agent
 // (dev/compare/compare.ts) as a child process, with the agent's unsaved draft when there is one, and streams NDJSON
 // back: `{progress}` per case, then `{done: {results, baseline}}` or `{error}`. One run at a time; closing the page stops it.
 import { spawn } from "node:child_process";

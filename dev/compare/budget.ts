@@ -1,4 +1,4 @@
-// What a comparison may still spend on Workers AI (README "Model comparison"). The account's 10,000 free Neurons are
+// What a comparison may still spend on Workers AI (DEVELOPMENT.md "Model comparison"). The account's 10,000 free Neurons are
 // not reset at 00:00 UTC as Cloudflare's pricing page says: they behave as a rolling 24-hour window (measured
 // 2026-11-20: refused with error 4006 at 00:20 UTC after a day with nothing spent, and free again about 24 hours after
 // the spend). Production shares them, and runs from several sessions added up past the allowance on 18 and 19

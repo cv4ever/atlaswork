@@ -15,7 +15,7 @@ const channel = 32;
 const allowed = 0.003;
 
 /**
- * Screenshot regression on the design showcase (README, "Design showcase"). Run from OMP Eval with its browser object
+ * Screenshot regression on the design showcase (DEVELOPMENT.md, "Design showcase"). Run from OMP Eval with its browser object
  * and a disposable loopback Vite origin; it owns and closes its tab. It shoots each token section, the parts (each in every state), the
  * states, every widget kind and every dialog at 1440px wide and one device pixel, in light and dark, and compares each with the
  * PNG in dev/design/golden/. Today, the project page and chat are left out: they follow the clock. Throws naming every

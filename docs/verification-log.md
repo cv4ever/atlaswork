@@ -1,6 +1,6 @@
 # Verification log
 
-Past delivery verification, newest first. Current checks live in README "Verification".
+Past delivery verification, newest first. Current checks live in DEVELOPMENT.md "Verification".
 
 Base UI menus and tooltips, redone on `main` (2026-11-18, not released; ADR 0003).
 The 2026-11-12 `base-ui` branch was too far behind `main` to merge, so it was rebuilt on it: about 180 `title`s on buttons and labels became `Tip` through an AST codemod, and the view menu, the crew, team and steward pickers, the side panel's All chats and the Chats page's picker (Needs you first, filtered as you type, opened by the Needs you shortcut too) became `Picker`.

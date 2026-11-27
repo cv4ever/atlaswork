@@ -1,4 +1,4 @@
-// The model comparison's fixed requests (compare.ts, README "Live agents"), in their own module so the admin page
+// The model comparison's fixed requests (compare.ts, DEVELOPMENT.md "Live agents"), in their own module so the admin page
 // (/dev/admin/) can list the cases that cover an agent and run just those. Data only: no Node APIs.
 import type { RoutineKind } from "../../src/model.ts";
 import type { RoutineOwner } from "../../src/routines.ts";

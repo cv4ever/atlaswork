@@ -1,4 +1,4 @@
-// The admin page's routes (/dev/admin/, README "Admin page"), dev server only: Operations' figures from the hosted
+// The admin page's routes (/dev/admin/, DEVELOPMENT.md "Admin page"), dev server only: Operations' figures from the hosted
 // project and invites from its waitlist (ops.ts), Save, which writes an agent default back into its source file
 // (source.ts), and the model cases (compare.ts). All sit behind the dev server's trust boundary (dev/trust.ts) with
 // their own per-start token, which only the admin page is given.

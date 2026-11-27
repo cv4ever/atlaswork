@@ -4,7 +4,7 @@ import { openCheckTab } from "./check-tab.mjs";
 const day = "2026-11-13";
 
 /**
- * Text contrast on every widget the design showcase draws (README, "Design showcase"), in every domain of the demo in
+ * Text contrast on every widget the design showcase draws (DEVELOPMENT.md, "Design showcase"), in every domain of the demo in
  * Garden and in the default domain of every other theme, in both modes: each element holding text must reach WCAG AA
  * against the colours actually painted behind it, 4.5:1, or 3:1 for large text (24px, or 18.66px at weight 700).
  * Disabled controls are exempt, as WCAG has them. Catches what the token pairs in `dev/design/Tokens.tsx` cannot: a

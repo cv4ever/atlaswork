@@ -1,4 +1,4 @@
-// The admin page (README, "Admin page"): the agents' defaults and exact system prompts, their tools, the limits and
+// The admin page (DEVELOPMENT.md, "Admin page"): the agents' defaults and exact system prompts, their tools, the limits and
 // caps, the hosted project's operations figures and the design showcase, in one place. Dev server only, at
 // /dev/admin/: `vite build` bundles index.html alone, so production never ships it. Its routes are dev/admin/server.ts.
 import { StrictMode } from "react";

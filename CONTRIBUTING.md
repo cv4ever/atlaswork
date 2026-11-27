@@ -15,7 +15,7 @@ You keep the copyright in your work; the CLA lets the maintainer also offer Atla
 
 ## Working on the code
 
-- Setup and commands: [README.md](README.md), "Run".
+- Setup and commands: [DEVELOPMENT.md](DEVELOPMENT.md).
 - Code standards: [CODING_STANDARDS.md](CODING_STANDARDS.md). Visual language: [DESIGN.md](DESIGN.md). Agent behaviour decisions: `docs/agents-design.md`.
 - Run `pnpm run check` before you open a pull request. It runs types, lint, tests, Edge Function tests and the bundle check.
 - Keep a pull request to one change, and describe what you changed and how you checked it.

@@ -227,7 +227,7 @@ On a domain page whose hue is a kind's own (`data-hue` on `.page-grid`: Marigold
 | Projects, Resources | page colour | projects sorted by pace verdict (default), as plant tiles, or as each project's next task, a project with no next step offering "Add a step"; resources behind kind-count chips (default), by age, or over a paste-or-drop strip |
 
 Rules of thumb: one figure, one action, one caption per card. Colour says what kind of thing you look at; size says
-what to read first. Every part and widget view is drawn live at the dev server's `/dev/design/` (README, "Design showcase"). No new border radius, shadow, duration or button style without adding it here; radii, durations and sizes come from the tokens in `DESIGN.md`.
+what to read first. Every part and widget view is drawn live at the dev server's `/dev/design/` (DEVELOPMENT.md, "Design showcase"). No new border radius, shadow, duration or button style without adding it here; radii, durations and sizes come from the tokens in `DESIGN.md`.
 
 ## Progressive disclosure
 

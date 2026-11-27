@@ -1,4 +1,4 @@
-// `pnpm run landing:shots`: retakes the landing page's app screenshots (README, "Landing page") from a production build
+// `pnpm run landing:shots`: retakes the landing page's app screenshots (DEVELOPMENT.md, "Landing page") from a production build
 // of this checkout, the demo seed, light theme, status bar hidden, at 14:40 on the day it runs (so Today's day line, sun
 // and the crew's next steps read the same whenever it's run): landing/today.webp and project.webp (1920×1200) and
 // landing/phone-today.webp and phone-project.webp (780×1688). The dialog, chat and routines close-ups stay hand-cropped.

@@ -1,7 +1,7 @@
 // Dev and speed builds only (src/main.tsx loads it behind `import.meta.env.DEV` or `--mode speed`, so production bundles
 // drop it; check:bundle verifies). `?fresh=large` starts from the demo seed plus a year of someone's records: about
 // 2,000 resources, 500 tasks, 60 projects, 30 topics and a few hundred chat messages, the same on every run, so
-// scripts/check-speed.mjs can time the screens at the size real workspaces reach (README, "Speed check").
+// scripts/check-speed.mjs can time the screens at the size real workspaces reach (DEVELOPMENT.md, "Speed check").
 import { seedWorkspace } from "../../src/demo.ts";
 import type { ChatMessage, Note, Project, Task, Thread, Topic, WorkspaceData } from "../../src/model.ts";
 import type { WorkspaceStore } from "../../src/workspace.ts";

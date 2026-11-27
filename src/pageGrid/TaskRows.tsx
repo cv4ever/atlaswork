@@ -63,7 +63,7 @@ const firstRows = 20;
  * a star on each open row (Today's one thing): shown on hover or focus, and always on the starred one. `timeOf` shows
  * where in the day a row sits (Today's parts, agents-design D75) in place of its due day. A new list longer
  * than `firstRows` paints its first rows at once and draws the rest just after, below the fold, so a page with dozens
- * of late tasks opens in one frame (README, "Speed check").
+ * of late tasks opens in one frame (DEVELOPMENT.md, "Speed check").
  */
 export function TaskRows({ tasks, limit = 8, large = false, showDomain = false, among = tasks, star, timeOf }: {
   tasks: Task[]; limit?: number; large?: boolean; showDomain?: boolean; among?: Task[];

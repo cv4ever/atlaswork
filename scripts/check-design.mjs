@@ -32,7 +32,7 @@ async function warm(origin) {
 }
 
 /**
- * impeccable's detector (README, "Design check") on each screen at desktop and phone widths, plus the landing page.
+ * impeccable's detector (DEVELOPMENT.md, "Design check") on each screen at desktop and phone widths, plus the landing page.
  * Throws on any finding that isn't advisory or ignored in .impeccable/config.json. Takes 3 to 6 minutes.
  * The browser argument is unused: the detector drives its own headless Chrome or Edge.
  */

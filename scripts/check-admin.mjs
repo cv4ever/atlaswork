@@ -3,7 +3,7 @@ import { openCheckTab } from "./check-tab.mjs";
 
 /**
  * Run from OMP Eval with its browser object and a disposable loopback Vite origin. Owns and closes its test tab.
- * Exercises the admin page (README, "Admin page") without writing anything: Agents draws Vital's prompt, a draft of
+ * Exercises the admin page (DEVELOPMENT.md, "Admin page") without writing anything: Agents draws Vital's prompt, a draft of
  * his house rules marks the line it changes and the roster's dot until Revert, the workspace switch rebuilds the
  * prompt, a ground rule's wording draft is marked and discarded, a profile line jumps to its field, the sample
  * person's rules for every agent reach the prompt, Atlas edits all but a hook and line, Try it and Cases open (nothing is

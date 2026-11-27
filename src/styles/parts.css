@@ -33,7 +33,7 @@
 }
 /* Today stays mounted behind other pages. Hidden with content-visibility instead of display: none, the browser keeps its
    laid-out boxes, so coming back to Today (or leaving it) restyles and lays out only what changed, not thousands of
-   elements (README, "Speed check"). Its contents stay out of focus, find and the accessibility tree, as display: none
+   elements (DEVELOPMENT.md, "Speed check"). Its contents stay out of focus, find and the accessibility tree, as display: none
    kept them. It keeps its top padding, so the boxes it keeps sit inset as on show (a tool reading boxes, such as the
    design check's detector, otherwise finds its heading flush at the panel's top edge), and a negative margin takes
    that padding back, so it takes no space. */

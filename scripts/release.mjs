@@ -56,7 +56,7 @@ if (!git("branch", "-r", "--contains", head)) throw new Error(`${ref} (${head.sl
 const looked = visualPassFor(head);
 if (looked) console.log(`Screenshot regression passed on this look (${looked}).`);
 else if (process.argv.includes("--without-visual-check")) console.log(`⚠ No screenshot regression passed on ${head.slice(0, 7)}'s look; shipping anyway (--without-visual-check).`);
-else throw new Error(`No screenshot regression passed on ${head.slice(0, 7)}'s look. Serve a clean checkout of it and run checkVisual (README, "Screenshot regression"), or pass --without-visual-check.`);
+else throw new Error(`No screenshot regression passed on ${head.slice(0, 7)}'s look. Serve a clean checkout of it and run checkVisual (DEVELOPMENT.md, "Screenshot regression"), or pass --without-visual-check.`);
 
 const token = process.env.CLOUDFLARE_API_TOKEN
   ?? JSON.parse(execFileSync("bws", ["secret", "get", pagesTokenId, "--output", "json"], { encoding: "utf8" })).value;

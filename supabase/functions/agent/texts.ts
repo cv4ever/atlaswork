@@ -1,5 +1,5 @@
 // The words and sizes people tune, by name: request `limits`, the tools' own descriptions, Atlaswork's ground rules and
-// the line templates the prompt fills in. The admin page (/dev/admin/, README "Admin page") edits these values in
+// the line templates the prompt fills in. The admin page (/dev/admin/, DEVELOPMENT.md "Admin page") edits these values in
 // this file; a change reaches people with the next release.
 
 
@@ -47,7 +47,7 @@ export const toolTexts = {
 /**
  * The fixed lines every agent reads when they apply, by name: Atlaswork's ground rules and the two lines a missing
  * permission adds. Lines built from the request (today's dates, places, notes) stay in `promptParts`. The admin page
- * (/dev/admin/, README "Admin page") edits these values in this file; a change reaches people with the next release.
+ * (/dev/admin/, DEVELOPMENT.md "Admin page") edits these values in this file; a change reaches people with the next release.
  */
 export const groundRules = {
   // "Nothing a proposal records" (2026-11-20): after a project was proposed, the model also remembered its deadline 2 of 3 times.

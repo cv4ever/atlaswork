@@ -75,7 +75,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
     The cost comes from input: the demo agents see 20–40 notes and tasks, the prompt lists every readable note title, and `list_tasks` returns every open task.
     At 111 Neurons the free 10,000 cover about 90 replies a day; the global cap of 8,000 stops at about 72.
     Workers AI returns `usage.neurons`, which the function records.
-  - **Model comparison, 2026-11-05** (`dev/compare/compare.ts`, README "Live agents"). 20 fixed requests through the same loop on the demo workspace.
+  - **Model comparison, 2026-11-05** (`dev/compare/compare.ts`, DEVELOPMENT.md "Live agents"). 20 fixed requests through the same loop on the demo workspace.
     **gpt-oss-120b on Workers AI first got 16 and 17 of 20** (median 3.0 and 2.2 s).
     Its one repeated miss: when told a task was done ("I cancelled the video service", "I called Sofia"), it proposed a new task instead of ticking the open one off.
     One prompt line fixed it ("When the person says they did… call `complete_tasks`"): **20 and 19 of 20** in two reruns, and the only remaining miss was an extra, unasked proposal.
@@ -216,7 +216,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
    - ~~Call `navigator.storage.persist()`.~~ Done 2026-11-04.
    - ~~Fix the backup: include file Blobs and add a matching import.~~ Done 2026-11-04 (`src/backup.ts`, Settings → Backups).
    - ~~Add Sentry.~~ Done 2026-11-05: `@sentry/react`, errors only, without personal data. It loads only in production builds with `VITE_SENTRY_DSN` set, as a 32 kB gzipped chunk. A test error reached the EU project (HTTP 200).
-4. **Real agent engine.** Built and deployed 2026-11-05: the `agent` Edge Function (`supabase/functions/agent/`) on Workers AI, and `createLiveEngine` (`src/live.ts`) behind `AgentEngine`. Details in README "Live agents".
+4. **Real agent engine.** Built and deployed 2026-11-05: the `agent` Edge Function (`supabase/functions/agent/`) on Workers AI, and `createLiveEngine` (`src/live.ts`) behind `AgentEngine`. Details in DEVELOPMENT.md "Live agents".
    - The browser sends the signed-in account's token (step 5; it signed in anonymously until then) and a permission-filtered snapshot with the current session's last 12 messages (about 6,000 characters at most). The function keeps no history; a chat reply or work handed off is stored as a job with its request until the job ends, at most 24 hours (agents-design D76, `public.agent_jobs`), and its answer lands in the workspace's chat.
    - Tools run server-side against that snapshot: up to 3 lookups (`read_notes`, `list_tasks`), then `propose_tasks` or `complete_tasks` until one proposal exists, at most 4 tool rounds.
      The browser turns the proposal draft into a Workbench `Proposal`, so Apply, Undo and write modes work unchanged (agents-design D2, D11).
@@ -229,7 +229,7 @@ Since 2026-11-27 the source is public under AGPL-3.0. Prices, the provider accou
      Revisit at the first paying customer or when the beta outgrows about 90 replies a day.
 5.
    **Accounts and access.**
-   Built 2026-11-06 (D15, README "Accounts and server storage") and deployed to the hosted project the same day: the migration, the agent function, anonymous sign-ins off.
+   Built 2026-11-06 (D15, DEVELOPMENT.md "Accounts and server storage") and deployed to the hosted project the same day: the migration, the agent function, anonymous sign-ins off.
    Two throwaway accounts on the hosted project each got a trial, saw only their own records and had an unknown key refused.
    Both were deleted afterwards.
    - ~~Supabase auth (D4) and an `entitlements` row per user.~~ Email sign-in links, "Continue with Google", Settings → Account, the trial and the plan check are done.

@@ -1,4 +1,4 @@
-// Which commits passed the screenshot regression (README, "Screenshot regression"), so `pnpm run release` can refuse a
+// Which commits passed the screenshot regression (DEVELOPMENT.md, "Screenshot regression"), so `pnpm run release` can refuse a
 // commit whose look nobody checked: `check` has no browser, and from 18 to 20 November 2026 two days of UI work shipped
 // with goldens nobody had redrawn. `checkVisual` records the tree of a clean checkout it passed on in a file of the
 // repository's shared Git folder (every worktree sees it; it is never committed). A release passes when a recorded tree

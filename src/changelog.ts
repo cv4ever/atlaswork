@@ -1,5 +1,5 @@
 // What's new, in your words not ours: one entry per release day, newest first, shown in Settings → About and offered
-// once after an update loads. A release that changes what people see or do adds its lines here (README, "Releasing");
+// once after an update loads. A release that changes what people see or do adds its lines here (DEVELOPMENT.md, "Releasing");
 // fixes nobody notices and work behind the scenes don't.
 
 export type Release = { day: string; title: string; changes: string[] };

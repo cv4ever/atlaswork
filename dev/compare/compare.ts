@@ -1,4 +1,4 @@
-// Side-by-side model check for the live agent loop (README "Live agents"). Runs fixed requests against the demo
+// Side-by-side model check for the live agent loop (DEVELOPMENT.md "Live agents"). Runs fixed requests against the demo
 // workspace through `runAgent`, the same loop the Edge Function runs, on Workers AI and, through their official CLIs,
 // Carlos's Claude and ChatGPT subscriptions. `chatgpt` calls the Responses API on the ChatGPT plan signed in through
 // the dev bridge (dev/chatgpt/README.md). Dev-only: subscription sign-ins never go near the hosted function.

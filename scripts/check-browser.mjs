@@ -27,7 +27,7 @@ const checks = (account, visual = {}) => ({ skin: checkSkin, chats: checkChats, 
   speed: async (tabs) => isMain() ? { skipped: "this checkout is origin/main" } : compareSpeed(tabs) });
 
 /**
- * Every browser regression in one call, for the release step (README, "Verification"), against a disposable loopback
+ * Every browser regression in one call, for the release step (DEVELOPMENT.md, "Verification"), against a disposable loopback
  * Vite origin: from OMP Eval with its browser object, or from any terminal with `pnpm run check:browser` (below). Each
  * check owns its tab and resets that origin itself; the speed check builds and serves production copies of this
  * checkout and origin/main, since the dev server is several times slower. Runs them all even after a failure and throws
