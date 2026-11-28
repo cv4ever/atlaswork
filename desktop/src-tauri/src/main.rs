@@ -1,6 +1,7 @@
 // Atlaswork on Windows (agents-design D77): the hosted app in a window that closes to the tray and starts at Windows
 // sign-in, so agents can keep working on this computer. The hosted app reaches ten commands, from its own origin only
-// (capabilities/app.json): what this app knows (`desktop_info`), pairing this computer with a token the account issued
+// (capabilities/app.json), or from this computer's dev server instead when settings.json names one (`dev_url`), for
+// the dev-only ChatGPT plan: what this app knows (`desktop_info`), pairing this computer with a token the account issued
 // (`pair`, kept in Windows Credential Manager, after a native confirmation a page can't click for you), forgetting it
 // (`unpair`), linking a folder through Windows' own picker and unlinking it (`link_folder`, `unlink_folder`), turning
 // search on or off and editing its list (`set_search`, `add_search_folder`, `remove_search_folder`, D78), turning
@@ -81,6 +82,9 @@ struct Settings {
     told_tray: bool,
     /// The version an update is installing (D85), so the app it starts says it updated, once.
     updated_to: Option<String>,
+    /// This computer's dev server, which the window loads instead of the hosted app while it answers (`dev_url`).
+    /// Set by hand on Carlos's computer; the app never writes it.
+    dev_url: Option<String>,
 }
 
 fn settings_path(app: &AppHandle) -> Option<std::path::PathBuf> {
@@ -113,6 +117,39 @@ fn start_url() -> Url {
         return url;
     }
     Url::parse(APP_URL).expect("APP_URL is a URL")
+}
+
+/// The dev server `settings.devUrl` names, loopback only: there agents can answer on the computer's ChatGPT plan,
+/// whose bridge only the dev server has (dev/chatgpt/README.md). The hosted app can't, until OpenAI approves it.
+fn dev_url(settings: &Settings) -> Option<Url> {
+    let url = Url::parse(settings.dev_url.as_deref()?).ok()?;
+    (url.scheme() == "http" && matches!(url.host_str(), Some("127.0.0.1" | "localhost"))).then_some(url)
+}
+
+/// Whether something accepts connections at `url`'s address now.
+fn answers(url: &Url) -> bool {
+    url.socket_addrs(|| None).is_ok_and(|addrs| {
+        addrs.iter().any(|addr| std::net::TcpStream::connect_timeout(addr, Duration::from_millis(300)).is_ok())
+    })
+}
+
+/// Gives a page other than the hosted app the hosted app's commands: a local Vite in debug builds, or the dev server.
+fn allow_commands(app: &tauri::App, name: &str, url: &Url) -> tauri::Result<()> {
+    app.add_capability(
+        tauri::ipc::CapabilityBuilder::new(name)
+            .window("main")
+            .remote(format!("{}/*", url.origin().ascii_serialization()))
+            .permission("allow-desktop-info")
+            .permission("allow-pair")
+            .permission("allow-unpair")
+            .permission("allow-link-folder")
+            .permission("allow-unlink-folder")
+            .permission("allow-set-search")
+            .permission("allow-set-tidy")
+            .permission("allow-add-search-folder")
+            .permission("allow-remove-search-folder")
+            .permission("allow-notify"),
+    )
 }
 
 /// Whether the window may show `url` itself; anything else opens in the default browser.
@@ -824,34 +861,26 @@ fn main() {
                 settings.autostart_chosen = true;
                 let _ = save_settings(&handle, &settings);
             }
-            let url = start_url();
+            let hosted = start_url();
             #[cfg(debug_assertions)]
-            if url.as_str() != Url::parse(APP_URL).expect("APP_URL is a URL").as_str() {
+            if hosted.as_str() != Url::parse(APP_URL).expect("APP_URL is a URL").as_str() {
                 // A local app gets the same commands as the hosted one, in debug builds only.
-                app.add_capability(
-                    tauri::ipc::CapabilityBuilder::new("local-app")
-                        .window("main")
-                        .remote(format!("{}/*", url.origin().ascii_serialization()))
-                        .permission("allow-desktop-info")
-                        .permission("allow-pair")
-                        .permission("allow-unpair")
-                        .permission("allow-link-folder")
-                        .permission("allow-unlink-folder")
-                        .permission("allow-set-search")
-                        .permission("allow-set-tidy")
-                        .permission("allow-add-search-folder")
-                        .permission("allow-remove-search-folder")
-                        .permission("allow-notify"),
-                )?;
+                allow_commands(app, "local-app", &hosted)?;
             }
-            let origin = url.clone();
+            let dev = dev_url(&settings);
+            if let Some(dev) = &dev {
+                allow_commands(app, "dev-server", dev)?;
+            }
+            let url = dev.clone().filter(answers).unwrap_or_else(|| hosted.clone());
+            let on_dev = url != hosted;
+            let allowed = dev.clone();
             let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))
                 .title("Atlaswork")
                 .inner_size(1280.0, 840.0)
                 .min_inner_size(400.0, 560.0)
                 .visible(!hidden)
                 .on_navigation(move |to| {
-                    if stays_in_window(to, &origin) {
+                    if stays_in_window(to, &hosted) || allowed.as_ref().is_some_and(|dev| stays_in_window(to, dev)) {
                         return true;
                     }
                     let _ = tauri_plugin_opener::open_url(to.as_str(), None::<&str>);
@@ -862,6 +891,18 @@ fn main() {
                     NewWindowResponse::Deny
                 })
                 .build()?;
+            // Started before the dev server (at Windows sign-in), it moves there once the server answers, but only
+            // while the window is hidden, so nothing being typed in the hosted app is lost.
+            if let (Some(dev), false) = (dev, on_dev) {
+                let window = window.clone();
+                std::thread::spawn(move || loop {
+                    std::thread::sleep(Duration::from_secs(10));
+                    if !window.is_visible().unwrap_or(true) && answers(&dev) {
+                        let _ = window.navigate(dev);
+                        break;
+                    }
+                });
+            }
             if hidden {
                 hide_window(&window);
             }
@@ -899,7 +940,18 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::{documents_listed, showable, SearchFolder};
+    use super::{dev_url, documents_listed, showable, SearchFolder, Settings};
+
+    #[test]
+    fn loads_only_a_dev_server_on_this_computer() {
+        let named = |url: &str| dev_url(&Settings { dev_url: Some(url.into()), ..Settings::default() }).is_some();
+        assert!(named("http://127.0.0.1:5191/"));
+        assert!(named("http://localhost:5191/"));
+        assert!(!named("https://drdoom.tail15279.ts.net:5191/"));
+        assert!(!named("http://192.168.1.5:5191/"));
+        assert!(!named("file:///C:/app.html"));
+        assert!(dev_url(&Settings::default()).is_none());
+    }
 
     #[test]
     fn shows_only_documents_images_and_folders_really_inside_a_listed_folder() {

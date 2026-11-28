@@ -10,6 +10,14 @@ Carlos's agents answer on his ChatGPT Plus or Pro plan, through the dev server o
 
 Usage and limits: <https://chatgpt.com/settings/usage>, linked from the setup, from "Using ChatGPT plan · Manage usage" beside each chat's context pill (OpenAI's UX guidelines), and first in the message when the plan's limit is reached. Disconnect the app there, or **Sign out** here (revokes the refresh token, keeps the registration).
 
+## On the Windows app and the phone
+
+Both load this computer's dev server, where the bridge is, and sign in to the same account, so the plan answers there too. Each keeps its own choice: pick ChatGPT plan once in Settings → AI model on each (the computer's sign-in is shared, so no second Continue with ChatGPT).
+
+- **Windows app:** `"devUrl": "http://127.0.0.1:5191/"` in `%APPDATA%\app.atlaswork.desktop\settings.json` (DEVELOPMENT.md, "Desktop app"). It loads the hosted app whenever the dev server is down.
+- **Phone:** with Tailscale on, open `https://<TAILNET_HOST>:5191/` in Chrome and Install it ("Atlaswork dev"). `tailscale serve` must proxy that port to `127.0.0.1:5191`, and the phone's login must be in `TAILNET_LOGINS`. Sign in with the emailed code: the link returns to the hosted app.
+- **Keeping it up:** on Carlos's computer the scheduled task `Atlaswork dev server` starts `pnpm dev` from the main checkout at Windows sign-in, hidden, logging to `%LOCALAPPDATA%\atlaswork-dev\vite.log`.
+
 ## Files
 
 - `oauth.ts`: the documented flow ([sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in)): `dynamic_agent_client` registration with a persisted `urn:uuid` host ID, PKCE with fresh state and nonce, a `http://127.0.0.1:<port>/auth/callback` redirect, ID-token checks (JWKS signature, issuer, audience, expiry, nonce), the `chatgpt.tokens.use.direct` scope check, serialized rotating refresh, and revocation on sign-out. Credentials live in `~/.config/atlaswork/chatgpt.json`, never in the browser, written atomically and owner-only: mode 0600, and on Windows an ACL (`icacls /inheritance:r /grant:r <you>:F`) that drops inherited access. DPAPI was considered and adds nothing against code running as you.
